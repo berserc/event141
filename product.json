@@ -1,0 +1,48 @@
+{
+    "manifest": 1,
+    "id": "event141",
+    "name": "Event141 Event- und Turnierverwaltung",
+    "vendor": "DevWorld LLC",
+    "baseDomain": "event141.com",
+    "php": ">=8.1",
+    "docroot": "public",
+    "adminPath": "/admin",
+    "health": "/health",
+
+    "config": {
+        "file": "app/config.php",
+        "template": "deploy/cloud-config.tpl.php"
+    },
+
+    "preserve": [
+        "data/",
+        "public/uploads/",
+        "app/config.php"
+    ],
+
+    "refresh": [
+        "data/schema.sql",
+        "data/seed"
+    ],
+
+    "writable": [
+        "data",
+        "public/uploads"
+    ],
+
+    "commands": {
+        "install": ["php", "bin/install.php", "--admin={admin_user}", "--password={admin_password}"],
+        "migrate": ["php", "bin/migrate.php"],
+        "backup":  ["php", "bin/backup.php", "--keep=14"]
+    },
+
+    "modes": {
+        "full":         { "label": "Event-Website + Verwaltung", "label_en": "Event website + Admin", "installArgs": [] },
+        "backend-only": { "label": "Nur Verwaltung",             "label_en": "Admin only",             "installArgs": ["--no-frontend"] }
+    },
+
+    "params": [
+        { "key": "app_name",     "label": "Veranstalter / Name",   "label_en": "Organizer name",     "type": "text", "required": true },
+        { "key": "country_code", "label": "Telefon-Landesvorwahl", "label_en": "Phone country code", "type": "text", "default": "43" }
+    ]
+}

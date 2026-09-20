@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 64 56">
+  <!-- Lorbeerkranz (Sieger-Markierung). Wird als CSS-Maske benutzt, Farbe kommt aus dem Stylesheet. -->
+  <defs>
+    <path id="l" d="M0,0 C3,-3.4 9,-3.4 13,0 C9,3.4 3,3.4 0,0 Z"/>
+    <g id="b">
+      <path d="M30.08,47.92 A22,22 0 0 1 13.98,13.38" fill="none" stroke="#000" stroke-width="1.6" stroke-linecap="round"/>
+      <g transform="rotate(103 32 26)"><use xlink:href="#l" transform="translate(54,26) rotate(55)"/></g>
+      <g transform="rotate(121 32 26)"><use xlink:href="#l" transform="translate(54,26) rotate(55)"/><use xlink:href="#l" transform="translate(54,26) rotate(128) scale(.8)"/></g>
+      <g transform="rotate(141 32 26)"><use xlink:href="#l" transform="translate(54,26) rotate(55)"/><use xlink:href="#l" transform="translate(54,26) rotate(128) scale(.8)"/></g>
+      <g transform="rotate(161 32 26)"><use xlink:href="#l" transform="translate(54,26) rotate(55)"/><use xlink:href="#l" transform="translate(54,26) rotate(128) scale(.8)"/></g>
+      <g transform="rotate(181 32 26)"><use xlink:href="#l" transform="translate(54,26) rotate(55)"/><use xlink:href="#l" transform="translate(54,26) rotate(128) scale(.8)"/></g>
+      <g transform="rotate(200 32 26)"><use xlink:href="#l" transform="translate(54,26) rotate(58)"/><use xlink:href="#l" transform="translate(54,26) rotate(125) scale(.75)"/></g>
+      <g transform="rotate(215 32 26)"><use xlink:href="#l" transform="translate(54,26) rotate(88) scale(.9)"/></g>
+    </g>
+  </defs>
+  <use xlink:href="#b"/>
+  <use xlink:href="#b" transform="translate(64,0) scale(-1,1)"/>
+</svg>

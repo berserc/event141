@@ -1,0 +1,163 @@
+/* ==========================================================================
+   Event141 – Fightcard im NAFN-Stil: Countdown, Live-Leiste, Hauptkampf,
+   Kampfzeilen mit Medien, Kampf-Detailseite, Location, Tickets, Sponsoren
+   ========================================================================== */
+
+.page-section { padding: 2.5rem 0 1rem; }
+.section-sub { color: var(--ink-soft); margin-top: -.4rem; }
+
+.countdown { display: flex; gap: .7rem; margin: 1.2rem 0 .4rem; }
+.countdown span { display: flex; flex-direction: column; align-items: center; min-width: 4.2rem; padding: .6rem .5rem; background: rgba(16,16,20,.72); border: 1px solid var(--line); border-radius: var(--radius); }
+.countdown b { font-size: 1.9rem; line-height: 1; font-variant-numeric: tabular-nums; color: var(--accent-bright); }
+.countdown small { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-soft); margin-top: .3rem; }
+
+.live-bar { display: inline-flex; gap: .7rem; align-items: center; margin: 1.2rem 0 .4rem; padding: .7rem 1rem; background: rgba(230,57,70,.18); border: 1px solid var(--accent); border-radius: var(--radius); color: var(--ink); text-decoration: none; }
+.live-bar:hover { color: var(--ink); background: rgba(230,57,70,.3); }
+
+/* Medien-Stack (Foto/Video im Wechsel) */
+.media-stack { position: relative; display: block; width: 100%; height: 100%; }
+.media-stack img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.media-stack video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; opacity: 0; transition: opacity .5s; pointer-events: none; }
+.media-stack.is-playing video { opacity: 1; }
+.fighter-silhouette { display: block; width: 100%; height: 100%; background: radial-gradient(circle at 50% 32%, var(--line) 0 17%, transparent 18%), radial-gradient(ellipse at 50% 105%, var(--line) 0 46%, transparent 47%), var(--bg-soft); }
+.fighter-silhouette--red { box-shadow: inset 0 -4px 0 #ff7b85; }
+.fighter-silhouette--blue { box-shadow: inset 0 -4px 0 #7cb7ff; }
+
+/* Hauptkampf */
+.main-event { display: block; margin: 1.2rem 0 1.6rem; padding: 1.2rem; background: linear-gradient(160deg, rgba(230,57,70,.16), var(--card) 45%); border: 1px solid var(--accent); border-radius: var(--radius-lg); color: var(--ink); text-decoration: none; text-align: center; transition: transform .15s; }
+.main-event:hover { transform: translateY(-2px); color: var(--ink); }
+.main-event--laufend { box-shadow: 0 0 40px rgba(230,57,70,.35); }
+.main-event__badge { display: inline-block; padding: .25rem .9rem; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 800; font-size: .8rem; text-transform: uppercase; letter-spacing: .1em; }
+.main-event__body { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center; margin: 1.2rem 0 .8rem; }
+.main-event__fighter { display: flex; flex-direction: column; align-items: center; gap: .2rem; }
+.main-event__photo { width: min(100%, 260px); aspect-ratio: 3/4; border-radius: var(--radius-lg); overflow: hidden; border: 3px solid var(--line); margin-bottom: .6rem; display: block; }
+.main-event__photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.main-event__fighter--red .main-event__photo { border-color: #ff7b85; }
+.main-event__fighter--blue .main-event__photo { border-color: #7cb7ff; }
+.main-event__name { font-size: clamp(1.2rem, .9rem + 1.6vw, 2rem); font-weight: 900; text-transform: uppercase; letter-spacing: .02em; line-height: 1.1; }
+.main-event__fighter--red .main-event__name { color: #ff7b85; }
+.main-event__fighter--blue .main-event__name { color: #7cb7ff; }
+.main-event__fighter.is-winner .main-event__name::after { content: ""; display: inline-block; width: 1.35em; height: 1.18em; margin-left: .35em; vertical-align: -.16em; background: linear-gradient(180deg, #f6e08e, #f2c14e 55%, #b88a2a); -webkit-mask: url(../img/laurel.svg) center / contain no-repeat; mask: url(../img/laurel.svg) center / contain no-repeat; filter: drop-shadow(0 0 4px rgba(242,193,78,.45)); }
+.main-event__nick { font-style: italic; color: var(--ink-soft); }
+.main-event__gym { color: var(--ink-soft); font-size: .95rem; }
+.main-event__rec { font-variant-numeric: tabular-nums; font-weight: 700; }
+.main-event__vs { font-size: clamp(1.4rem, 1rem + 2vw, 2.6rem); font-weight: 900; color: var(--accent); }
+.main-event__meta { display: block; color: var(--ink-soft); }
+.main-event__result { display: block; margin-top: .6rem; font-weight: 800; color: var(--accent-bright); }
+.start-time { color: var(--accent-bright); white-space: nowrap; }
+
+/* Kampfzeilen */
+.fight-list { display: grid; gap: .6rem; margin-bottom: 2rem; }
+.block-heading { margin: 1.4rem 0 .2rem; font-size: .9rem; text-transform: uppercase; letter-spacing: .14em; color: var(--accent-bright); border-bottom: 1px solid var(--line); padding-bottom: .4rem; }
+.fight-row { display: grid; grid-template-columns: 2.2rem minmax(9rem, 1fr) minmax(8rem, 1.3fr) minmax(9rem, 1fr); gap: .8rem; align-items: center; padding: .6rem .9rem; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); color: var(--ink); text-decoration: none; transition: border-color .15s, transform .15s; }
+.fight-row:hover { border-color: var(--accent); transform: translateX(3px); color: var(--ink); }
+.fight-row--laufend { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.fight-row--beendet { opacity: .8; }
+.fight-row--abgesagt { opacity: .45; }
+.fight-row__no { font-weight: 900; font-size: 1.2rem; color: var(--accent-bright); text-align: center; font-variant-numeric: tabular-nums; }
+.fight-row__corner { display: flex; align-items: center; gap: .7rem; min-width: 0; }
+.fight-row__corner--blue { justify-content: flex-end; text-align: right; }
+.fight-row__who { display: flex; flex-direction: column; min-width: 0; }
+.fight-row__who strong { text-transform: uppercase; letter-spacing: .02em; overflow-wrap: break-word; hyphens: auto; }
+.fight-row__corner--red strong { color: #ff7b85; }
+.fight-row__corner--blue strong { color: #7cb7ff; }
+.fight-row__corner.is-winner strong::after { content: ""; display: inline-block; width: 1.35em; height: 1.18em; margin-left: .35em; vertical-align: -.16em; background: linear-gradient(180deg, #f6e08e, #f2c14e 55%, #b88a2a); -webkit-mask: url(../img/laurel.svg) center / contain no-repeat; mask: url(../img/laurel.svg) center / contain no-repeat; filter: drop-shadow(0 0 4px rgba(242,193,78,.45)); }
+.fight-row__who small { color: var(--ink-soft); }
+.row-thumb { flex: 0 0 56px; width: 56px; height: 56px; border-radius: 50%; overflow: hidden; border: 2px solid var(--line); display: block; }
+.row-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.row-thumb .media-stack video { object-position: center center; }
+.fight-row__mid { display: flex; flex-direction: column; align-items: center; text-align: center; gap: .1rem; }
+.fight-row__mid small { color: var(--ink-soft); font-size: .8rem; }
+.fight-row__vs { font-weight: 900; color: var(--accent); }
+.fight-row__result { color: var(--accent-bright) !important; font-weight: 700; }
+.break-row { display: flex; justify-content: center; gap: 1rem; padding: .5rem 1rem; border: 1px dashed var(--line); border-radius: var(--radius); color: var(--ink-soft); text-transform: uppercase; letter-spacing: .1em; font-size: .85rem; }
+.break-row--laufend { border-color: var(--accent); color: var(--accent-bright); }
+
+@media (max-width: 640px) {
+    .fight-row { grid-template-columns: 1.6rem 1fr 1fr; grid-template-areas: "no red blue" "no mid mid"; }
+    .fight-row__no { grid-area: no; }
+    .fight-row__corner--red { grid-area: red; }
+    .fight-row__corner--blue { grid-area: blue; }
+    .fight-row__mid { grid-area: mid; }
+    .row-thumb { flex-basis: 40px; width: 40px; height: 40px; }
+    .main-event__body { gap: .4rem; }
+}
+
+/* Kampf-Detailseite */
+.fight-detail { padding-bottom: 3rem; }
+.fight-detail__versus { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1.2rem; align-items: start; margin: 1.5rem 0; }
+.fight-detail__fighter { text-align: center; }
+.fight-detail__photo { display: block; width: min(100%, 340px); aspect-ratio: 3/4; margin: 0 auto 1rem; border-radius: var(--radius-lg); overflow: hidden; border: 3px solid var(--line); }
+.fight-detail__photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.fight-detail__fighter--red .fight-detail__photo { border-color: #ff7b85; }
+.fight-detail__fighter--blue .fight-detail__photo { border-color: #7cb7ff; }
+.fight-detail__corner { font-size: .75rem; text-transform: uppercase; letter-spacing: .14em; color: var(--ink-soft); margin: 0; }
+.fight-detail__fighter h2 { text-transform: uppercase; margin: .1rem 0; }
+.fight-detail__fighter--red h2 { color: #ff7b85; }
+.fight-detail__fighter--blue h2 { color: #7cb7ff; }
+.fight-detail__nick { font-style: italic; color: var(--ink-soft); margin: 0; }
+.fight-detail__gym { margin: .2rem 0 .6rem; }
+.fight-detail__facts { display: flex; justify-content: center; gap: 1.2rem; margin: 0; }
+.fight-detail__facts dt { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-soft); }
+.fight-detail__facts dd { margin: 0; font-weight: 800; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.fight-detail__win { color: var(--accent-bright); font-weight: 800; }
+.fight-detail__vs { align-self: center; font-size: 2.4rem; font-weight: 900; color: var(--accent); }
+.fight-detail__meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: .7rem; margin: 1.5rem 0; }
+.fight-detail__meta div { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: .6rem .9rem; }
+.fight-detail__meta small { display: block; font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-soft); }
+.fight-detail__result { text-align: center; font-size: 1.2rem; padding: .9rem; border: 1px solid var(--accent); border-radius: var(--radius); background: rgba(230,57,70,.12); }
+.fight-detail__story { max-width: 70ch; margin: 2rem auto; font-size: 1.05rem; }
+.fight-detail__story p:first-child { font-size: 1.25rem; font-weight: 700; color: var(--accent-bright); }
+.fight-detail__bios { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.side-card--red { border-left: 4px solid #ff7b85; }
+.side-card--blue { border-left: 4px solid #7cb7ff; }
+
+@media (max-width: 600px) {
+    .fight-detail__versus { gap: .5rem; }
+    .fight-detail__vs { font-size: 1.4rem; }
+}
+
+/* Location, Tickets, Sponsoren */
+.location-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(260px, 2fr); gap: 1.5rem; }
+@media (max-width: 800px) { .location-grid { grid-template-columns: 1fr; } }
+.map-wrap { min-height: 320px; display: flex; flex-direction: column; gap: .6rem; align-items: center; justify-content: center; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; }
+.map-wrap iframe { width: 100%; height: 100%; min-height: 320px; border: 0; display: block; }
+.map-wrap.is-loaded { display: block; }
+.location-info { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 1.2rem 1.4rem; }
+.location-info p { margin-bottom: .5rem; }
+.ticket-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1rem 0; }
+.ticket-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 1.2rem; text-align: center; }
+.ticket-card--highlight { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.ticket-card h3 { text-transform: uppercase; letter-spacing: .08em; font-size: 1rem; }
+.ticket-card__price { font-size: 2.4rem; font-weight: 900; color: var(--accent-bright); }
+.ticket-card p { color: var(--ink-soft); font-size: .9rem; margin: .4rem 0 0; }
+.ticket-actions { text-align: center; }
+.sponsor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: .8rem; margin-bottom: 1rem; }
+.sponsor-grid--main { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.sponsor-tile { display: flex; align-items: center; justify-content: center; height: 110px; padding: 1rem; background: #fff; border-radius: var(--radius); color: #101014; font-weight: 700; text-align: center; text-decoration: none; transition: transform .15s; }
+.sponsor-tile--main { height: 170px; }
+a.sponsor-tile:hover { transform: scale(1.03); color: #101014; }
+.sponsor-tile img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.social-row { display: flex; gap: 1.2rem; justify-content: center; padding: 1rem 0 2.5rem; }
+
+/* Verwaltung */
+body.admin .key-once { font-family: ui-monospace, Consolas, monospace; font-size: 1.05rem; padding: .7rem 1rem; background: #101014; color: #7dffb0; border-radius: 8px; word-break: break-all; user-select: all; }
+body.admin code.endpoint { display: block; padding: .15rem 0; font-size: .85rem; }
+body.admin .bout-row--inactive td { opacity: .45; }
+body.admin .sponsor-tile { height: 70px; border: 1px solid var(--line); }
+
+/* Sieger: Lorbeerkranz + Gold (wie nafn.at) */
+.laurel { display: inline-block; width: 1.35em; height: 1.18em; margin-left: .35em; vertical-align: -.16em; background: linear-gradient(180deg, #f6e08e, #f2c14e 55%, #b88a2a); -webkit-mask: url(../img/laurel.svg) center / contain no-repeat; mask: url(../img/laurel.svg) center / contain no-repeat; filter: drop-shadow(0 0 4px rgba(242,193,78,.45)); }
+.main-event__fighter.is-winner .main-event__name,
+.fight-row__corner.is-winner strong,
+.fight-detail__fighter.is-winner h2,
+.fighter.is-winner .fighter__name { color: #f2c14e !important; }
+.fight-detail__fighter.is-winner .fight-detail__photo,
+.main-event__fighter.is-winner .main-event__photo { border-color: #f2c14e; box-shadow: 0 0 26px rgba(242,193,78,.25); }
+.fight-detail__win { color: #f2c14e; }
+.fight-row__result, .main-event__result { color: #f2c14e !important; }
+
+/* Titelkampf: Guertel */
+.main-event__belt-label { display: block; margin-top: .8rem; color: #f2c14e; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; font-size: .95rem; }
+.belt-hero { display: block; width: min(560px, 88%); margin: .6rem auto 0; filter: drop-shadow(0 0 24px rgba(242,193,78,.3)) drop-shadow(0 14px 35px rgba(0,0,0,.8)); }
+.belt-hero img { width: 100%; height: auto; }
