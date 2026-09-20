@@ -23,4 +23,7 @@ return [
     'country_code' => '{{country_code}}',
     'setup_key' => '',
     'gym141_timeout' => 15,
+
+    // Cloud-Tenants zahlen fuers Hosting – das Gratis-Limit (1 aktives Event) gilt hier nicht.
+    'free_event_limit' => 100000,
 ];

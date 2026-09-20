@@ -79,6 +79,13 @@ return [
     // Nach der Einrichtung auf '' setzen, dann ist der Installer gesperrt.
     'setup_key' => '',
 
+    // Optional: DevWorld-Lizenzschlüssel fest hinterlegen (verwaltete Installationen).
+    // 'devworld_license_key' => 'DW-XXXX-XXXX-XXXX-XXXX',
+
+    // In der Testumgebung gilt ohne Schlüssel alles als freigeschaltet;
+    // false = Gratis-Sperren auch lokal testen.
+    // 'license_dev_pro' => false,
+
     // Zeitlimit (Sekunden) für Anfragen an eine Gym141-Instanz.
     'gym141_timeout' => 15,
 ];

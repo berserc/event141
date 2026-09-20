@@ -103,6 +103,12 @@ final class EventAdminController
 
         [$data, $errors] = $this->validate();
 
+        if ($errors === [] && $data['status'] !== 'beendet' && ($limit = \App\Core\License::eventLimitError()) !== null) {
+            Flash::withInput($_POST, []);
+            Flash::error($limit);
+            Url::redirect('/admin/events/neu');
+        }
+
         if ($errors !== []) {
             Flash::withInput($_POST, $errors);
             Flash::error('Bitte die markierten Felder prüfen.');
@@ -137,6 +143,12 @@ final class EventAdminController
         $event = self::load($id);
 
         [$data, $errors] = $this->validate($id);
+
+        // Ein beendetes Event wieder zu oeffnen zaehlt als weiteres aktives Event.
+        if ($event['status'] === 'beendet' && $data['status'] !== 'beendet' && ($limit = \App\Core\License::eventLimitError($id)) !== null) {
+            Flash::error($limit);
+            Url::redirect('/admin/events/' . $id);
+        }
 
         if ($errors !== []) {
             Flash::withInput($_POST, $errors);
@@ -180,6 +192,11 @@ final class EventAdminController
 
         if (!isset(EventRepo::STATUS[$status])) {
             Flash::error('Unbekannter Status.');
+            Url::redirect('/admin/events/' . $id);
+        }
+
+        if ($event['status'] === 'beendet' && $status !== 'beendet' && ($limit = \App\Core\License::eventLimitError($id)) !== null) {
+            Flash::error($limit);
             Url::redirect('/admin/events/' . $id);
         }
 

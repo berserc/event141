@@ -294,6 +294,11 @@ final class GymAreaController
         $gym = self::requireGym();
         Csrf::verify();
 
+        if (($pro = \App\Core\License::proFeatureError('Die Gym141-Kopplung')) !== null) {
+            Flash::error($pro . ' (Bitte an den Veranstalter wenden.)');
+            Url::redirect('/gym/gym141');
+        }
+
         if (count(\App\Models\ApiKeyRepo::all((int) $gym['id'])) >= 5) {
             Flash::error('Maximal fünf Schlüssel je Gym – bitte zuerst einen alten löschen.');
             Url::redirect('/gym/gym141');

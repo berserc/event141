@@ -121,6 +121,11 @@ final class BoutController
             Url::redirect('/admin/events/' . $event['id'] . '/kaempfe');
         }
 
+        if (($pro = \App\Core\License::proFeatureError('Der automatische Turnierbaum')) !== null) {
+            Flash::error($pro);
+            Url::redirect('/admin/events/' . $event['id'] . '/kaempfe');
+        }
+
         $result = Bracket::generate($event, $category);
 
         if ($result['bouts'] === 0) {

@@ -50,6 +50,28 @@ $s = static fn (string $k, string $d = ''): string => e($settings[$k] ?? $d);
         </fieldset>
 
         <fieldset class="card">
+            <legend>Lizenz</legend>
+            <?php $lic = \App\Core\License::state(); $aktiv = \App\Core\License::activeEventCount(); ?>
+            <?php if (\App\Core\License::isPro() && \App\Core\License::key() !== ''): ?>
+                <p><span class="pill pill--aktiv">Event141 Pro</span>
+                    <?= empty($lic['expires_at']) ? 'unbefristet (Lifetime)' : 'gültig bis ' . e(format_date(substr((string) $lic['expires_at'], 0, 10))) ?>
+                    <?= !empty($lic['trial']) ? ' · Testphase' : '' ?></p>
+            <?php elseif (\App\Core\License::key() !== ''): ?>
+                <p><span class="pill pill--offen">Lizenz nicht gültig</span> <?= e((string) ($lic['reason'] ?? '')) ?></p>
+            <?php else: ?>
+                <p class="muted">Event141 ist Open Source. Gratis: <?= \App\Core\License::FREE_EVENT_LIMIT ?> aktives Event (derzeit <?= (int) $aktiv ?>).
+                    <strong>Event141 Pro</strong> bringt unbegrenzte Events, den automatischen Turnierbaum und die Gym141-Kopplung –
+                    <a href="https://account.devworld-llc.com" target="_blank" rel="noopener">account.devworld-llc.com</a>.</p>
+            <?php endif; ?>
+            <div class="field">
+                <label for="devworld_license_key">DevWorld-Lizenzschlüssel</label>
+                <input id="devworld_license_key" name="devworld_license_key" autocomplete="off" placeholder="DW-XXXX-XXXX-XXXX-XXXX" value="<?= $s('devworld_license_key') ?>">
+                <p class="field__hint">Wird beim Speichern sofort geprüft. Die Lizenz gilt für eine Domain.</p>
+            </div>
+            <button class="btn btn--sm" type="submit" formaction="<?= e(url('/admin/einstellungen/lizenz-pruefen')) ?>" formnovalidate>Lizenz jetzt prüfen</button>
+        </fieldset>
+
+        <fieldset class="card">
             <legend>Ergebnisse</legend>
             <div class="field">
                 <label for="win_methods">Siegarten <small>(eine je Zeile)</small></label>

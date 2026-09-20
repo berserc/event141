@@ -293,6 +293,11 @@ final class EventExtrasController
             Url::redirect('/admin/events/import');
         }
 
+        if (post_bool('replace') !== 1 && ($limit = \App\Core\License::eventLimitError()) !== null) {
+            Flash::error($limit);
+            Url::redirect('/admin/events/import');
+        }
+
         try {
             $result = Fightcard::import($data, (array) (json_decode($pool, true) ?: []), $base, Auth::id(), post_bool('replace') === 1);
         } catch (\Throwable $e) {

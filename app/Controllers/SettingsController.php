@@ -61,8 +61,39 @@ final class SettingsController
         Setting::set('gym_area', post_bool('gym_area') ? '1' : '0');
         Setting::set('gym_signup', post_bool('gym_signup') ? '1' : '0');
 
+        // DevWorld-Lizenzschluessel: bei Aenderung sofort pruefen.
+        $lizenz = trim(post('devworld_license_key'));
+
+        if ($lizenz !== Setting::get('devworld_license_key')) {
+            Setting::set('devworld_license_key', $lizenz);
+            \App\Core\License::refresh();
+        }
+
         Audit::log('settings_updated', 'settings');
         Flash::success('Einstellungen gespeichert.');
+        Url::redirect('/admin/einstellungen');
+    }
+
+    public function checkLicense(): void
+    {
+        AuthController::requireRole('superuser');
+        Csrf::verify();
+
+        if (\App\Core\License::key() === '') {
+            Flash::info('Kein Lizenzschlüssel hinterlegt – Event141 läuft in der Gratis-Version (' . \App\Core\License::FREE_EVENT_LIMIT . ' aktives Event).');
+            Url::redirect('/admin/einstellungen');
+        }
+
+        $state = \App\Core\License::refresh();
+
+        if (($state['reason'] ?? '') === 'unreachable') {
+            Flash::error('Der Lizenzserver ist gerade nicht erreichbar – der letzte bekannte Stand gilt weiter.');
+        } elseif (!empty($state['valid'])) {
+            Flash::success('Lizenz gültig' . (empty($state['expires_at']) ? ' – unbefristet (Lifetime).' : ' bis ' . format_date(substr((string) $state['expires_at'], 0, 10)) . '.'));
+        } else {
+            Flash::error('Lizenz ungültig: ' . (string) ($state['reason'] ?? 'unbekannt'));
+        }
+
         Url::redirect('/admin/einstellungen');
     }
 

@@ -305,6 +305,7 @@ $settings = new SettingsController();
 
 $router->get('/admin/einstellungen', [$settings, 'index']);
 $router->post('/admin/einstellungen', [$settings, 'save']);
+$router->post('/admin/einstellungen/lizenz-pruefen', [$settings, 'checkLicense']);
 $router->get('/admin/protokoll', [$settings, 'auditLog']);
 
 $apiAdmin = new App\Controllers\ApiAdminController();

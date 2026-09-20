@@ -256,6 +256,12 @@ final class GymAdminController
     /** Verbindung herstellen: Login bei Gym141, Token speichern. */
     public static function connect(array $gym, string $url, string $username, string $password): bool
     {
+        if (($pro = \App\Core\License::proFeatureError('Die Gym141-Kopplung')) !== null) {
+            Flash::error($pro . ' (Hinweis für Gyms: bitte an den Veranstalter wenden.)');
+
+            return false;
+        }
+
         try {
             $client = new Gym141Client($url);
             $login  = $client->login($username, $password);
