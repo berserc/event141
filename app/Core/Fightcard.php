@@ -130,11 +130,11 @@ final class Fightcard
     {
         $out = [];
 
-        if (!empty($b['started_at']) && in_array((string) $b['status'], ['laufend', 'beendet'], true)) {
+        if (!empty($b['started_at'])) {
             $out['liveSince'] = (int) strtotime($b['started_at'] . ' UTC');
         }
 
-        if (!empty($b['finished_at']) && (string) $b['status'] === 'beendet') {
+        if (!empty($b['finished_at'])) {
             $out['finishedAt'] = (int) strtotime($b['finished_at'] . ' UTC');
         }
 
@@ -155,7 +155,7 @@ final class Fightcard
         return [
             'athleteId' => (int) $b[$s . '_athlete_id'],
             'name'      => $name,
-            'gym'       => (string) $b[$s . '_gym'],
+            'gym'       => (string) $b[$s . '_gym'] === 'Ohne Gym' ? '' : (string) $b[$s . '_gym'],
             'age'       => $age === null ? '' : (string) $age,
             'record'    => (int) $b[$s . '_w'] . '–' . (int) $b[$s . '_l'] . '–' . (int) $b[$s . '_d'],
             'bio'       => (string) $b[$s . '_bio'],
