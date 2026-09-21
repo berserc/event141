@@ -202,6 +202,7 @@ final class Installer
             'active'       => 'INTEGER NOT NULL DEFAULT 1',
             'result_round' => "TEXT NOT NULL DEFAULT ''",
             'belt_label'   => "TEXT NOT NULL DEFAULT ''",
+            'external_id'  => "TEXT NOT NULL DEFAULT ''",
         ]);
 
         // Seit 0.2.0: Sponsoren, Plattform-API (Schluessel), Webhooks.

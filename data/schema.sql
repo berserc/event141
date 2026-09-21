@@ -312,6 +312,7 @@ CREATE TABLE IF NOT EXISTS event_bouts (
     show_record    INTEGER NOT NULL DEFAULT 1,
     active         INTEGER NOT NULL DEFAULT 1,                   -- 0 = inaktiv (nicht oeffentlich)
     result_round   TEXT    NOT NULL DEFAULT '',
+    external_id    TEXT    NOT NULL DEFAULT '',                  -- ID aus einer importierten Fightcard (haelt geteilte Links stabil)
     belt_label     TEXT    NOT NULL DEFAULT '',                  -- Titelkampf: "Oesterr. Muay Thai Titel"
     scheduled_time TEXT    NOT NULL DEFAULT '',                  -- HH:MM (geplant)
     status         TEXT    NOT NULL DEFAULT 'geplant'

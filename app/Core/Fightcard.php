@@ -79,7 +79,7 @@ final class Fightcard
 
         if ((int) $b['is_break'] === 1) {
             return [
-                'id'       => 'p' . (int) $b['id'],
+                'id'       => (string) ($b['external_id'] ?? '') !== '' ? (string) $b['external_id'] : 'p' . (int) $b['id'],
                 'type'     => 'break',
                 'label'    => (string) ($b['title'] ?: 'Pause'),
                 'duration' => (string) $b['note'],
@@ -103,7 +103,7 @@ final class Fightcard
         $min = rtrim(rtrim(number_format((float) $b['round_minutes'], 1, ',', ''), '0'), ',');
 
         return [
-            'id'          => 'k' . (int) $b['id'],
+            'id'          => (string) ($b['external_id'] ?? '') !== '' ? (string) $b['external_id'] : 'k' . (int) $b['id'],
             'boutId'      => (int) $b['id'],
             'no'          => (int) $b['bout_no'],
             'type'        => 'fight',
@@ -303,7 +303,7 @@ final class Fightcard
                 if (($f['type'] ?? 'fight') === 'break') {
                     Database::insert('event_bouts', [
                         'event_id' => $eventId, 'session_id' => $sessionId, 'venue_id' => $venueId, 'order_no' => $order,
-                        'is_break' => 1, 'title' => (string) ($f['label'] ?? 'Pause'), 'note' => (string) ($f['duration'] ?? ''),
+                        'is_break' => 1, 'external_id' => mb_substr((string) ($f['id'] ?? ''), 0, 120), 'title' => (string) ($f['label'] ?? 'Pause'), 'note' => (string) ($f['duration'] ?? ''),
                         'minutes' => (int) ($f['minutes'] ?? 0), 'status' => $status, 'rounds' => 1, 'round_minutes' => 1,
                         'active' => ($f['active'] ?? true) === false ? 0 : 1,
                     ] + $live);
@@ -388,6 +388,7 @@ final class Fightcard
 
                 Database::insert('event_bouts', [
                     'event_id' => $eventId, 'session_id' => $sessionId, 'venue_id' => $venueId, 'order_no' => $order, 'bout_no' => $no,
+                    'external_id' => mb_substr((string) ($f['id'] ?? ''), 0, 120),
                     'block' => (string) ($f['block'] ?? ''), 'title' => (string) ($f['label'] ?? ''), 'belt_label' => (string) ($f['title'] ?? ''),
                     'style' => (string) ($f['style'] ?? ''), 'weight_label' => (string) ($f['weight'] ?? ''),
                     'description' => (string) ($f['description'] ?? ''), 'minutes' => (int) ($f['minutes'] ?? 0),
