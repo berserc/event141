@@ -97,9 +97,6 @@
 .fight-detail__fighter--blue h2 { color: #7cb7ff; }
 .fight-detail__nick { font-style: italic; color: var(--ink-soft); margin: 0; }
 .fight-detail__gym { margin: .2rem 0 .6rem; }
-.fight-detail__facts { display: flex; justify-content: center; gap: 1.2rem; margin: 0; }
-.fight-detail__facts dt { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-soft); }
-.fight-detail__facts dd { margin: 0; font-weight: 800; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
 .fight-detail__win { color: var(--accent-bright); font-weight: 800; }
 .fight-detail__vs { align-self: center; font-size: 2.4rem; font-weight: 900; color: var(--accent); }
 .fight-detail__meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: .7rem; margin: 1.5rem 0; }
@@ -156,6 +153,36 @@ body.admin .sponsor-tile { height: 70px; border: 1px solid var(--line); }
 .main-event__fighter.is-winner .main-event__photo { border-color: #f2c14e; box-shadow: 0 0 26px rgba(242,193,78,.25); }
 .fight-detail__win { color: #f2c14e; }
 .fight-row__result, .main-event__result { color: #f2c14e !important; }
+
+/* Schriftzug „Winner“ unten quer über dem Bild des Siegers (Gesicht bleibt frei) */
+.main-event__photo, .row-thumb, .fight-detail__photo { position: relative; }
+.winner-ribbon { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; padding: .28em 0 .3em; text-align: center; font-weight: 800; font-size: 1rem; letter-spacing: .32em; text-indent: .32em; text-transform: uppercase; color: #15100a; background: linear-gradient(180deg, #f6e08e, #f2c14e 55%, #b88a2a); box-shadow: 0 -2px 8px rgba(0,0,0,.55); pointer-events: none; }
+.row-thumb .winner-ribbon { font-size: .5rem; padding: .2em 0; letter-spacing: .15em; text-indent: .15em; }
+.row-thumb.is-winner { border-color: #f2c14e; box-shadow: 0 0 12px rgba(242,193,78,.35); }
+
+/* Bilanz / Alter / Gewicht als Chips */
+.chips { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem; margin: .5rem 0 0; }
+.chips--lg { margin: .4rem 0 .6rem; }
+.chip { display: inline-block; white-space: nowrap; padding: .15rem .8rem; border: 1px solid var(--line); border-radius: 999px; font-size: .8rem; letter-spacing: .06em; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.chip--gold { color: #f2c14e; border-color: rgba(244,201,93,.45); }
+.chips--lg .chip { font-size: .9rem; padding: .25rem 1rem; }
+
+/* Sterne beim Titelkampf */
+.main-event__vs-col { display: flex; flex-direction: column; align-items: center; gap: .2rem; }
+.stars-row { color: #f2c14e; font-size: .75rem; letter-spacing: 4px; text-indent: 4px; }
+
+/* Story-Aufklapper unter Hauptkampf und Kampfzeilen */
+.fight-entry { display: grid; gap: 0; }
+.fight-story { background: var(--card); border: 1px solid var(--line); border-top: 0; border-radius: 0 0 var(--radius) var(--radius); margin: -.15rem 0 0; }
+.fight-story--main { border-radius: 0 0 var(--radius-lg) var(--radius-lg); margin: -1.75rem 0 1.6rem; }
+.fight-story summary { list-style: none; cursor: pointer; padding: .55rem 1rem; text-align: center; color: #f2c14e; text-transform: uppercase; letter-spacing: .14em; font-size: .78rem; font-weight: 700; }
+.fight-story summary::-webkit-details-marker { display: none; }
+.fight-story summary:hover { color: #fff; }
+.fight-story[open] .fight-story__more, .fight-story:not([open]) .fight-story__less { display: none; }
+.fight-story__body { padding: .2rem 1.4rem 1.2rem; border-top: 1px solid var(--line); color: var(--ink-soft); line-height: 1.7; font-size: .95rem; }
+.fight-story__body p:first-child { margin-top: .8rem; }
+.fight-entry > .fight-row:has(+ .fight-story) { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.main-event:has(+ .fight-story) { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
 
 /* Titelkampf: Guertel */
 .main-event__belt-label { display: block; margin-top: .8rem; color: #f2c14e; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; font-size: .95rem; }

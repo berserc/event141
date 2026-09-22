@@ -41,8 +41,12 @@
           var key = html.replace(/\s+/g, " ").trim();
           if (key === last) return;
           last = key;
+          /* ausgeklappte Storys merken, sonst klappt die Aktualisierung sie zu */
+          var open = {};
+          slot.querySelectorAll("details.fight-story[open]").forEach(function (d) { open[d.getAttribute("data-story")] = true; });
           if (window.NAFNMedia) window.NAFNMedia.teardown(slot);
           slot.innerHTML = html;
+          slot.querySelectorAll("details.fight-story").forEach(function (d) { if (open[d.getAttribute("data-story")]) d.open = true; });
           if (window.NAFNMedia) window.NAFNMedia.init(slot);
         })
         .catch(function () {});

@@ -36,6 +36,46 @@ $resultText = static function (array $b): string {
 
     return $text . ($more !== '' ? ' – ' . $more : '');
 };
+
+$ageOf = static function (array $b, string $s): ?int {
+    $birth = $b[$s . '_birth'] ?? null;
+
+    return $birth ? age_from((string) $birth) : ($b[$s . '_age'] !== null ? (int) $b[$s . '_age'] : null);
+};
+
+// Bilanz + Alter als goldene Chips (wie nafn.at)
+$chips = static function (array $b, string $s) use ($ageOf): string {
+    if ($b[$s . '_entry_id'] === null) {
+        return '';
+    }
+
+    $out = [];
+
+    if ((int) $b['show_record'] === 1) {
+        $out[] = '<span class="chip chip--gold">Bilanz ' . (int) $b[$s . '_w'] . '–' . (int) $b[$s . '_l'] . '–' . (int) $b[$s . '_d'] . '</span>';
+    }
+
+    $age = $ageOf($b, $s);
+
+    if ($age !== null) {
+        $out[] = '<span class="chip chip--gold">Alter ' . $age . '</span>';
+    }
+
+    return $out === [] ? '' : '<span class="chips">' . implode('', $out) . '</span>';
+};
+
+// Story-Aufklapper unter der Karte; offene bleiben bei der Live-Aktualisierung offen (event.js)
+$story = static function (array $b, string $extra = ''): string {
+    if (trim((string) $b['description']) === '') {
+        return '';
+    }
+
+    return '<details class="fight-story' . $extra . '" data-story="' . (int) $b['id'] . '">'
+        . '<summary><span class="fight-story__more">▾ Story lesen</span><span class="fight-story__less">▴ Weniger anzeigen</span></summary>'
+        . '<div class="fight-story__body">' . nl2p((string) $b['description']) . '</div></details>';
+};
+
+$ribbon = '<span class="winner-ribbon">Winner</span>';
 ?>
 <?php if ($list === []): ?>
     <p class="muted">Die Fightcard wird noch zusammengestellt.</p>
@@ -54,19 +94,22 @@ $resultText = static function (array $b): string {
         <?php endif; ?>
         <span class="main-event__body">
             <span class="main-event__fighter main-event__fighter--red<?= $main['winner'] === 'red' ? ' is-winner' : '' ?>">
-                <span class="main-event__photo"><?php $side = 'red'; $lazy = false; require __DIR__ . '/_media.php'; ?></span>
+                <span class="main-event__photo"><?php $side = 'red'; $lazy = false; require __DIR__ . '/_media.php'; ?><?= $main['winner'] === 'red' ? $ribbon : '' ?></span>
                 <span class="main-event__name"><?= e($red) ?></span>
                 <?php if ($main['red_nick'] !== '' && $main['red_nick'] !== null): ?><span class="main-event__nick">„<?= e($main['red_nick']) ?>“</span><?php endif; ?>
                 <span class="main-event__gym"><?= e($main['red_gym'] ?? '') ?></span>
-                <?php if ((int) $main['show_record'] === 1 && $main['red_entry_id'] !== null): ?><span class="main-event__rec"><?= (int) $main['red_w'] ?>–<?= (int) $main['red_l'] ?>–<?= (int) $main['red_d'] ?></span><?php endif; ?>
+                <?= $chips($main, 'red') ?>
             </span>
-            <span class="main-event__vs">VS</span>
+            <span class="main-event__vs-col">
+                <?php if ((string) $main['belt_label'] !== ''): ?><span class="stars-row" aria-hidden="true">★ ★ ★ ★ ★ ★</span><?php endif; ?>
+                <span class="main-event__vs">VS</span>
+            </span>
             <span class="main-event__fighter main-event__fighter--blue<?= $main['winner'] === 'blue' ? ' is-winner' : '' ?>">
-                <span class="main-event__photo"><?php $side = 'blue'; $lazy = false; require __DIR__ . '/_media.php'; ?></span>
+                <span class="main-event__photo"><?php $side = 'blue'; $lazy = false; require __DIR__ . '/_media.php'; ?><?= $main['winner'] === 'blue' ? $ribbon : '' ?></span>
                 <span class="main-event__name"><?= e($blue) ?></span>
                 <?php if ($main['blue_nick'] !== '' && $main['blue_nick'] !== null): ?><span class="main-event__nick">„<?= e($main['blue_nick']) ?>“</span><?php endif; ?>
                 <span class="main-event__gym"><?= e($main['blue_gym'] ?? '') ?></span>
-                <?php if ((int) $main['show_record'] === 1 && $main['blue_entry_id'] !== null): ?><span class="main-event__rec"><?= (int) $main['blue_w'] ?>–<?= (int) $main['blue_l'] ?>–<?= (int) $main['blue_d'] ?></span><?php endif; ?>
+                <?= $chips($main, 'blue') ?>
             </span>
         </span>
         <span class="main-event__meta">
@@ -75,6 +118,7 @@ $resultText = static function (array $b): string {
         </span>
         <?php if ($resultText($main) !== ''): ?><span class="main-event__result"><?= e($resultText($main)) ?></span><?php endif; ?>
     </a>
+    <?= $story($main, ' fight-story--main') ?>
 <?php endif; ?>
 
 <div class="fight-list">
@@ -96,10 +140,11 @@ $resultText = static function (array $b): string {
         <?php $lastBlock = (string) $bout['block']; ?>
 
         <?php $red = BoutRepo::cornerName($bout, 'red') ?: 'TBA'; $blue = BoutRepo::cornerName($bout, 'blue') ?: 'TBA'; ?>
+        <div class="fight-entry">
         <a class="fight-row fight-row--<?= e($bout['status']) ?>" href="<?= e(url($base . '/kampf/' . $bout['id'])) ?>">
             <span class="fight-row__no"><?= (int) $bout['bout_no'] ?></span>
             <span class="fight-row__corner fight-row__corner--red<?= $bout['winner'] === 'red' ? ' is-winner' : '' ?>">
-                <span class="row-thumb"><?php $side = 'red'; $lazy = true; require __DIR__ . '/_media.php'; ?></span>
+                <span class="row-thumb<?= $bout['winner'] === 'red' ? ' is-winner' : '' ?>"><?php $side = 'red'; $lazy = true; require __DIR__ . '/_media.php'; ?><?= $bout['winner'] === 'red' ? $ribbon : '' ?></span>
                 <span class="fight-row__who"><strong><?= e($red) ?></strong><small><?= e($bout['red_gym'] ?? '') ?></small></span>
             </span>
             <span class="fight-row__mid">
@@ -112,8 +157,10 @@ $resultText = static function (array $b): string {
             </span>
             <span class="fight-row__corner fight-row__corner--blue<?= $bout['winner'] === 'blue' ? ' is-winner' : '' ?>">
                 <span class="fight-row__who"><strong><?= e($blue) ?></strong><small><?= e($bout['blue_gym'] ?? '') ?></small></span>
-                <span class="row-thumb"><?php $side = 'blue'; $lazy = true; require __DIR__ . '/_media.php'; ?></span>
+                <span class="row-thumb<?= $bout['winner'] === 'blue' ? ' is-winner' : '' ?>"><?php $side = 'blue'; $lazy = true; require __DIR__ . '/_media.php'; ?><?= $bout['winner'] === 'blue' ? $ribbon : '' ?></span>
             </span>
         </a>
+        <?= $story($bout) ?>
+        </div>
     <?php endforeach; ?>
 </div>

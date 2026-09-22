@@ -82,6 +82,19 @@ hochladen, `setup.php` aufrufen, fertig. Schwesterprodukt von
 
 Ein eigenes Logo? Als `public/assets/img/logo.png` (oder `.svg`) hochladen.
 
+## Updates
+
+Unter **Updates** in der Verwaltung (Superuser) nach neuen Versionen suchen und
+per Klick einspielen: das Release-ZIP wird vom Update-Server geladen
+(SHA-256-geprüft), vorher die Datenbank gesichert, dann werden nur die
+Anwendungsdateien ersetzt – `data/`, `public/uploads/` und `app/config.php`
+bleiben unangetastet, Migrationen laufen automatisch. Eigene Dateien, die ein
+Update überleben sollen, in `app/config.php` unter `update_protected` eintragen.
+
+Manuell: neue Version hochladen (`data/` und `public/uploads/` **nicht**
+überschreiben) und `php bin/migrate.php` bzw. `setup.php?key=…` aufrufen.
+Release bauen: `php bin/release.php --version=X.Y.Z --changelog="…"`.
+
 ### Kommandozeile (alternativ)
 
 ```bash

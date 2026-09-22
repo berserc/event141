@@ -308,6 +308,11 @@ $router->post('/admin/einstellungen', [$settings, 'save']);
 $router->post('/admin/einstellungen/lizenz-pruefen', [$settings, 'checkLicense']);
 $router->get('/admin/protokoll', [$settings, 'auditLog']);
 
+$system = new App\Controllers\SystemController();
+
+$router->get('/admin/updates', [$system, 'updates']);
+$router->post('/admin/updates/installieren', [$system, 'installUpdate']);
+
 $apiAdmin = new App\Controllers\ApiAdminController();
 
 $router->get('/admin/api', [$apiAdmin, 'index']);
