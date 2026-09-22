@@ -8,7 +8,9 @@ use App\Core\Audit;
 use App\Core\Auth;
 use App\Core\Csrf;
 use App\Core\Database;
+use App\Core\Fightcard;
 use App\Core\Flash;
+use App\Core\Ticket141Client;
 use App\Core\Upload;
 use App\Core\Url;
 use App\Core\View;
@@ -88,12 +90,145 @@ final class EventAdminController
         $event = self::load((int) ($args['id'] ?? 0));
 
         View::display('admin/events/form', [
-            'title'  => (string) $event['name'],
-            'event'  => Flash::oldInput() + $event,
-            'stats'  => EventRepo::stats((int) $event['id']),
-            'errors' => Flash::errors(),
-            'isNew'  => false,
+            'title'     => (string) $event['name'],
+            'event'     => Flash::oldInput() + $event,
+            'stats'     => EventRepo::stats((int) $event['id']),
+            'errors'    => Flash::errors(),
+            'isNew'     => false,
+            'ticket141' => self::ticket141Info($event),
         ], 'layouts/admin');
+    }
+
+    /**
+     * Event in Ticket141 anlegen bzw. dessen Stammdaten aktualisieren
+     * (Upsert ueber external_source/external_ref = Event141-Kuerzel).
+     */
+    public function ticket141Push(array $args): void
+    {
+        AuthController::requireWrite();
+        Csrf::verify();
+
+        $id    = (int) ($args['id'] ?? 0);
+        $event = self::load($id);
+
+        if (($pro = \App\Core\License::proFeatureError('Die Ticket141-Kopplung')) !== null) {
+            Flash::error($pro);
+            Url::redirect('/admin/events/' . $id);
+        }
+
+        $client = Ticket141Client::fromSettings();
+
+        if (!$client->configured() || !$client->hasKey()) {
+            Flash::error('Ticket141 ist nicht eingerichtet – Adresse und API-Schlüssel unter Einstellungen → Ticket141 eintragen.');
+            Url::redirect('/admin/events/' . $id);
+        }
+
+        try {
+            $res = $client->createEvent(self::ticket141Payload($event));
+        } catch (RuntimeException $e) {
+            Flash::error('Ticket141: ' . $e->getMessage());
+            Url::redirect('/admin/events/' . $id);
+        }
+
+        $slug = (string) $res['event']['slug'];
+
+        if ($slug !== (string) $event['ticket141_slug']) {
+            Database::update('events', $id, ['ticket141_slug' => $slug, 'updated_at' => gmdate('Y-m-d H:i:s')]);
+        }
+
+        Ticket141Client::forgetCache($slug);
+        Audit::log($res['created'] ? 'ticket141_created' : 'ticket141_updated', 'event', $id, $slug);
+
+        $status = (string) ($res['event']['status'] ?? '');
+        $hint   = $res['created'] || $status === 'entwurf'
+            ? ' Das Ticket141-Event ist ein Entwurf: dort Kategorien mit Preisen anlegen und den Verkauf starten.'
+            : '';
+
+        Flash::success(
+            ($res['created'] ? 'Event in Ticket141 angelegt' : 'Ticket141-Stammdaten aktualisiert') . ' („' . $slug . '“).' . $hint
+            . ($res['admin_url'] !== '' ? ' Verwaltung: ' . $res['admin_url'] : '')
+        );
+        Url::redirect('/admin/events/' . $id);
+    }
+
+    /**
+     * Stammdaten fuer POST /api/v1/events.
+     *
+     * @return array<string,mixed>
+     */
+    private static function ticket141Payload(array $event): array
+    {
+        $base = Fightcard::requestBase();
+
+        return [
+            'name'            => (string) $event['name'],
+            'tagline'         => (string) $event['tagline'],
+            'starts_at'       => $event['starts_on'] . ' ' . self::ticket141StartTime($event),
+            'ends_at'         => $event['ends_on'] ? $event['ends_on'] . ' 23:59' : '',
+            'doors_at'        => (string) $event['doors_time'],
+            'venue_name'      => (string) $event['venue_name'],
+            'venue_street'    => (string) $event['venue_street'],
+            'venue_zip'       => (string) $event['venue_zip'],
+            'venue_city'      => (string) $event['venue_city'],
+            'external_source' => 'event141',
+            'external_ref'    => (string) $event['slug'],
+            'external_url'    => $base !== '' ? $base . url('/e/' . $event['slug']) : '',
+            'ticket_note'     => (string) $event['ticket_note'],
+        ];
+    }
+
+    /** Beginn: erste Abschnitts-Startzeit, sonst Beginnzeit des Events, sonst 19:00. */
+    private static function ticket141StartTime(array $event): string
+    {
+        foreach (EventRepo::sessions((int) $event['id']) as $s) {
+            if ((string) $s['starts_at'] !== '') {
+                return (string) $s['starts_at'];
+            }
+        }
+
+        return (string) $event['start_time'] !== '' ? (string) $event['start_time'] : '19:00';
+    }
+
+    /**
+     * Stand der Ticket141-Kopplung fuer die Event-Uebersicht (null = nicht konfiguriert).
+     *
+     * @return array<string,mixed>|null
+     */
+    private static function ticket141Info(array $event): ?array
+    {
+        $client = Ticket141Client::fromSettings();
+
+        if (!$client->configured()) {
+            return null;
+        }
+
+        $slug = (string) ($event['ticket141_slug'] ?? '');
+        $info = [
+            'slug'      => $slug,
+            'has_key'   => $client->hasKey(),
+            'shop_url'  => $slug !== '' ? $client->shopUrl($slug) : '',
+            'admin_url' => '',
+            'stats'     => null,
+            'event'     => null,
+            'sale'      => [],
+            'error'     => '',
+        ];
+
+        if ($slug === '' || !$client->hasKey()) {
+            return $info;
+        }
+
+        try {
+            $info['stats']     = $client->stats($slug);
+            $ev                = $client->event($slug);
+            $info['event']     = $ev['event'];
+            $info['sale']      = $ev['sale'];
+            $info['admin_url'] = (string) ($ev['event']['admin_url'] ?? '');
+        } catch (RuntimeException $e) {
+            $info['error'] = $e->getMessage();
+        }
+
+        return $info;
     }
 
     public function store(): void
@@ -258,7 +393,7 @@ final class EventAdminController
             'published' => 0, 'show_entries' => 1, 'show_results' => 1, 'gym_registration' => 1,
             'short_name' => '', 'live_mode' => 0, 'default_bout_minutes' => 12, 'default_break_minutes' => 15,
             'show_countdown' => 1, 'show_map' => 1, 'location_note' => '', 'min_age_note' => '', 'ticket_note' => '',
-            'tickets_json' => '[]', 'social_json' => '{}',
+            'tickets_json' => '[]', 'social_json' => '{}', 'ticket141_slug' => '',
         ];
     }
 
@@ -345,6 +480,7 @@ final class EventAdminController
             'ticket_note'           => post('ticket_note'),
             'tickets_json'          => self::ticketsFromPost(),
             'social_json'           => self::socialFromPost(),
+            'ticket141_slug'        => mb_substr(trim(post('ticket141_slug')), 0, 120),
         ];
 
         return [$data, $errors];

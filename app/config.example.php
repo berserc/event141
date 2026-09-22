@@ -86,6 +86,6 @@ return [
     // false = Gratis-Sperren auch lokal testen.
     // 'license_dev_pro' => false,
 
-    // Zeitlimit (Sekunden) für Anfragen an eine Gym141-Instanz.
+    // Zeitlimit (Sekunden) für Anfragen an eine Gym141-/Ticket141-Instanz.
     'gym141_timeout' => 15,
 ];

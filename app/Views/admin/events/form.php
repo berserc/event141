@@ -44,6 +44,54 @@ if ($isNew): ?>
             <span class="stat__label">nicht eingeplant</span>
         </a>
     </div>
+
+    <?php $tk = $ticket141 ?? null; ?>
+    <?php if ($tk !== null): ?>
+        <div class="card">
+            <div class="card__head">
+                <h2>Ticketverkauf <small class="muted">(Ticket141)</small></h2>
+                <?php if ($tk['slug'] !== ''): ?>
+                    <p>
+                        <a href="<?= e($tk['shop_url']) ?>" target="_blank" rel="noopener">Shop ansehen ↗</a>
+                        <?php if ($tk['admin_url'] !== ''): ?> · <a href="<?= e($tk['admin_url']) ?>" target="_blank" rel="noopener">Ticket141-Verwaltung ↗</a><?php endif; ?>
+                    </p>
+                <?php endif; ?>
+            </div>
+
+            <?php if ($tk['slug'] === ''): ?>
+                <p class="muted">Noch nicht gekoppelt. „In Ticket141 anlegen“ legt dort ein Event mit Name, Datum, Beginn, Einlass und Location an (als Entwurf) – Preise und Verkaufsstart dann in Ticket141.</p>
+            <?php elseif ($tk['error'] !== ''): ?>
+                <p class="muted">Gekoppelt mit „<?= e($tk['slug']) ?>“, aber Ticket141 antwortet gerade nicht: <?= e($tk['error']) ?></p>
+            <?php elseif (!$tk['has_key']): ?>
+                <p class="muted">Gekoppelt mit „<?= e($tk['slug']) ?>“. Für Verkaufszahlen einen API-Schlüssel unter Einstellungen → Ticket141 hinterlegen.</p>
+            <?php elseif ($tk['stats'] !== null): ?>
+                <?php $st = $tk['stats']['stats']; ?>
+                <div class="stat-grid stat-grid--compact">
+                    <div class="stat"><span class="stat__value"><?= (int) ($st['tickets'] ?? 0) ?></span><span class="stat__label">Tickets verkauft</span></div>
+                    <div class="stat"><span class="stat__value"><?= e(\App\Core\Ticket141Client::price((int) ($st['gross_cents'] ?? 0) - (int) ($st['refunded_cents'] ?? 0))) ?></span><span class="stat__label">Umsatz</span></div>
+                    <div class="stat"><span class="stat__value"><?= (int) ($st['checked_in'] ?? 0) ?></span><span class="stat__label">eingelassen</span></div>
+                    <div class="stat"><span class="stat__value"><?= (int) ($st['orders_open'] ?? 0) ?></span><span class="stat__label">offene Bestellungen</span></div>
+                </div>
+                <?php if (!empty($tk['stats']['categories'])): ?>
+                    <p class="muted">
+                        <?php foreach ($tk['stats']['categories'] as $i => $c): ?><?= $i > 0 ? ' · ' : '' ?><?= e($c['name']) ?>: <?= (int) $c['sold'] ?><?= (int) $c['quota'] > 0 ? '/' . (int) $c['quota'] : '' ?><?php endforeach; ?>
+                    </p>
+                <?php endif; ?>
+                <p class="muted">
+                    Status in Ticket141: <strong><?= e((string) ($tk['event']['status'] ?? '')) ?></strong><?= !empty($tk['event']['published']) ? ', veröffentlicht' : ', nicht veröffentlicht' ?>
+                    <?= empty($tk['sale']['open']) && ($tk['sale']['reason'] ?? '') !== '' ? ' – ' . e((string) $tk['sale']['reason']) : '' ?>
+                </p>
+            <?php endif; ?>
+
+            <?php if (Auth::canWrite()): ?>
+                <form method="post" action="<?= e(url('/admin/events/' . $id . '/ticket141/anlegen')) ?>" class="inline">
+                    <?= csrf_field() ?>
+                    <button class="btn btn--sm<?= $tk['slug'] === '' ? ' btn--primary' : '' ?>" type="submit"><?= $tk['slug'] === '' ? 'In Ticket141 anlegen' : 'Ticket141-Stammdaten aktualisieren' ?></button>
+                </form>
+                <?php if ($tk['slug'] !== ''): ?><small class="muted">Überträgt Name, Untertitel, Datum, Beginn, Einlass und Location nach Ticket141 (Preise bleiben dort unangetastet).</small><?php endif; ?>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
 <?php endif; ?>
 
 <form method="post" action="<?= e($action) ?>" enctype="multipart/form-data" class="form">
@@ -240,6 +288,15 @@ if ($isNew): ?>
             </div>
         <?php endfor; ?>
         <div class="field"><label for="ticket_note">Text über den Tickets</label><input id="ticket_note" name="ticket_note" value="<?= e($event['ticket_note']) ?>" placeholder="Sei live dabei – wenn weg, dann weg!"<?= $ro ?>></div>
+        <div class="field">
+            <label for="ticket141_slug">Ticket141-Event <small>(Kürzel)</small></label>
+            <input id="ticket141_slug" name="ticket141_slug" value="<?= e((string) ($event['ticket141_slug'] ?? '')) ?>" placeholder="wird beim Anlegen in Ticket141 gesetzt"<?= $ro ?>>
+            <p class="field__hint">
+                Ist ein Ticket141-Event verknüpft, zeigt die Event-Seite dessen Kategorien mit Preis und Verfügbarkeit und einen „Tickets kaufen“-Knopf
+                (die Ticketpreise oben dienen dann nur noch als Ersatz, falls Ticket141 nicht erreichbar ist). Leer = keine Kopplung.
+                <?= !$isNew && (string) ($event['ticket141_slug'] ?? '') === '' && ($ticket141 ?? null) !== null ? 'Am einfachsten: oben „In Ticket141 anlegen“.' : '' ?>
+            </p>
+        </div>
 
         <legend style="margin-top:1rem">Social Media</legend>
         <?php $socialLinks = \App\Models\EventRepo::social($event); ?>

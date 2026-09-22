@@ -139,6 +139,44 @@ hochladen; Modus *Foto*, *Video in Schleife* oder *Foto ↔ Video im Wechsel*
 
 ---
 
+## Ticketverkauf mit Ticket141
+
+Tickets verkauft das Schwesterprodukt **Ticket141** (Ticketshop mit
+Stripe-Zahlung, QR-Tickets und Einlass-Scanner). Event141 ist damit gekoppelt
+(Pro-Funktion):
+
+1. **Einrichten** (Admin): in Ticket141 unter *API & Webhooks* einen Schlüssel
+   mit Rechten „write“ erzeugen. In Event141 unter *Einstellungen → Ticket141*
+   Adresse der Ticket141-Instanz und Schlüssel eintragen, *Speichern &
+   Verbindung prüfen*. Der Schlüssel wird nach dem Speichern nicht mehr
+   angezeigt; das leere Feld lässt ihn unverändert.
+2. **Event koppeln**: in der Event-Übersicht (Karte *Ticketverkauf*) auf
+   **In Ticket141 anlegen**. Ticket141 bekommt Name, Untertitel, Datum, Beginn
+   (erste Abschnittszeit, sonst Beginnzeit, sonst 19:00), Einlass, Location und
+   den Link zur Event-Seite; das Kürzel des Ticket141-Events landet im
+   Event-Formular (*Ticket141-Event*). Das neue Event ist dort ein **Entwurf**:
+   Kategorien mit Preisen und Kontingent anlegen und den Verkauf starten.
+   Ändern sich später Datum oder Ort, überträgt **Ticket141-Stammdaten
+   aktualisieren** die Daten noch einmal (Preise bleiben unangetastet).
+   Ein bereits in Ticket141 bestehendes Event lässt sich auch von Hand
+   koppeln: dessen Kürzel ins Feld *Ticket141-Event* eintragen.
+3. **Auf der Event-Seite** erscheinen unter *Tickets sichern* die Kategorien
+   aus Ticket141 mit Preis und Verfügbarkeit („nur noch 12“, „ausverkauft“)
+   und der Knopf **Tickets kaufen** zum Shop. Mit der Einstellung *Shop als
+   Widget einbetten* läuft der Kauf direkt auf der Event-Seite. Die Daten
+   werden fünf Minuten zwischengespeichert; ist Ticket141 gerade nicht
+   erreichbar, gilt der letzte Stand bzw. nur der Knopf (dann mit den manuell
+   eingetragenen Ticketpreisen als Ersatz).
+4. **Verkaufszahlen**: die Karte *Ticketverkauf* zeigt verkaufte Tickets,
+   Umsatz, Einlass und offene Bestellungen samt Link zur Ticket141-Verwaltung.
+   Die Lese-API (`/api/v1/event/{kürzel}`) liefert die Shop-Adresse als
+   `tickets_url`, damit eine eigene Event-Website darauf verlinken kann.
+
+Ohne Ticket141 bleiben die manuellen *Ticketpreise* und der *Ticket-Link* im
+Event-Formular wie gehabt.
+
+---
+
 ## Listen und Druck
 
 *Listen* erzeugt druckfertige Seiten: **Fightcard-Aushang** (Kabinen,
@@ -186,7 +224,7 @@ angezeigt. Details in `docs/api.md`.
 * **Benutzer** – Konten anlegen, Rolle vergeben, Passwörter zurücksetzen.
 * **Seiten** – Impressum, Datenschutz und weitere Seiten.
 * **Einstellungen** – Veranstalterdaten, Startseite, Siegarten, Lizenzschlüssel
-  (*Lizenz jetzt prüfen*).
+  (*Lizenz jetzt prüfen*), Ticket141-Kopplung (Adresse, Schlüssel, Widget).
 * **Updates** – *Nach Updates suchen* fragt den Update-Server ab; *Update jetzt
   installieren* sichert vorher die Datenbank und ersetzt nur die
   Anwendungsdateien. Eigene Daten, Fotos und Videos bleiben unangetastet.

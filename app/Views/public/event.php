@@ -20,7 +20,14 @@ use App\Models\EventRepo;
  * @var list<array<string,mixed>> $tickets
  * @var array<string,string>      $social
  * @var int                       $startTs
+ * @var array<string,mixed>|null  $ticket141 (slug, shop_url, embed, embed_js, data|null)
  */
+$ticket141 = $ticket141 ?? null;
+$tkData    = $ticket141['data'] ?? null;
+$tkCats    = is_array($tkData) ? array_values(array_filter((array) ($tkData['categories'] ?? []), 'is_array')) : [];
+$tkSale    = is_array($tkData) ? (array) ($tkData['sale'] ?? []) : [];
+$tkOpen    = $tkData === null || !empty($tkSale['open']);
+$tkUrl     = $ticket141 !== null ? (string) ($tkData['event']['shop_url'] ?? $ticket141['shop_url']) : '';
 $hero    = $event['hero_path'] !== '' ? upload_url($event['hero_path']) : ($event['poster_path'] !== '' ? upload_url($event['poster_path']) : '');
 $base    = '/e/' . $event['slug'];
 $isGala  = $event['type'] === 'gala';
@@ -57,7 +64,8 @@ $liveNow = array_values(array_filter($bouts, static fn (array $b): bool => $b['s
         <?php endif; ?>
 
         <p class="event-hero__actions">
-            <?php if ($event['ticket_url'] !== '' && !$vorbei): ?><a class="btn btn--primary" href="<?= e($event['ticket_url']) ?>" target="_blank" rel="noopener">Tickets sichern</a><?php endif; ?>
+            <?php if ($ticket141 !== null && !$vorbei): ?><a class="btn btn--primary" href="#tickets">Tickets sichern</a>
+            <?php elseif ($event['ticket_url'] !== '' && !$vorbei): ?><a class="btn btn--primary" href="<?= e($event['ticket_url']) ?>" target="_blank" rel="noopener">Tickets sichern</a><?php endif; ?>
             <a class="btn btn--ghost btn--on-dark" href="<?= $isGala ? '#fightcard' : e(url($base . '/kaempfe')) ?>"><?= $isGala ? 'Fightcard' : 'Turnierplan' ?></a>
             <?php if (EventRepo::registrationOpen($event) && ($gymArea ?? true)): ?>
                 <a class="btn btn--ghost btn--on-dark" href="<?= e(url('/gym/event/' . $event['id'])) ?>">Sportler anmelden (Gyms)</a>
@@ -171,7 +179,44 @@ $liveNow = array_values(array_filter($bouts, static fn (array $b): bool => $b['s
     </section>
 <?php endif; ?>
 
-<?php if (($tickets !== [] || $event['ticket_url'] !== '') && !$vorbei): ?>
+<?php if ($ticket141 !== null && !$vorbei): ?>
+    <section class="wrap page-section" id="tickets">
+        <h2 class="section-heading">Tickets sichern</h2>
+        <?php if ($event['ticket_note'] !== ''): ?><p class="section-sub"><?= e($event['ticket_note']) ?></p><?php endif; ?>
+        <?php if ($tkCats !== []): ?>
+            <div class="ticket-grid">
+                <?php foreach ($tkCats as $c): ?>
+                    <?php $avail = \App\Core\Ticket141Client::availability($c); ?>
+                    <div class="ticket-card<?= !empty($c['sold_out']) ? ' ticket-card--soldout' : '' ?>">
+                        <h3><?= e((string) $c['name']) ?></h3>
+                        <div class="ticket-card__price"><?= e(\App\Core\Ticket141Client::price((int) ($c['price_cents'] ?? 0))) ?></div>
+                        <?php if ((string) ($c['description'] ?? '') !== ''): ?><p><?= e((string) $c['description']) ?></p><?php endif; ?>
+                        <?php if ($avail !== ''): ?><p class="ticket-card__avail"><?= e($avail) ?></p><?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php elseif ($tkData === null && $tickets !== []): ?>
+            <div class="ticket-grid">
+                <?php foreach ($tickets as $t): ?>
+                    <div class="ticket-card<?= $t['highlight'] ? ' ticket-card--highlight' : '' ?>">
+                        <h3><?= e($t['label']) ?></h3>
+                        <div class="ticket-card__price"><?= e($t['price']) ?></div>
+                        <?php if ($t['note'] !== ''): ?><p><?= e($t['note']) ?></p><?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+        <?php if ($tkOpen && $ticket141['embed']): ?>
+            <div data-ticket141="<?= e($ticket141['slug']) ?>" data-return="<?= e(\App\Core\Fightcard::requestBase() . url($base)) ?>"></div>
+            <script src="<?= e($ticket141['embed_js']) ?>" defer></script>
+            <p class="ticket-actions"><a class="btn btn--ghost btn--on-dark" href="<?= e($tkUrl) ?>" target="_blank" rel="noopener">Shop in neuem Fenster öffnen</a></p>
+        <?php elseif ($tkOpen): ?>
+            <p class="ticket-actions"><a class="btn btn--primary btn--lg" href="<?= e($tkUrl) ?>" target="_blank" rel="noopener">Tickets kaufen</a></p>
+        <?php else: ?>
+            <p class="ticket-actions muted"><?= e((string) ($tkSale['reason'] ?: 'Der Ticketverkauf ist derzeit nicht geöffnet.')) ?></p>
+        <?php endif; ?>
+    </section>
+<?php elseif (($tickets !== [] || $event['ticket_url'] !== '') && !$vorbei): ?>
     <section class="wrap page-section" id="tickets">
         <h2 class="section-heading">Tickets sichern</h2>
         <?php if ($event['ticket_note'] !== ''): ?><p class="section-sub"><?= e($event['ticket_note']) ?></p><?php endif; ?>

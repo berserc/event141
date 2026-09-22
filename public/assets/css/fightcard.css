@@ -128,7 +128,13 @@
 .ticket-card h3 { text-transform: uppercase; letter-spacing: .08em; font-size: 1rem; }
 .ticket-card__price { font-size: 2.4rem; font-weight: 900; color: var(--accent-bright); }
 .ticket-card p { color: var(--ink-soft); font-size: .9rem; margin: .4rem 0 0; }
+.ticket-card--soldout { opacity: .55; }
+.ticket-card--soldout .ticket-card__price { text-decoration: line-through; color: var(--ink-soft); }
+.ticket-card__avail { font-weight: 700; color: var(--accent-bright); text-transform: uppercase; letter-spacing: .06em; font-size: .8rem; }
+.ticket-card--soldout .ticket-card__avail { color: var(--ink-soft); }
 .ticket-actions { text-align: center; }
+.ticket-actions .btn--lg { font-size: 1.15rem; padding: .9rem 2.2rem; }
+[data-ticket141] { margin: 1rem 0; border-radius: var(--radius-lg); overflow: hidden; background: #fff; }
 .sponsor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: .8rem; margin-bottom: 1rem; }
 .sponsor-grid--main { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 .sponsor-tile { display: flex; align-items: center; justify-content: center; height: 110px; padding: 1rem; background: #fff; border-radius: var(--radius); color: #101014; font-weight: 700; text-align: center; text-decoration: none; transition: transform .15s; }

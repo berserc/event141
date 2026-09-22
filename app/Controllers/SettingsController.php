@@ -8,6 +8,7 @@ use App\Core\Audit;
 use App\Core\Csrf;
 use App\Core\Database;
 use App\Core\Flash;
+use App\Core\Ticket141Client;
 use App\Core\Url;
 use App\Core\View;
 use App\Models\EventRepo;
@@ -36,6 +37,52 @@ final class SettingsController
         AuthController::requireRole('superuser');
         Csrf::verify();
 
+        $this->persist();
+
+        Flash::success('Einstellungen gespeichert.');
+        Url::redirect('/admin/einstellungen');
+    }
+
+    /** Speichern + Verbindung zu Ticket141 pruefen (ein Submit). */
+    public function checkTicket141(): void
+    {
+        AuthController::requireRole('superuser');
+        Csrf::verify();
+
+        $this->persist();
+
+        $client = Ticket141Client::fromSettings();
+
+        if (!$client->configured()) {
+            Flash::info('Einstellungen gespeichert. Keine Ticket141-Adresse hinterlegt – die Kopplung ist aus.');
+            Url::redirect('/admin/einstellungen');
+        }
+
+        try {
+            $ping  = $client->ping();
+            $key   = (array) ($ping['key'] ?? []);
+            $scope = (string) ($key['scope'] ?? '');
+            $text  = 'Verbindung zu Ticket141 ' . (string) ($ping['version'] ?? '') . ' steht (Schlüssel „' . (string) ($key['name'] ?? '') . '“, Rechte: ' . $scope . ').';
+
+            if ($scope !== 'write') {
+                $text .= ' Zum Anlegen von Events braucht der Schlüssel die Rechte „write“.';
+            }
+
+            if (($key['event'] ?? null) !== null) {
+                $text .= ' Achtung: Der Schlüssel ist auf ein einzelnes Event beschränkt – damit lassen sich keine Events anlegen.';
+            }
+
+            Flash::success($text);
+        } catch (\RuntimeException $e) {
+            Flash::error('Einstellungen gespeichert, aber Ticket141 antwortet nicht: ' . $e->getMessage());
+        }
+
+        Url::redirect('/admin/einstellungen');
+    }
+
+    /** Alle Felder des Einstellungsformulars uebernehmen (bricht bei Fehlern mit Redirect ab). */
+    private function persist(): void
+    {
         $values = [];
 
         foreach (self::FIELDS as $field) {
@@ -69,9 +116,54 @@ final class SettingsController
             \App\Core\License::refresh();
         }
 
+        $this->persistTicket141();
+
         Audit::log('settings_updated', 'settings');
-        Flash::success('Einstellungen gespeichert.');
-        Url::redirect('/admin/einstellungen');
+    }
+
+    /**
+     * Ticket141-Kopplung: Adresse, Schluessel (leer = unveraendert), Widget.
+     * Pro-Funktion – ohne Lizenz nur eine Meldung, die uebrigen Felder
+     * werden trotzdem gespeichert.
+     */
+    private function persistTicket141(): void
+    {
+        $url   = trim(post('ticket141_url'));
+        $key   = trim(post('ticket141_api_key'));
+        $embed = post_bool('ticket141_embed') ? '1' : '0';
+
+        if ($url !== '') {
+            try {
+                $url = Ticket141Client::normalizeUrl($url);
+            } catch (\RuntimeException $e) {
+                Flash::error($e->getMessage());
+                Url::redirect('/admin/einstellungen');
+            }
+        }
+
+        $geaendert = $url !== Setting::get('ticket141_url')
+            || ($key !== '' && $key !== Setting::get('ticket141_api_key'))
+            || $embed !== Setting::get('ticket141_embed', '0');
+
+        if (!$geaendert) {
+            return;
+        }
+
+        if (($pro = \App\Core\License::proFeatureError('Die Ticket141-Kopplung')) !== null) {
+            Flash::error($pro);
+
+            return;
+        }
+
+        Setting::set('ticket141_url', $url);
+        Setting::set('ticket141_embed', $embed);
+
+        if ($key !== '') {
+            Setting::set('ticket141_api_key', $key);
+        } elseif ($url === '') {
+            // Kopplung aufgehoben: Schluessel nicht weiter aufheben.
+            Setting::set('ticket141_api_key', '');
+        }
     }
 
     public function checkLicense(): void

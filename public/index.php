@@ -206,6 +206,7 @@ $router->post('/admin/events/{id}', [$events, 'update']);
 $router->post('/admin/events/{id}/status', [$events, 'setStatus']);
 $router->post('/admin/events/{id}/bild-entfernen', [$events, 'removeImage']);
 $router->post('/admin/events/{id}/loeschen', [$events, 'destroy']);
+$router->post('/admin/events/{id}/ticket141/anlegen', [$events, 'ticket141Push']);
 
 $router->get('/admin/events/{id}/sponsoren', [$extras, 'sponsors']);
 $router->post('/admin/events/{id}/sponsor', [$extras, 'saveSponsor']);
@@ -306,6 +307,7 @@ $settings = new SettingsController();
 $router->get('/admin/einstellungen', [$settings, 'index']);
 $router->post('/admin/einstellungen', [$settings, 'save']);
 $router->post('/admin/einstellungen/lizenz-pruefen', [$settings, 'checkLicense']);
+$router->post('/admin/einstellungen/ticket141-pruefen', [$settings, 'checkTicket141']);
 $router->get('/admin/protokoll', [$settings, 'auditLog']);
 
 $system = new App\Controllers\SystemController();

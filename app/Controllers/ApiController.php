@@ -533,9 +533,26 @@ final class ApiController
             'live_mode'  => (int) ($e['live_mode'] ?? 0) === 1,
             'registration_open' => EventRepo::registrationOpen($e),
             'ticket_url' => $e['ticket_url'],
+            'tickets_url' => self::ticketsUrl($e),
             'poster_url' => $e['poster_path'] !== '' ? Fightcard::requestBase() . upload_url((string) $e['poster_path']) : null,
             'url'        => Fightcard::requestBase() . url('/e/' . $e['slug']),
         ];
+    }
+
+    /** Shop-Adresse des gekoppelten Ticket141-Events (sonst der manuelle Ticket-Link). */
+    private static function ticketsUrl(array $e): ?string
+    {
+        $slug = (string) ($e['ticket141_slug'] ?? '');
+
+        if ($slug !== '') {
+            $client = \App\Core\Ticket141Client::fromSettings();
+
+            if ($client->configured()) {
+                return $client->shopUrl($slug);
+            }
+        }
+
+        return (string) $e['ticket_url'] !== '' ? (string) $e['ticket_url'] : null;
     }
 
     /** @param array<int,array<string,mixed>> $times */

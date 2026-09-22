@@ -60,7 +60,7 @@ $s = static fn (string $k, string $d = ''): string => e($settings[$k] ?? $d);
                 <p><span class="pill pill--offen">Lizenz nicht gültig</span> <?= e((string) ($lic['reason'] ?? '')) ?></p>
             <?php else: ?>
                 <p class="muted">Event141 ist Open Source. Gratis: <?= \App\Core\License::FREE_EVENT_LIMIT ?> aktives Event (derzeit <?= (int) $aktiv ?>).
-                    <strong>Event141 Pro</strong> bringt unbegrenzte Events, den automatischen Turnierbaum und die Gym141-Kopplung –
+                    <strong>Event141 Pro</strong> bringt unbegrenzte Events, den automatischen Turnierbaum sowie die Gym141- und Ticket141-Kopplung –
                     <a href="https://account.devworld-llc.com" target="_blank" rel="noopener">account.devworld-llc.com</a>.</p>
             <?php endif; ?>
             <div class="field">
@@ -69,6 +69,28 @@ $s = static fn (string $k, string $d = ''): string => e($settings[$k] ?? $d);
                 <p class="field__hint">Wird beim Speichern sofort geprüft. Die Lizenz gilt für eine Domain.</p>
             </div>
             <button class="btn btn--sm" type="submit" formaction="<?= e(url('/admin/einstellungen/lizenz-pruefen')) ?>" formnovalidate>Lizenz jetzt prüfen</button>
+        </fieldset>
+
+        <fieldset class="card">
+            <legend>Ticket141 (Ticketshop)</legend>
+            <?php $tkUrl = $settings['ticket141_url'] ?? ''; $tkKey = ($settings['ticket141_api_key'] ?? '') !== ''; ?>
+            <p class="muted">
+                Ticketverkauf über das Schwesterprodukt <strong>Ticket141</strong>: Events per Knopf dort anlegen,
+                Kategorien mit Preis und Verfügbarkeit auf der Event-Seite zeigen, Verkaufszahlen in der Verwaltung sehen.
+                <?= $tkUrl !== '' ? '<span class="pill pill--aktiv">gekoppelt</span>' : '' ?>
+            </p>
+            <div class="field">
+                <label for="ticket141_url">Adresse der Ticket141-Instanz</label>
+                <input id="ticket141_url" name="ticket141_url" value="<?= e($tkUrl) ?>" placeholder="https://tickets.example.org" autocomplete="off">
+                <p class="field__hint">Leer = keine Kopplung.</p>
+            </div>
+            <div class="field">
+                <label for="ticket141_api_key">API-Schlüssel <small>(tk_…, Rechte „write“)</small></label>
+                <input id="ticket141_api_key" name="ticket141_api_key" type="password" autocomplete="new-password" placeholder="<?= $tkKey ? 'gespeichert – zum Ändern neu eingeben' : 'tk_…' ?>">
+                <p class="field__hint">In Ticket141 unter <em>API &amp; Webhooks</em> erzeugen. Leer lassen = bleibt unverändert.</p>
+            </div>
+            <label class="check"><input type="checkbox" name="ticket141_embed" value="1" <?= ($settings['ticket141_embed'] ?? '0') === '1' ? 'checked' : '' ?>> Shop als Widget direkt auf der Event-Seite einbetten (statt nur „Tickets kaufen“-Knopf)</label>
+            <button class="btn btn--sm" type="submit" formaction="<?= e(url('/admin/einstellungen/ticket141-pruefen')) ?>" formnovalidate>Speichern &amp; Verbindung prüfen</button>
         </fieldset>
 
         <fieldset class="card">

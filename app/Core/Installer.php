@@ -186,6 +186,8 @@ final class Installer
             'tickets_json'          => "TEXT NOT NULL DEFAULT '[]'",
             'social_json'           => "TEXT NOT NULL DEFAULT '{}'",
             'belt_path'             => "TEXT NOT NULL DEFAULT ''",
+            // Seit 0.5.0: Ticket141-Kopplung.
+            'ticket141_slug'        => "TEXT NOT NULL DEFAULT ''",
         ]);
         $this->addColumns($pdo, 'event_entries', [
             'medical_ok' => 'INTEGER NOT NULL DEFAULT 0',

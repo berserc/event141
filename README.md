@@ -45,6 +45,9 @@ hochladen, `setup.php` aufrufen, fertig. Schwesterprodukt von
 - Kampfstatus und Ergebnisse per API setzen (Anzeigetafel, App, Kampfrichter-Tool)
 - **Gym141 in beide Richtungen**: Mitglieder aus Gym141 holen (Gym-Bereich) *und*
   per Gym-Schlüssel von Gym141 aus Sportler abgleichen, anmelden, Ergebnisse abholen
+- **Ticket141 (seit 0.5)**: Event per Knopf im Ticketshop anlegen, Kategorien mit
+  Preis und Verfügbarkeit plus „Tickets kaufen“ (oder Shop-Widget) auf der
+  Event-Seite, Verkaufszahlen in der Verwaltung
 
 **Gym-Bereich (`/gym`)**
 - Gyms/Vereine registrieren sich selbst, legen ihre Sportler an und melden sie
@@ -128,6 +131,20 @@ Event141 meldet sich an der Gym141-Verwaltungs-API (`/api/app/verwaltung/*`)
 an und speichert nur das Token. Danach: Mitglieder auswählen → als Sportler
 übernehmen (Name, Geburtsdatum, Kontakt; bereits übernommene werden
 aktualisiert, nicht doppelt angelegt).
+
+## Kopplung mit Ticket141
+
+Ticketverkauf über das Schwesterprodukt [Ticket141](https://devworld-llc.com)
+(Pro-Funktion): unter **Einstellungen → Ticket141** Adresse der Instanz und
+einen API-Schlüssel (`tk_…`, Rechte „write“) eintragen. In der Event-Übersicht
+legt **In Ticket141 anlegen** das Event dort per `POST /api/v1/events` an
+(Upsert über `external_source=event141` + `external_ref=<kürzel>`) und merkt
+sich das Ticket141-Kürzel (`events.ticket141_slug`). Die öffentliche
+Event-Seite zeigt dann die Kategorien mit Preis und Verfügbarkeit (5 Minuten
+gepuffert) und einen „Tickets kaufen“-Knopf – optional den Shop als
+eingebettetes Widget (`<base>/embed.js`). Die Verwaltung zeigt verkaufte
+Tickets, Umsatz und Einlass; die Lese-API liefert die Shop-Adresse als
+`tickets_url`.
 
 ## Verwaltetes Hosting
 

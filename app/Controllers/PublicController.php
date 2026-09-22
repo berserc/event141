@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Core\Bracket;
 use App\Core\Config;
+use App\Core\Ticket141Client;
 use App\Core\Timetable;
 use App\Core\Url;
 use App\Core\View;
@@ -53,7 +54,26 @@ final class PublicController
         $eventId = (int) $event['id'];
         $bouts   = self::visible(BoutRepo::forEvent($eventId));
 
+        // Ticket141-Kopplung: Kategorien mit Preis/Verfuegbarkeit (5 Minuten gepuffert).
+        $ticket141 = null;
+        $tkSlug    = (string) ($event['ticket141_slug'] ?? '');
+
+        if ($tkSlug !== '') {
+            $client = Ticket141Client::fromSettings();
+
+            if ($client->configured()) {
+                $ticket141 = [
+                    'slug'       => $tkSlug,
+                    'shop_url'   => $client->shopUrl($tkSlug),
+                    'embed'      => Setting::get('ticket141_embed', '0') === '1',
+                    'embed_js'   => $client->embedScriptUrl(),
+                    'data'       => $client->eventCached($tkSlug),
+                ];
+            }
+        }
+
         View::display('public/event', [
+            'ticket141'  => $ticket141,
             'bouts'      => $bouts,
             'times'      => Timetable::compute($event, $bouts),
             'sponsors'   => EventRepo::sponsors($eventId, true),
