@@ -117,6 +117,9 @@ if ($publicSite) {
     $router->get('/e/{slug}/zeitplan', [$public, 'schedule']);
     $router->get('/e/{slug}/teilnehmer', [$public, 'entries']);
     $router->get('/e/{slug}/ergebnisse', [$public, 'results']);
+    $router->get('/e/{slug}/bericht', [$public, 'report']);
+    $router->get('/e/{slug}/galerie', [$public, 'galleries']);
+    $router->get('/e/{slug}/galerie/{gslug}', [$public, 'gallery']);
     $router->get('/sitemap.xml', [$public, 'sitemap']);
 } else {
     $router->get('/', static fn () => Url::redirect('/admin'));
@@ -209,6 +212,23 @@ $router->post('/admin/events/{id}/loeschen', [$events, 'destroy']);
 $router->post('/admin/events/{id}/ticket141/anlegen', [$events, 'ticket141Push']);
 
 $router->get('/admin/events/{id}/sponsoren', [$extras, 'sponsors']);
+
+// Bildbibliothek, Galerien, Bericht, Kampf-Bilder (seit 0.6.0)
+$medien = new App\Controllers\ImageLibraryController();
+$evMedia = new App\Controllers\EventMediaController();
+$router->get('/admin/medien',                                  [$medien, 'index']);
+$router->post('/admin/medien/hochladen',                       [$medien, 'upload']);
+$router->post('/admin/medien/sammel',                          [$medien, 'bulk']);
+$router->post('/admin/medien/{id}',                            [$medien, 'update']);
+$router->get('/admin/events/{id}/galerie',                     [$evMedia, 'index']);
+$router->post('/admin/events/{id}/bericht',                    [$evMedia, 'saveReport']);
+$router->get('/admin/events/{id}/galerie/neu',                 [$evMedia, 'createGallery']);
+$router->post('/admin/events/{id}/galerie',                    [$evMedia, 'storeGallery']);
+$router->get('/admin/events/{id}/galerie/{gid}',               [$evMedia, 'editGallery']);
+$router->post('/admin/events/{id}/galerie/{gid}',              [$evMedia, 'updateGallery']);
+$router->post('/admin/events/{id}/galerie/{gid}/umschalten',   [$evMedia, 'toggleGallery']);
+$router->post('/admin/events/{id}/galerie/{gid}/loeschen',     [$evMedia, 'destroyGallery']);
+$router->post('/admin/events/{id}/kampf/{bid}/bilder',         [$evMedia, 'saveBoutImages']);
 $router->post('/admin/events/{id}/sponsor', [$extras, 'saveSponsor']);
 $router->post('/admin/events/{id}/sponsor-loeschen', [$extras, 'deleteSponsor']);
 $router->get('/admin/events/{id}/listen', [$extras, 'lists']);

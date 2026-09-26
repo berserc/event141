@@ -167,6 +167,8 @@ final class BoutController
                 'SELECT id, bout_no, round_label, next_slot, status FROM event_bouts WHERE next_bout_id = ? ORDER BY bracket_pos',
                 [(int) $bout['id']]
             ),
+            'boutImages' => \App\Models\GalleryRepo::mediaIds('bout', (int) $bout['id']),
+            'libImages'  => \App\Models\ImageRepo::search(),
         ], 'layouts/admin');
     }
 
@@ -291,6 +293,7 @@ final class BoutController
             'style'        => mb_substr(post('style'), 0, 60),
             'weight_label' => mb_substr(post('weight_label'), 0, 80),
             'description'  => trim((string) ($_POST['description'] ?? '')),
+            'epilog'       => trim((string) ($_POST['epilog'] ?? '')),
             'minutes'      => max(0, post_int('minutes')),
             'show_record'  => isset($_POST['card_form']) ? post_bool('show_record') : 1,
             'active'       => isset($_POST['card_form']) ? post_bool('active') : 1,

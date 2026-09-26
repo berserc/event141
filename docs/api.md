@@ -27,7 +27,7 @@ Ohne Schlüssel sind **veröffentlichte** Events lesbar:
 | GET | `/events` | Eventliste |
 | GET | `/event/{slug}` | Event komplett: Tage, Abschnitte, Ringe, Kategorien, Sponsoren, Kämpfe mit berechneten Zeiten; `tickets_url` = Shop des gekoppelten Ticket141-Events (sonst der manuelle Ticket-Link) |
 | GET | `/event/{slug}/live` | nur Status/Ergebnisse/Zeiten (klein, zum Pollen) |
-| GET | `/event/{slug}/fightcard` | Fightcard im **NAFN-Format** (`fights.json`) |
+| GET | `/event/{slug}/fightcard` | Fightcard im **NAFN-Format** (`fights.json`); je Kampf optional `epilog` (Nachwort) und `gallery` (`[{img, thumb, caption, w, h}]`, absolute URLs) – nur wenn befüllt (seit 0.6) |
 | POST | `/event/{slug}/bout/{id}` | Kampf steuern (scope `write`) |
 
 `POST …/bout/{id}` – Body:

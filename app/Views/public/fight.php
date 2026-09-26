@@ -93,6 +93,25 @@ $corner = static function (string $side) use ($bout): array {
         <div class="fight-detail__story"><?= nl2p((string) $bout['description']) ?></div>
     <?php endif; ?>
 
+    <?php if (trim((string) ($bout['epilog'] ?? '')) !== ''): ?>
+        <div class="fight-detail__story fight-detail__epilog"><h3>Nach dem Kampf</h3><?= nl2p((string) $bout['epilog']) ?></div>
+    <?php endif; ?>
+
+    <?php $images = $images ?? []; if ($images !== []): ?>
+        <div class="fight-detail__gallery">
+            <h3>Bilder</h3>
+            <div class="gallery-grid" style="--gallery-spalten: 3">
+                <?php foreach ($images as $img): ?>
+                    <figure class="gallery-item">
+                        <a href="<?= e(upload_url((string) $img['file'])) ?>" class="js-lightbox" data-caption="<?= e((string) $img['caption']) ?>">
+                            <img src="<?= e(upload_url((string) $img['thumb'])) ?>" alt="<?= e((string) $img['caption']) ?>" loading="lazy">
+                        </a>
+                    </figure>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <div class="fight-detail__bios">
         <?php foreach (['red', 'blue'] as $side): ?>
             <?php $c = $corner($side); ?>

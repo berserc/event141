@@ -111,5 +111,6 @@ $gymArea   = $gymArea ?? true;
 </footer>
 <script src="<?= e(asset('js/media.js')) ?>" defer></script>
 <script src="<?= e(asset('js/event.js')) ?>" defer></script>
+<script src="<?= e(asset('js/gallery.js')) ?>" defer></script>
 </body>
 </html>

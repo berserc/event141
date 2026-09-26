@@ -72,6 +72,36 @@ final class Fightcard
         ];
     }
 
+    /**
+     * Optionale Felder (nur wenn befuellt): Nachwort und Bilder eines Kampfs.
+     *
+     * @param array<string,mixed> $b
+     * @return array<string,mixed>
+     */
+    private static function extras(array $b, string $baseUrl): array
+    {
+        $out = [];
+        if (trim((string) ($b['epilog'] ?? '')) !== '') {
+            $out['epilog'] = (string) $b['epilog'];
+        }
+        try {
+            $imgs = \App\Models\GalleryRepo::boutImages((int) $b['id']);
+        } catch (\Throwable) {
+            $imgs = [];
+        }
+        if ($imgs !== []) {
+            $out['gallery'] = array_map(static fn (array $i): array => [
+                'img'     => $baseUrl . upload_url((string) $i['file']),
+                'thumb'   => $baseUrl . upload_url((string) $i['thumb']),
+                'caption' => (string) $i['caption'],
+                'w'       => (int) $i['width'],
+                'h'       => (int) $i['height'],
+            ], $imgs);
+        }
+
+        return $out;
+    }
+
     /** @return array<string,mixed> */
     private static function item(array $b, string $baseUrl): array
     {
@@ -122,7 +152,7 @@ final class Fightcard
             'active'      => $aktiv,
             'red'         => self::corner($b, 'red', $baseUrl),
             'blue'        => self::corner($b, 'blue', $baseUrl),
-        ] + self::liveTimes($b);
+        ] + self::liveTimes($b) + self::extras($b, $baseUrl);
     }
 
     /** @return array<string,int> */

@@ -248,6 +248,32 @@ function safe_html(string $html): string
 }
 
 /** Wandelt Zeilenumbrueche eines Freitextfeldes in Absaetze. */
+/**
+ * Freitext mit Absaetzen und Zwischenueberschriften: Leerzeile = <p>, "## " am Zeilenanfang = <h3>.
+ * $maxParagraphs > 0 kuerzt (Teaser).
+ */
+function text_blocks(string $text, int $maxParagraphs = 0): string
+{
+    $out = '';
+    $n   = 0;
+    foreach (preg_split('/\R{2,}/', trim(str_replace("\r\n", "\n", $text))) ?: [] as $block) {
+        $block = trim($block);
+        if ($block === '') {
+            continue;
+        }
+        if (str_starts_with($block, '## ')) {
+            $out .= '<h3>' . e(substr($block, 3)) . '</h3>';
+            continue;
+        }
+        $out .= '<p>' . nl2br(e($block)) . '</p>';
+        if ($maxParagraphs > 0 && ++$n >= $maxParagraphs) {
+            break;
+        }
+    }
+
+    return $out;
+}
+
 function nl2p(string $text): string
 {
     $parts = preg_split('/\R{2,}/', trim($text)) ?: [];

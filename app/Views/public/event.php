@@ -102,6 +102,31 @@ $liveNow = array_values(array_filter($bouts, static fn (array $b): bool => $b['s
     </section>
 <?php endif; ?>
 
+<?php $galleries = $galleries ?? []; $reportCover = $reportCover ?? null; $hatBericht = (int) ($event['report_published'] ?? 0) === 1 && trim((string) ($event['report_text'] ?? '')) !== ''; ?>
+<?php if ($hatBericht): ?>
+    <section class="wrap page-section" id="bericht">
+        <h2 class="section-heading">Der Bericht</h2>
+        <a class="report-teaser" href="<?= e(url($base . '/bericht')) ?>">
+            <?php if ($reportCover !== null): ?><span class="report-teaser__img"><img src="<?= e(upload_url((string) $reportCover['file'])) ?>" alt="" loading="lazy"></span><?php endif; ?>
+            <span class="report-teaser__body">
+                <strong><?= e((string) ($event['report_title'] ?: 'Bericht')) ?></strong>
+                <?= text_blocks((string) $event['report_text'], 2) ?>
+                <em>Ganzen Bericht lesen →</em>
+            </span>
+        </a>
+    </section>
+<?php endif; ?>
+<?php if ($galleries !== []): ?>
+    <section class="wrap page-section" id="galerie">
+        <h2 class="section-heading">Die Galerie</h2>
+        <div class="gallery-cards">
+            <?php foreach ($galleries as $g): ?>
+                <a class="gallery-card" href="<?= e(url($base . '/galerie/' . $g['slug'])) ?>"><?php if (!empty($g['cover_thumb'])): ?><img src="<?= e(upload_url((string) $g['cover_thumb'])) ?>" alt="" loading="lazy"><?php endif; ?><strong><?= e((string) $g['title']) ?></strong><span><?= (int) $g['image_count'] ?> Bilder</span></a>
+            <?php endforeach; ?>
+        </div>
+    </section>
+<?php endif; ?>
+
 <div class="wrap event-body">
     <div class="event-body__main">
         <?php if (trim($event['description']) !== ''): ?>

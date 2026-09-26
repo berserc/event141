@@ -177,6 +177,35 @@ Event-Formular wie gehabt.
 
 ---
 
+## Bilder, Galerien und Bericht
+
+**Bildbibliothek** (*Medien (Bilder)* im Menü): Fotos vom Event auf einmal
+hochladen – sie werden am Server verkleinert (max. 1800 px), Handyfotos
+richtig gedreht, eine Vorschau wird angelegt. Beim Hochladen gibst du **Tags**
+an (mit Komma, z. B. „nafn 3, hauptkampf, reiser“) und optional einen
+Bildtext. Suche und Tag-Wolke finden jedes Bild wieder; mit Mehrfachauswahl
+ergänzt oder entfernst du Tags oder löschst Bilder (mit Nachfrage – die
+Bilder verschwinden dann auch aus Kämpfen, Galerien und dem Bericht).
+
+Im Event unter dem Reiter **Galerie & Bericht**:
+
+* **Event-Bericht** – Überschrift, Text (Leerzeile = Absatz, `## ` am
+  Zeilenanfang = Zwischenüberschrift), Titelbild und Bilder aus der
+  Bibliothek. Mit *Bericht auf der Website anzeigen* erscheint er als Teaser
+  auf der Event-Seite, als eigener Reiter und unter `/e/<event>/bericht`.
+* **Galerien** – benannte Bildersammlungen („Impressionen“, „Backstage“ …)
+  mit eigener Seite `/e/<event>/galerie/<kürzel>`. Bilder auswählen: erst
+  nach Tag filtern, anhaken, unten die Reihenfolge ziehen, ★ setzt das
+  Titelbild. Sobald eine Galerie sichtbar ist, bekommt die Event-Seite den
+  Reiter *Galerie*.
+* **Je Kampf** – auf der Kampfseite (Fightcard → Kampf) gibt es das Feld
+  **Nachwort** („Nach dem Kampf“) und darunter **Bilder zum Kampf**. Beides
+  erscheint auf der Kampf-Detailseite unter Ergebnis und Story und wird in
+  der Fightcard-API mitgeliefert (`epilog`, `gallery`), sodass eine gekoppelte
+  Event-Website es übernehmen kann.
+
+---
+
 ## Listen und Druck
 
 *Listen* erzeugt druckfertige Seiten: **Fightcard-Aushang** (Kabinen,

@@ -197,6 +197,8 @@ $entryOptions = static function (?int $selected) use ($entries): string {
         <?php if (!$isBreak): ?>
             <div class="field"><label for="description">Story zum Kampf <small>(Kampf-Detailseite; erster Absatz = Überschrift)</small></label>
                 <textarea id="description" name="description" rows="7" <?= $canWrite ? '' : 'disabled' ?>><?= e($bout['description']) ?></textarea></div>
+            <div class="field"><label for="epilog">Nachwort – „Nach dem Kampf“ <small>(erscheint nach dem Kampf unter dem Ergebnis; Leerzeile = Absatz)</small></label>
+                <textarea id="epilog" name="epilog" rows="4" <?= $canWrite ? '' : 'disabled' ?>><?= e((string) ($bout['epilog'] ?? '')) ?></textarea></div>
             <label class="check"><input type="checkbox" name="show_record" value="1" <?= (int) $bout['show_record'] === 1 ? 'checked' : '' ?> <?= $canWrite ? '' : 'disabled' ?>> Kampfbilanz öffentlich zeigen</label>
         <?php else: ?>
             <input type="hidden" name="show_record" value="1">
@@ -212,6 +214,17 @@ $entryOptions = static function (?int $selected) use ($entries): string {
         <?php endif; ?>
     </form>
 </div>
+
+<?php if (!$isBreak): ?>
+<form method="post" action="<?= e(url('/admin/events/' . $id . '/kampf/' . $bid . '/bilder')) ?>" class="card form" id="bilder">
+    <?= csrf_field() ?>
+    <div class="card__head"><h2>Bilder zum Kampf (<?= count($boutImages ?? []) ?>)</h2></div>
+    <p class="muted">Aus der <a href="<?= e(url('/admin/medien')) ?>">Bildbibliothek</a> – erscheinen auf der Kampf-Detailseite unter Story und Nachwort. Tipp: Bilder beim Hochladen mit dem Kämpfernamen taggen, dann hier danach suchen.</p>
+    <?php $pickerField = 'bout_images'; $pickerSelected = $boutImages ?? []; $pickerImages = $libImages ?? []; $pickerSingle = false;
+    require dirname(__DIR__) . '/partials/_image-picker.php'; ?>
+    <?php if ($canWrite): ?><div class="form-actions"><button class="btn btn--primary" type="submit">Bilder speichern</button></div><?php endif; ?>
+</form>
+<?php endif; ?>
 
 <?php if ($canWrite): ?>
     <form method="post" action="<?= e(url('/admin/events/' . $id . '/kampf/' . $bid . '/loeschen')) ?>" class="inline" data-confirm="<?= $isBreak ? 'Pause' : 'Kampf' ?> löschen?">

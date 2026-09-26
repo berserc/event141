@@ -91,6 +91,60 @@ final class PublicController
             'nextBouts'  => array_slice(array_values(array_filter($bouts, static fn (array $b): bool => $b['status'] === 'geplant' && (int) $b['is_break'] === 0 && $b['session_id'] !== null)), 0, 6),
             'activePage' => $active,
             'eventTab'   => 'uebersicht',
+            'galleries'  => \App\Models\GalleryRepo::forEvent($eventId, true),
+            'reportCover' => (int) ($event['report_cover_id'] ?? 0) > 0 ? \App\Models\ImageRepo::find((int) $event['report_cover_id']) : null,
+        ]);
+    }
+
+    /** Event-Bericht (/e/{slug}/bericht) */
+    public function report(array $args): void
+    {
+        $event = $this->loadEvent($args);
+        if ((int) ($event['report_published'] ?? 0) !== 1) {
+            $this->notFound();
+            return;
+        }
+        View::display('public/report', [
+            'title'      => (string) ($event['report_title'] ?: 'Bericht') . ' – ' . $event['name'],
+            'metaDesc'   => mb_substr(trim(preg_replace('/\s+/', ' ', (string) $event['report_text']) ?? ''), 0, 160),
+            'event'      => $event,
+            'cover'      => (int) ($event['report_cover_id'] ?? 0) > 0 ? \App\Models\ImageRepo::find((int) $event['report_cover_id']) : null,
+            'images'     => \App\Models\GalleryRepo::reportImages((int) $event['id']),
+            'activePage' => 'event',
+            'eventTab'   => 'bericht',
+        ]);
+    }
+
+    /** Galerien eines Events (/e/{slug}/galerie) */
+    public function galleries(array $args): void
+    {
+        $event = $this->loadEvent($args);
+        View::display('public/galleries', [
+            'title'      => 'Galerie – ' . $event['name'],
+            'event'      => $event,
+            'galleries'  => \App\Models\GalleryRepo::forEvent((int) $event['id'], true),
+            'activePage' => 'event',
+            'eventTab'   => 'galerie',
+        ]);
+    }
+
+    /** Eine Galerie (/e/{slug}/galerie/{gslug}) */
+    public function gallery(array $args): void
+    {
+        $event   = $this->loadEvent($args);
+        $gallery = \App\Models\GalleryRepo::findBySlug((int) $event['id'], (string) ($args['gslug'] ?? ''));
+        if ($gallery === null) {
+            $this->notFound();
+            return;
+        }
+        View::display('public/galleries', [
+            'title'      => $gallery['title'] . ' – ' . $event['name'],
+            'event'      => $event,
+            'gallery'    => $gallery,
+            'images'     => \App\Models\GalleryRepo::images((int) $gallery['id']),
+            'galleries'  => \App\Models\GalleryRepo::forEvent((int) $event['id'], true),
+            'activePage' => 'event',
+            'eventTab'   => 'galerie',
         ]);
     }
 
@@ -162,6 +216,7 @@ final class PublicController
             'event'      => $event,
             'bout'       => $bout,
             'times'      => Timetable::compute($event, $bouts),
+            'images'     => \App\Models\GalleryRepo::boutImages((int) $bout['id']),
             'activePage' => 'event',
             'eventTab'   => 'kaempfe',
         ]);

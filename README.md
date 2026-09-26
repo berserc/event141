@@ -45,6 +45,10 @@ hochladen, `setup.php` aufrufen, fertig. Schwesterprodukt von
 - Kampfstatus und Ergebnisse per API setzen (Anzeigetafel, App, Kampfrichter-Tool)
 - **Gym141 in beide Richtungen**: Mitglieder aus Gym141 holen (Gym-Bereich) *und*
   per Gym-Schlüssel von Gym141 aus Sportler abgleichen, anmelden, Ergebnisse abholen
+- **Bilder, Galerien, Bericht (seit 0.6)**: Bildbibliothek mit Tags (Upload wird
+  verkleinert und EXIF-gedreht), Suche und Auswahl im Backend; je Event ein Bericht
+  (Titelbild, Text, Bilder) und Galerien mit eigener Seite; je Kampf Nachwort und
+  Bilder – auch in der Fightcard-API (`epilog`, `gallery`)
 - **Ticket141 (seit 0.5)**: Event per Knopf im Ticketshop anlegen, Kategorien mit
   Preis und Verfügbarkeit plus „Tickets kaufen“ (oder Shop-Widget) auf der
   Event-Seite, Verkaufszahlen in der Verwaltung

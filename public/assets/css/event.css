@@ -290,3 +290,32 @@ body.admin .checkbox-grid--inline { display: flex; flex-wrap: wrap; gap: .3rem .
 body.admin .day-card .plan-edit { font-size: .9rem; }
 body.admin .admin-nav__item--muted { opacity: .7; margin-top: 1rem; }
 body.admin .venue-row { align-items: flex-end; }
+
+
+/* ---- Galerien, Bericht, Kampf-Bilder (seit 0.6.0) ---- */
+.gallery-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+.gallery-card { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--card); color: inherit; text-decoration: none; transition: border-color .2s, transform .2s; }
+.gallery-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.gallery-card img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; }
+.gallery-card strong { font-size: 1.15rem; text-transform: uppercase; letter-spacing: .04em; padding: .9rem 1.1rem 0; }
+.gallery-card span { color: var(--ink-soft); font-size: .85rem; padding: .15rem 1.1rem 1rem; }
+.report { padding: 2rem 0 3rem; }
+.report__cover { margin: 0 auto 2rem; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); }
+.report__cover img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: center 30%; display: block; }
+.report__cover figcaption { padding: .5rem .9rem; font-size: .8rem; color: var(--ink-soft); background: var(--card); }
+.report__text { max-width: 760px; margin: 0 auto 2rem; font-size: 1.05rem; line-height: 1.75; }
+.report__text h3 { color: var(--accent-bright); text-transform: uppercase; letter-spacing: .1em; font-size: 1.1rem; margin: 1.8rem 0 .6rem; }
+.report-teaser { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--card); color: inherit; text-decoration: none; transition: border-color .2s; }
+.report-teaser:hover { border-color: var(--accent); }
+.report-teaser__img img { width: 100%; height: 100%; min-height: 240px; object-fit: cover; display: block; }
+.report-teaser__body { padding: 1.5rem 1.8rem; display: flex; flex-direction: column; }
+.report-teaser__body strong { font-size: 1.5rem; text-transform: uppercase; letter-spacing: .04em; line-height: 1.15; margin-bottom: .6rem; }
+.report-teaser__body p { color: var(--ink-soft); margin-bottom: .6rem; }
+.report-teaser__body h3 { display: none; }
+.report-teaser__body em { font-style: normal; color: var(--accent-bright); text-transform: uppercase; letter-spacing: .1em; font-size: .85rem; margin-top: auto; padding-top: .6rem; }
+.fight-detail__epilog h3, .fight-detail__gallery h3 { color: var(--accent-bright); text-transform: uppercase; letter-spacing: .1em; font-size: 1rem; margin-bottom: .6rem; }
+.fight-detail__gallery { margin: 1.5rem 0; }
+@media (max-width: 640px) {
+  .report-teaser { grid-template-columns: 1fr; }
+  .report-teaser__img img { min-height: 0; aspect-ratio: 16 / 9; }
+}

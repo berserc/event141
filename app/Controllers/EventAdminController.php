@@ -40,6 +40,7 @@ final class EventAdminController
             ['Zeitplan', '/admin/events/' . $id . '/zeitplan'],
             ['Ergebnisse', '/admin/events/' . $id . '/ergebnisse'],
             ['Sponsoren', '/admin/events/' . $id . '/sponsoren'],
+            ['Galerie & Bericht', '/admin/events/' . $id . '/galerie'],
             ['Listen & Druck', '/admin/events/' . $id . '/listen'],
         ];
 

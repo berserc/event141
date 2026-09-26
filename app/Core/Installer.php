@@ -207,6 +207,58 @@ final class Installer
             'external_id'  => "TEXT NOT NULL DEFAULT ''",
         ]);
 
+        // Seit 0.6.0: Bildbibliothek mit Tags, Galerien, Event-Bericht, Bilder + Nachwort je Kampf.
+        $this->addColumns($pdo, 'event_bouts', ['epilog' => "TEXT NOT NULL DEFAULT ''"]);
+        $this->addColumns($pdo, 'events', [
+            'report_title'     => "TEXT NOT NULL DEFAULT ''",
+            'report_text'      => "TEXT NOT NULL DEFAULT ''",
+            'report_cover_id'  => 'INTEGER',
+            'report_published' => 'INTEGER NOT NULL DEFAULT 0',
+        ]);
+        $pdo->exec(<<<'SQL'
+CREATE TABLE IF NOT EXISTS library_images (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    file        TEXT    NOT NULL,
+    thumb       TEXT    NOT NULL DEFAULT '',
+    width       INTEGER NOT NULL DEFAULT 0,
+    height      INTEGER NOT NULL DEFAULT 0,
+    caption     TEXT    NOT NULL DEFAULT '',
+    tags        TEXT    NOT NULL DEFAULT '',
+    orig_name   TEXT    NOT NULL DEFAULT '',
+    uploaded_by INTEGER,
+    created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_library_images_created ON library_images(created_at DESC);
+CREATE TABLE IF NOT EXISTS galleries (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id       INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    slug           TEXT    NOT NULL,
+    title          TEXT    NOT NULL,
+    text           TEXT    NOT NULL DEFAULT '',
+    cover_image_id INTEGER REFERENCES library_images(id) ON DELETE SET NULL,
+    published      INTEGER NOT NULL DEFAULT 1,
+    sort_order     INTEGER NOT NULL DEFAULT 0,
+    created_at     TEXT    NOT NULL DEFAULT (datetime('now')),
+    updated_at     TEXT    NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (event_id, slug)
+);
+CREATE TABLE IF NOT EXISTS gallery_images (
+    gallery_id INTEGER NOT NULL REFERENCES galleries(id) ON DELETE CASCADE,
+    image_id   INTEGER NOT NULL REFERENCES library_images(id) ON DELETE CASCADE,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (gallery_id, image_id)
+);
+CREATE TABLE IF NOT EXISTS event_media (
+    event_id   INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    kind       TEXT    NOT NULL CHECK (kind IN ('bout', 'report')),
+    ref_id     INTEGER NOT NULL,
+    image_id   INTEGER NOT NULL REFERENCES library_images(id) ON DELETE CASCADE,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (kind, ref_id, image_id)
+);
+CREATE INDEX IF NOT EXISTS idx_event_media_event ON event_media(event_id, kind);
+SQL);
+
         // Seit 0.2.0: Sponsoren, Plattform-API (Schluessel), Webhooks.
         $pdo->exec(<<<'SQL'
 

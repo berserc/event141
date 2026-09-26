@@ -13,6 +13,7 @@ use App\Core\Auth;
  * @var int                      $pendingGyms
  */
 $icons = [
+    'image'    => '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
     'home'     => '<path d="M3 9.5 12 3l9 6.5V21h-6v-7h-6v7H3z"/>',
     'calendar' => '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
     'flag'     => '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>',
@@ -42,6 +43,7 @@ $nav = [
     'Teilnehmer' => [
         ['/admin/gyms', 'Gyms & Vereine', null, 'flag'],
         ['/admin/sportler', 'Sportler', null, 'users'],
+        ['/admin/medien', 'Medien (Bilder)', ['superuser', 'orga'], 'image'],
     ],
     'System' => [
         ['/admin/seiten', 'Seiten', 'superuser', 'file'],

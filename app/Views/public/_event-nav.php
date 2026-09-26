@@ -20,6 +20,14 @@ if ((int) $event['show_entries'] === 1) {
 if ((int) $event['show_results'] === 1) {
     $tabs[] = ['ergebnisse', 'Ergebnisse', $base . '/ergebnisse'];
 }
+
+if ((int) ($event['report_published'] ?? 0) === 1 && trim((string) ($event['report_text'] ?? '')) !== '') {
+    $tabs[] = ['bericht', 'Bericht', $base . '/bericht'];
+}
+
+if (\App\Models\GalleryRepo::hasGalleries((int) $event['id'])) {
+    $tabs[] = ['galerie', 'Galerie', $base . '/galerie'];
+}
 ?>
 <nav class="event-nav" aria-label="Event-Seiten">
     <div class="wrap event-nav__inner">
