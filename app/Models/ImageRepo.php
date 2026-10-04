@@ -57,11 +57,11 @@ final class ImageRepo
     {
         $where  = [];
         $params = [];
-        foreach (preg_split('/\s+/', mb_strtolower(trim($q), 'UTF-8')) ?: [] as $word) {
+        foreach (preg_split('/\s+/', fold_text(trim($q))) ?: [] as $word) {
             if ($word === '') {
                 continue;
             }
-            $where[]  = "(tags LIKE ? OR lower(caption) LIKE ? OR lower(orig_name) LIKE ?)";
+            $where[]  = "(fold(tags) LIKE ? OR fold(caption) LIKE ? OR fold(orig_name) LIKE ?)";
             $like     = '%' . str_replace(['%', '_'], ['\%', '\_'], $word) . '%';
             $params[] = $like;
             $params[] = $like;

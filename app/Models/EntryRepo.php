@@ -51,9 +51,9 @@ final class EntryRepo
         }
 
         if (($filter['q'] ?? '') !== '') {
-            $where[] = "(a.first_name LIKE ? OR a.last_name LIKE ? OR g.name LIKE ?)";
-            $like    = '%' . $filter['q'] . '%';
-            array_push($params, $like, $like, $like);
+            $where[] = "(fold(a.first_name) LIKE ? OR fold(a.last_name) LIKE ? OR fold(a.first_name || ' ' || a.last_name) LIKE ? OR fold(g.name) LIKE ?)";
+            $like    = '%' . fold_text((string) $filter['q']) . '%';
+            array_push($params, $like, $like, $like, $like);
         }
 
         return Database::all(

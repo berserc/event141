@@ -219,6 +219,16 @@ if ($isNew): ?>
                 <?= e(t('Gyms dürfen ihre Sportler selbst anmelden (Status „Anmeldung offen“ nötig)')) ?>
             </label>
 
+            <div class="field">
+                <label for="age_mode"><?= e(t('Altersklassen gelten nach')) ?></label>
+                <select id="age_mode" name="age_mode"<?= $ro !== '' ? ' disabled' : '' ?>>
+                    <?php foreach (\App\Models\EventRepo::AGE_MODES as $mKey => $mLabel): ?>
+                        <option value="<?= e($mKey) ?>" <?= (string) ($event['age_mode'] ?? 'jahrgang') === $mKey ? 'selected' : '' ?>><?= e(t($mLabel)) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <p class="field__hint"><?= e(t('WAKO, World Boxing und IFMA rechnen nach dem Geburtsjahr – der Geburtstag spielt keine Rolle. Bei den Kategorien stehen dann die Jahrgänge dabei.')) ?></p>
+            </div>
+
             <div class="field-row">
                 <div class="field field--sm">
                     <label for="registration_from"><?= e(t('Anmeldung ab')) ?></label>

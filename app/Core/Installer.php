@@ -188,6 +188,8 @@ final class Installer
             'belt_path'             => "TEXT NOT NULL DEFAULT ''",
             // Seit 0.5.0: Ticket141-Kopplung.
             'ticket141_slug'        => "TEXT NOT NULL DEFAULT ''",
+            // Seit 0.9.2: Altersklassen nach Geburtsjahr (Verbandsregel) oder nach Alter am Wettkampftag.
+            'age_mode'              => "TEXT NOT NULL DEFAULT 'jahrgang'",
         ]);
         $this->addColumns($pdo, 'event_entries', [
             'medical_ok' => 'INTEGER NOT NULL DEFAULT 0',

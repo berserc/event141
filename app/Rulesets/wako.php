@@ -56,7 +56,7 @@ return [
     'sport'    => 'Kickboxen',
     'version'  => 'WAKO Rules, Ausgabe 2022 (letzte Revision 25.10.2022) mit den Regeländerungen vom 20.03.2026',
     'source'   => 'https://www.wako.sport/rules-overview',
-    'age_rule' => 'Maßgeblich ist das Geburtsjahr: Alter = Wettkampfjahr minus Geburtsjahr, nicht der Geburtstag.',
+    'age_rule' => 'Maßgeblich ist das Geburtsjahr (WAKO Rules Art. 2.1.1.2): Alter = Wettkampfjahr minus Geburtsjahr, nicht der Geburtstag. Einzige Ausnahme: Ältere Junioren dürfen im Ring erst dann bei den Senioren starten, wenn sie tatsächlich schon 18 Jahre alt sind.',
     'note'     => 'Kinder und Kadetten starten nur in ihrer eigenen Altersklasse. Tatami-Sportler dürfen PF, LC und KL kombinieren; '
         . 'Ring-Sportler starten je Meisterschaft in genau einer Ring-Disziplin und nicht auf der Tatami. Gemeldet werden darf höchstens '
         . 'eine Gewichtsklasse über dem tatsächlichen Gewicht. Veteranen dürfen auf der Tatami bis 45 Jahre bei den Senioren starten. '

@@ -43,8 +43,10 @@ final class CategoryFilter
      * @param list<array<string,mixed>> $categories
      * @return array{disciplines:list<string>,ages:array<string,string>,genders:list<string>}
      */
-    public static function options(array $categories): array
+    public static function options(array $categories, ?array $event = null): array
     {
+        $jahr = $event !== null && \App\Models\EventRepo::ageMode($event) === 'jahrgang' ? \App\Models\EventRepo::year($event) : 0;
+
         $disziplinen = [];
         $alter       = [];
         $klassen     = [];
@@ -79,6 +81,13 @@ final class CategoryFilter
             $namen  = array_keys($klassen[$key] ?? []);
 
             // Nur wenn alle Kategorien dieser Altersspanne dieselbe Klasse nennen, den Namen zeigen.
+            // Jahrgaenge dazu, wenn das Event nach Geburtsjahr rechnet
+            $jg = $jahr > 0 ? birth_years($von >= 0 ? $von : null, $bis < 999 ? $bis : null, $jahr) : '';
+
+            if ($jg !== '') {
+                $spanne .= ' · ' . $jg;
+            }
+
             $labels[$key] = count($namen) === 1 && $namen[0] !== '' ? $namen[0] . ' (' . $spanne . ')' : $spanne;
         }
 
@@ -100,14 +109,14 @@ final class CategoryFilter
         $treffer = null;   // Kategorie-Ids, in denen Sportler/Gym zur Suche passen
 
         if ($filter['suche'] !== '') {
-            $like    = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $filter['suche']) . '%';
+            $like    = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], fold_text($filter['suche'])) . '%';
             $treffer = array_flip(array_map('intval', array_column(Database::all(
                 "SELECT DISTINCT e.category_id FROM event_entries e
                    JOIN athletes a ON a.id = e.athlete_id
                    JOIN gyms g ON g.id = e.gym_id
                   WHERE e.event_id = ? AND e.category_id IS NOT NULL AND e.status IN ('angemeldet', 'bestaetigt')
-                    AND (a.first_name || ' ' || a.last_name LIKE ? ESCAPE '\\' OR a.last_name || ' ' || a.first_name LIKE ? ESCAPE '\\'
-                         OR a.nickname LIKE ? ESCAPE '\\' OR g.name LIKE ? ESCAPE '\\' OR g.short_name LIKE ? ESCAPE '\\')",
+                    AND (fold(a.first_name || ' ' || a.last_name) LIKE ? ESCAPE '\\' OR fold(a.last_name || ' ' || a.first_name) LIKE ? ESCAPE '\\'
+                         OR fold(a.nickname) LIKE ? ESCAPE '\\' OR fold(g.name) LIKE ? ESCAPE '\\' OR fold(g.short_name) LIKE ? ESCAPE '\\')",
                 [$eventId, $like, $like, $like, $like, $like]
             ), 'category_id')));
         }
@@ -126,7 +135,7 @@ final class CategoryFilter
             }
 
             if ($filter['suche'] !== '') {
-                return mb_stripos((string) $c['name'], $filter['suche']) !== false || isset($treffer[(int) $c['id']]);
+                return str_contains(fold_text((string) $c['name']), fold_text($filter['suche'])) || isset($treffer[(int) $c['id']]);
             }
 
             return true;

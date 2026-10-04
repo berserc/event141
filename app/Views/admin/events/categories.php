@@ -107,7 +107,7 @@ $fmt = static fn ($v): string => $v === null || $v === '' ? '' : rtrim(rtrim(num
                         <div class="field">
                             <label><?= e(t('Altersklassen')) ?></label>
                             <div class="checkbox-grid">
-                                <?php foreach (\App\Core\Ruleset::classes($rs) as $cKey => $cLabel): ?>
+                                <?php foreach (\App\Core\Ruleset::classes($rs, \App\Models\EventRepo::ageMode($event) === 'jahrgang' ? \App\Models\EventRepo::year($event) : 0) as $cKey => $cLabel): ?>
                                     <label class="check"><input type="checkbox" name="class[]" value="<?= e((string) $cKey) ?>" checked> <?= e(t($cLabel)) ?></label>
                                 <?php endforeach; ?>
                             </div>

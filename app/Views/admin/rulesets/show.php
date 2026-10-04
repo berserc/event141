@@ -36,13 +36,13 @@ $liste = static fn (array $limits): string => implode(' · ', array_map(static f
         <?php if ((string) ($disc['equipment'] ?? '') !== ''): ?><p class="muted"><?= e(t($disc['equipment'])) ?></p><?php endif; ?>
         <div class="table-scroll">
             <table class="table">
-                <thead><tr><th><?= e(t('Altersklasse')) ?></th><th><?= e(t('Alter')) ?></th><th><?= e(t('Kampfzeit')) ?></th><th><?= isset($disc['divisions'][0]['styles']) ? e(t('Kategorien')) : e(t('Gewichtsklassen (kg)')) ?></th></tr></thead>
+                <thead><tr><th><?= e(t('Altersklasse')) ?></th><th><?= e(t('Alter')) ?><br><small><?= e(t('Jahrgänge %d', (int) date('Y'))) ?></small></th><th><?= e(t('Kampfzeit')) ?></th><th><?= isset($disc['divisions'][0]['styles']) ? e(t('Kategorien')) : e(t('Gewichtsklassen (kg)')) ?></th></tr></thead>
                 <tbody>
                 <?php foreach ($disc['divisions'] as $div): ?>
                     <?php $klasse = t((string) $div['class']); $klasseDe = lang() === 'de' ? (string) ($div['de'] ?? '') : ''; ?>
                     <tr>
                         <td><strong><?= e($klasse) ?></strong><?php if ($klasseDe !== '' && $klasseDe !== $klasse): ?><br><small class="muted"><?= e($klasseDe) ?></small><?php endif; ?></td>
-                        <td style="white-space:nowrap"><?= (int) $div['age'][0] ?>–<?= (int) $div['age'][1] ?></td>
+                        <td style="white-space:nowrap"><?= (int) $div['age'][0] ?>–<?= (int) $div['age'][1] ?><br><small class="muted"><?= e(birth_years((int) $div['age'][0], (int) $div['age'][1], (int) date('Y'))) ?></small></td>
                         <td style="white-space:nowrap">
                             <?php if (isset($div['styles'])): ?>
                                 <?= e(t('bis %s', $zeit((float) $div['minutes']))) ?>

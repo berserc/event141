@@ -37,4 +37,15 @@ return [
     'Kein Turnierbaum passt zu diesem Filter.' => 'No bracket matches this filter.',
     'Turnierbäume der Auswahl drucken / PDF' => 'Print brackets of the selection / PDF',
     'Keine Kategorie passt zu diesem Filter.' => 'No category matches this filter.',
+    // Jahrgaenge / Altersregel
+    'Jg. %d'                 => 'born %d',
+    'Jg. %1$d–%2$d'          => 'born %1$d–%2$d',
+    'Jg. %d und älter'       => 'born %d or earlier',
+    'Jg. %d und jünger'      => 'born %d or later',
+    'Jahrgänge %d'           => 'Birth years %d',
+    'Altersklassen gelten nach' => 'Age classes are based on',
+    'Geburtsjahr (Jahrgang) – Alter = Wettkampfjahr minus Geburtsjahr' => 'Year of birth – age = competition year minus year of birth',
+    'Alter am ersten Wettkampftag' => 'Age on the first competition day',
+    'WAKO, World Boxing und IFMA rechnen nach dem Geburtsjahr – der Geburtstag spielt keine Rolle. Bei den Kategorien stehen dann die Jahrgänge dabei.'
+        => 'WAKO, World Boxing and IFMA go by the year of birth – the birthday does not matter. The categories then also show the birth years.',
 ];

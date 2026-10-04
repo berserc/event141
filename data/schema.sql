@@ -187,6 +187,7 @@ CREATE TABLE IF NOT EXISTS events (
     social_json        TEXT    NOT NULL DEFAULT '{}',     -- {facebook,instagram,...}
     belt_path          TEXT    NOT NULL DEFAULT '',       -- Bild des Titelguertels (Titelkaempfe)
     ticket141_slug     TEXT    NOT NULL DEFAULT '',       -- Kuerzel des gekoppelten Ticket141-Events
+    age_mode           TEXT    NOT NULL DEFAULT 'jahrgang', -- Altersklassen nach Geburtsjahr (jahrgang) oder Alter am Wettkampftag (stichtag)
     created_by         INTEGER REFERENCES users(id),
     created_at         TEXT    NOT NULL DEFAULT (datetime('now')),
     updated_at         TEXT    NOT NULL DEFAULT (datetime('now'))

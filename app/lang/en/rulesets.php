@@ -35,8 +35,8 @@ return [
     'Kickboxen' => 'Kickboxing',
     'WAKO Rules, Ausgabe 2022 (letzte Revision 25.10.2022) mit den Regeländerungen vom 20.03.2026'
         => 'WAKO Rules, 2022 edition (last revision 25 Oct 2022) with the rule changes of 20 March 2026',
-    'Maßgeblich ist das Geburtsjahr: Alter = Wettkampfjahr minus Geburtsjahr, nicht der Geburtstag.'
-        => 'The year of birth counts: age = competition year minus year of birth, not the birthday.',
+    'Maßgeblich ist das Geburtsjahr (WAKO Rules Art. 2.1.1.2): Alter = Wettkampfjahr minus Geburtsjahr, nicht der Geburtstag. Einzige Ausnahme: Ältere Junioren dürfen im Ring erst dann bei den Senioren starten, wenn sie tatsächlich schon 18 Jahre alt sind.'
+        => 'The year of birth counts (WAKO Rules Art. 2.1.1.2): age = competition year minus year of birth, not the birthday. The only exception: in the ring, older juniors may compete with the seniors only once they have actually turned 18.',
     'Kinder und Kadetten starten nur in ihrer eigenen Altersklasse. Tatami-Sportler dürfen PF, LC und KL kombinieren; Ring-Sportler starten je Meisterschaft in genau einer Ring-Disziplin und nicht auf der Tatami. Gemeldet werden darf höchstens eine Gewichtsklasse über dem tatsächlichen Gewicht. Veteranen dürfen auf der Tatami bis 45 Jahre bei den Senioren starten. WAKO hat eine überarbeitete Fassung des Regelwerks angekündigt – Tabellen vor einer Meisterschaft mit dem Verband abgleichen.'
         => 'Children and cadets compete only in their own age class. Tatami athletes may combine PF, LC and KL; ring athletes enter exactly one ring discipline per championship and none on the tatami. An athlete may enter at most one weight class above their actual weight. Veterans may compete with the seniors on the tatami up to the age of 45. WAKO has announced a revised rulebook – check the tables with the federation before a championship.',
     'Unentschieden: 1 Minute Verlängerung ohne Pause, danach Sudden Death. Teamwettbewerb (3 Sportler, offenes Gewicht, je 1 × 2:00) und Grand Champion sind nicht als Kategorien hinterlegt.'

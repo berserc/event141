@@ -47,7 +47,7 @@ final class BoutController
             'categories' => $categories,
             'allCategories' => $alle,
             'filter'        => $filter,
-            'filterOptions' => \App\Core\CategoryFilter::options($alle),
+            'filterOptions' => \App\Core\CategoryFilter::options($alle, $event),
             'filterTotal'   => count($alle),
             'bouts'      => $bouts,
             'byCategory' => $byCategory,

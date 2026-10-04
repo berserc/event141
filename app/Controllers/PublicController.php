@@ -179,7 +179,7 @@ final class PublicController
             'times'      => Timetable::compute($event, $bouts),
             'brackets'   => $brackets,
             'filter'        => $filter,
-            'filterOptions' => \App\Core\CategoryFilter::options($mitBaum),
+            'filterOptions' => \App\Core\CategoryFilter::options($mitBaum, $event),
             'filterTotal'   => count($mitBaum),
             'activePage' => 'event',
             'eventTab'   => 'kaempfe',

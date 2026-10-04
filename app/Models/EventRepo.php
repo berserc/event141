@@ -28,6 +28,52 @@ final class EventRepo
         'w'    => 'weiblich',
     ];
 
+    /** Wonach richten sich die Altersklassen? */
+    public const AGE_MODES = [
+        'jahrgang' => 'Geburtsjahr (Jahrgang) – Alter = Wettkampfjahr minus Geburtsjahr',
+        'stichtag' => 'Alter am ersten Wettkampftag',
+    ];
+
+    /** @var array<int,array<string,mixed>|null> */
+    private static array $cache = [];
+
+    /** Event je Anfrage nur einmal laden (fuer categoryInfo in langen Listen). */
+    public static function cached(int $id): ?array
+    {
+        return self::$cache[$id] ??= self::find($id);
+    }
+
+    public static function ageMode(array $event): string
+    {
+        return (string) ($event['age_mode'] ?? 'jahrgang') === 'stichtag' ? 'stichtag' : 'jahrgang';
+    }
+
+    /** Wettkampfjahr (Jahr des ersten Tags). */
+    public static function year(array $event): int
+    {
+        return (int) substr((string) ($event['starts_on'] ?? ''), 0, 4);
+    }
+
+    /**
+     * Alter eines Sportlers fuer die Altersklassen dieses Events: nach
+     * Geburtsjahr (Verbandsregel) oder nach dem Alter am ersten Wettkampftag.
+     */
+    public static function athleteAge(array $event, ?string $birthdate): ?int
+    {
+        if ($birthdate === null || trim($birthdate) === '') {
+            return null;
+        }
+
+        if (self::ageMode($event) === 'jahrgang') {
+            $jahr    = self::year($event);
+            $geboren = (int) substr($birthdate, 0, 4);
+
+            return $jahr > 0 && $geboren > 0 ? $jahr - $geboren : null;
+        }
+
+        return age_from($birthdate, (string) $event['starts_on']);
+    }
+
     // ---------------------------------------------------------------- Events --
 
     /** @return list<array<string,mixed>> */
@@ -307,7 +353,7 @@ final class EventRepo
     }
 
     /** Lesbare Kategorie-Beschreibung, z. B. "K1 · männlich · 18–40 J. · bis 75 kg". */
-    public static function categoryInfo(array $c): string
+    public static function categoryInfo(array $c, ?array $event = null): string
     {
         $teile = [];
 
@@ -319,12 +365,19 @@ final class EventRepo
             $teile[] = t(self::GENDERS[(string) $c['gender']] ?? (string) $c['gender']);
         }
 
+        // Bei der Verbandsregel "Alter = Wettkampfjahr minus Geburtsjahr" stehen die Jahrgaenge dabei.
+        $event ??= isset($c['event_id']) ? self::cached((int) $c['event_id']) : null;
+        $jg      = $event !== null && self::ageMode($event) === 'jahrgang'
+            ? birth_years($c['age_min'] !== null ? (int) $c['age_min'] : null, $c['age_max'] !== null ? (int) $c['age_max'] : null, self::year($event))
+            : '';
+        $jg      = $jg !== '' ? ' (' . $jg . ')' : '';
+
         if ($c['age_min'] !== null && $c['age_max'] !== null) {
-            $teile[] = t('%s–%s J.', (string) (int) $c['age_min'], (string) (int) $c['age_max']);
+            $teile[] = t('%s–%s J.', (string) (int) $c['age_min'], (string) (int) $c['age_max']) . $jg;
         } elseif ($c['age_min'] !== null) {
-            $teile[] = t('ab %d J.', (int) $c['age_min']);
+            $teile[] = t('ab %d J.', (int) $c['age_min']) . $jg;
         } elseif ($c['age_max'] !== null) {
-            $teile[] = t('bis %d J.', (int) $c['age_max']);
+            $teile[] = t('bis %d J.', (int) $c['age_max']) . $jg;
         }
 
         if ($c['weight_min'] !== null || $c['weight_max'] !== null) {

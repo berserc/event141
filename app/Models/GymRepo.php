@@ -21,8 +21,8 @@ final class GymRepo
         $params = [];
 
         if ($search !== '') {
-            $where[]  = '(g.name LIKE ? OR g.city LIKE ? OR g.contact_name LIKE ? OR g.email LIKE ?)';
-            $like     = '%' . $search . '%';
+            $where[]  = '(fold(g.name) LIKE ? OR fold(g.city) LIKE ? OR fold(g.contact_name) LIKE ? OR fold(g.email) LIKE ?)';
+            $like     = '%' . fold_text($search) . '%';
             array_push($params, $like, $like, $like, $like);
         }
 

@@ -445,7 +445,7 @@ final class GymAreaController
 
             // Hinweise (kein Ausschluss): Alter/Gewicht passen nicht zur Kategorie.
             if ($category !== null) {
-                $alter = age_from($athlete['birthdate'], (string) $event['starts_on']);
+                $alter = EventRepo::athleteAge($event, $athlete['birthdate']);
 
                 if ($alter !== null && (($category['age_min'] !== null && $alter < (int) $category['age_min']) || ($category['age_max'] !== null && $alter > (int) $category['age_max']))) {
                     $warn[] = t('%s (%d J.) liegt außerhalb des Alters der Kategorie.', person_name($athlete), $alter);

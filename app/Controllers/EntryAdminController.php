@@ -216,7 +216,7 @@ final class EntryAdminController
         foreach ($rows as $r) {
             fputcsv($out, [
                 $r['category_name'] ?? '', $r['last_name'], $r['first_name'], $r['nickname'],
-                format_date($r['birthdate']), (string) (age_from($r['birthdate'], (string) $event['starts_on']) ?? ''),
+                format_date($r['birthdate']), (string) (EventRepo::athleteAge($event, $r['birthdate']) ?? ''),
                 t(AthleteRepo::GENDERS[$r['gender']] ?? $r['gender']), $r['nationality'], $r['gym_name'], $r['gym_city'],
                 $r['athlete_weight'] !== null ? number_format((float) $r['athlete_weight'], 1, ',', '') : '',
                 $r['weighed'] !== null ? number_format((float) $r['weighed'], 1, ',', '') : '',

@@ -78,6 +78,16 @@ lässt sich danach ändern oder entfernen.
 
 ---
 
+**Alter und Jahrgänge.** WAKO, World Boxing und IFMA rechnen nach dem
+**Geburtsjahr**: Alter = Wettkampfjahr minus Geburtsjahr, der Geburtstag spielt
+keine Rolle. Event141 hält es standardmäßig genauso und schreibt bei jeder
+Kategorie die Jahrgänge dazu, z. B. „13–15 J. (Jg. 2011–2013)“ – auf der
+Website, im Filter, in der Anmeldung und auf den Ausdrucken. Wer ein Turnier
+nach dem Alter am Wettkampftag ausschreibt, stellt das im Event unter
+*Anmeldung durch Gyms → Altersklassen gelten nach* um.
+
+---
+
 ## Anmeldungen
 
 Gyms melden ihre Sportler im Gym-Bereich selbst an; die Verwaltung kann unter

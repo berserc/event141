@@ -32,7 +32,10 @@ final class Database
             );
         }
 
-        $pdo = new PDO('sqlite:' . $path, null, null, [
+        // Ab PHP 8.4 die SQLite-Klasse verwenden (eigene SQL-Funktionen ohne veraltete Aufrufe).
+        $class = class_exists(\Pdo\Sqlite::class) ? \Pdo\Sqlite::class : PDO::class;
+
+        $pdo = new $class('sqlite:' . $path, null, null, [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES   => false,
@@ -42,13 +45,30 @@ final class Database
         $pdo->exec('PRAGMA journal_mode = WAL');
         $pdo->exec('PRAGMA synchronous = NORMAL');
         $pdo->exec('PRAGMA busy_timeout = 5000');
+        self::addFunctions($pdo);
 
         return self::$pdo = $pdo;
+    }
+
+    /**
+     * Eigene SQL-Funktion fold(text): Suche ohne Unterschied bei Gross-/Klein-
+     * schreibung, Umlauten und Akzenten – SQLite kann das von sich aus nur fuer ASCII.
+     */
+    private static function addFunctions(PDO $pdo): void
+    {
+        $fold = static fn (mixed $v): ?string => $v === null ? null : fold_text((string) $v);
+
+        if (class_exists(\Pdo\Sqlite::class) && $pdo instanceof \Pdo\Sqlite) {
+            $pdo->createFunction('fold', $fold, 1);
+        } else {
+            @$pdo->sqliteCreateFunction('fold', $fold, 1);
+        }
     }
 
     /** Setzt eine bereits geoeffnete Verbindung (wird vom Installer genutzt). */
     public static function setPdo(PDO $pdo): void
     {
+        self::addFunctions($pdo);
         self::$pdo = $pdo;
     }
 

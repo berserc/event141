@@ -117,6 +117,50 @@ function t(?string $text, mixed ...$args): string
     return \App\Core\I18n::translate((string) $text, $args);
 }
 
+/**
+ * Text fuer die Suche vereinheitlichen: Kleinbuchstaben, Umlaute und Akzente
+ * auf den Grundbuchstaben ("Müller", "MÜLLER" und "muller" sind gleich,
+ * ebenso "Zupančič" und "zupancic"). Steht in SQL als fold(spalte) bereit.
+ */
+function fold_text(?string $text): string
+{
+    static $map = [
+        'ä' => 'a', 'á' => 'a', 'à' => 'a', 'â' => 'a', 'ã' => 'a', 'å' => 'a', 'ą' => 'a', 'ă' => 'a',
+        'ö' => 'o', 'ó' => 'o', 'ò' => 'o', 'ô' => 'o', 'õ' => 'o', 'ő' => 'o', 'ø' => 'o',
+        'ü' => 'u', 'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ů' => 'u', 'ű' => 'u',
+        'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e', 'ě' => 'e', 'ę' => 'e',
+        'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i', 'ı' => 'i',
+        'č' => 'c', 'ć' => 'c', 'ç' => 'c', 'š' => 's', 'ś' => 's', 'ş' => 's', 'ș' => 's',
+        'ž' => 'z', 'ź' => 'z', 'ż' => 'z', 'ñ' => 'n', 'ń' => 'n', 'ň' => 'n',
+        'ř' => 'r', 'ť' => 't', 'ț' => 't', 'ď' => 'd', 'đ' => 'd', 'ł' => 'l', 'ľ' => 'l',
+        'ý' => 'y', 'ÿ' => 'y', 'ğ' => 'g', 'ß' => 'ss', 'æ' => 'ae', 'œ' => 'oe',
+    ];
+
+    return strtr(mb_strtolower((string) $text, 'UTF-8'), $map);
+}
+
+/**
+ * Jahrgaenge zu einer Altersspanne im Wettkampfjahr: (13, 15, 2026) ->
+ * "Jg. 2011–2013". Grundlage ist die Verbandsregel "Alter = Wettkampfjahr
+ * minus Geburtsjahr" (WAKO, World Boxing, IFMA).
+ */
+function birth_years(?int $ageMin, ?int $ageMax, int $year): string
+{
+    if ($year <= 0) {
+        return '';
+    }
+
+    if ($ageMin !== null && $ageMax !== null) {
+        return $ageMin === $ageMax ? t('Jg. %d', $year - $ageMin) : t('Jg. %1$d–%2$d', $year - $ageMax, $year - $ageMin);
+    }
+
+    if ($ageMin !== null) {
+        return t('Jg. %d und älter', $year - $ageMin);
+    }
+
+    return $ageMax !== null ? t('Jg. %d und jünger', $year - $ageMax) : '';
+}
+
 /** Aktuelle Sprache der Oberflaeche ("de", "en"). */
 function lang(): string
 {

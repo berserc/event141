@@ -40,8 +40,8 @@ final class AthleteRepo
         }
 
         if ($q !== '') {
-            $where[] = "(a.first_name LIKE ? OR a.last_name LIKE ? OR a.nickname LIKE ? OR (a.first_name || ' ' || a.last_name) LIKE ? OR g.name LIKE ?)";
-            $like    = '%' . $q . '%';
+            $where[] = "(fold(a.first_name) LIKE ? OR fold(a.last_name) LIKE ? OR fold(a.nickname) LIKE ? OR fold(a.first_name || ' ' || a.last_name) LIKE ? OR fold(g.name) LIKE ?)";
+            $like    = '%' . fold_text($q) . '%';
             array_push($params, $like, $like, $like, $like, $like);
         }
 

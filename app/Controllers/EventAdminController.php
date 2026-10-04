@@ -394,7 +394,7 @@ final class EventAdminController
             'published' => 0, 'show_entries' => 1, 'show_results' => 1, 'gym_registration' => 1,
             'short_name' => '', 'live_mode' => 0, 'default_bout_minutes' => 12, 'default_break_minutes' => 15,
             'show_countdown' => 1, 'show_map' => 1, 'location_note' => '', 'min_age_note' => '', 'ticket_note' => '',
-            'tickets_json' => '[]', 'social_json' => '{}', 'ticket141_slug' => '',
+            'tickets_json' => '[]', 'social_json' => '{}', 'ticket141_slug' => '', 'age_mode' => 'jahrgang',
         ];
     }
 
@@ -482,6 +482,7 @@ final class EventAdminController
             'tickets_json'          => self::ticketsFromPost(),
             'social_json'           => self::socialFromPost(),
             'ticket141_slug'        => mb_substr(trim(post('ticket141_slug')), 0, 120),
+            'age_mode'              => post('age_mode') === 'stichtag' ? 'stichtag' : 'jahrgang',
         ];
 
         return [$data, $errors];

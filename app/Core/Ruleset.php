@@ -62,23 +62,28 @@ final class Ruleset
     }
 
     /** Altersklassen eines Regelsatzes in der Reihenfolge ihres Auftretens: key => Anzeige. */
-    public static function classes(array $ruleset): array
+    public static function classes(array $ruleset, int $year = 0): array
     {
         $out = [];
 
         foreach ($ruleset['disciplines'] as $disc) {
             foreach ($disc['divisions'] as $div) {
-                $out[(string) $div['key']] ??= self::classLabel($div);
+                $out[(string) $div['key']] ??= self::classLabel($div, $year);
             }
         }
 
         return $out;
     }
 
-    public static function classLabel(array $div): string
+    public static function classLabel(array $div, int $year = 0): string
     {
         [$von, $bis] = $div['age'] + [null, null];
         $alter       = $von !== null && $bis !== null ? ' (' . $von . '–' . $bis . ')' : ($von !== null ? ' (' . t('ab %d', $von) . ')' : ($bis !== null ? ' (' . t('bis %d', $bis) . ')' : ''));
+
+        // Mit Wettkampfjahr auch die Jahrgaenge nennen: "Older Cadets (13–15 · Jg. 2011–2013)"
+        if ($year > 0 && $alter !== '') {
+            $alter = rtrim($alter, ')') . ' · ' . birth_years($von, $bis, $year) . ')';
+        }
 
         return (string) $div['class'] . $alter;
     }
