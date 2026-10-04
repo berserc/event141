@@ -3,7 +3,7 @@
     "id": "event141",
     "name": "Event141 Event- und Turnierverwaltung",
     "vendor": "DevWorld LLC",
-    "baseDomain": "gym141.com",
+    "baseDomain": "event141.com",
     "php": ">=8.1",
     "docroot": "public",
     "adminPath": "/admin",
