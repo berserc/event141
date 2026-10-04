@@ -197,10 +197,8 @@ final class License
         }
 
         if (($state['reason'] ?? '') === 'multi_domain_blocked') {
-            return 'Lizenz gesperrt: Dieser Lizenzschlüssel wird auf mehreren Domains verwendet. '
-                . 'Event141 Pro gilt für ein System – bitte die überzähligen Installationen stilllegen '
-                . 'oder eine weitere Lizenz erwerben (account.devworld-llc.com). '
-                . 'Sobald nur noch eine Domain aktiv ist, wird die Lizenz automatisch wieder gültig.';
+            // Ein zusammenhaengendes Literal: der deutsche Text ist der Woerterbuch-Schluessel.
+            return t('Lizenz gesperrt: Dieser Lizenzschlüssel wird auf mehreren Domains verwendet. Event141 Pro gilt für ein System – bitte die überzähligen Installationen stilllegen oder eine weitere Lizenz erwerben (account.devworld-llc.com). Sobald nur noch eine Domain aktiv ist, wird die Lizenz automatisch wieder gültig.');
         }
 
         $warnung = trim((string) ($state['warning'] ?? ''));
@@ -248,10 +246,8 @@ final class License
             return null;
         }
 
-        return sprintf(
-            'Die Gratis-Version erlaubt %d aktives Event. Für unbegrenzte Events, Turnierbaum und '
-            . 'Gym141-Kopplung gibt es Event141 Pro auf account.devworld-llc.com – den Lizenzschlüssel '
-            . 'dann unter Einstellungen eintragen. (Ein Event auf „Beendet“ zu stellen schafft ebenfalls Platz.)',
+        return t(
+            'Die Gratis-Version erlaubt %d aktives Event. Für unbegrenzte Events, Turnierbaum und Gym141-Kopplung gibt es Event141 Pro auf account.devworld-llc.com – den Lizenzschlüssel dann unter Einstellungen eintragen. (Ein Event auf „Beendet“ zu stellen schafft ebenfalls Platz.)',
             $limit
         );
     }
@@ -263,8 +259,10 @@ final class License
             return null;
         }
 
-        return $feature . ' gehört zu Event141 Pro. Lizenz auf account.devworld-llc.com, '
-            . 'den Schlüssel dann unter Einstellungen eintragen.';
+        return t(
+            '%s gehört zu Event141 Pro. Lizenz auf account.devworld-llc.com, den Schlüssel dann unter Einstellungen eintragen.',
+            $feature
+        );
     }
 
     // --------------------------------------------------------------- Intern --

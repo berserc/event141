@@ -5,6 +5,11 @@
 (function () {
     'use strict';
 
+    /* Text in der Sprache der Oberflaeche (window.I18N kommt aus dem Layout). */
+    function tx(key, fallback) {
+        return (window.I18N && window.I18N[key]) || fallback;
+    }
+
     // Navigation auf schmalen Bildschirmen ein-/ausklappen
     var burger = document.querySelector('.admin-burger');
     var nav = document.getElementById('admin-nav');
@@ -56,7 +61,7 @@
 
             if (selected === 0) {
                 event.preventDefault();
-                window.alert('Bitte zuerst mindestens ein Mitglied auswählen.');
+                window.alert(tx('selectFirst', 'Bitte zuerst mindestens einen Eintrag auswählen.'));
                 return;
             }
 
@@ -65,7 +70,7 @@
                 ? select.options[select.selectedIndex].text
                 : 'Aktion';
 
-            if (!window.confirm('„' + label + '“ für ' + selected + ' Mitglied(er) ausführen?')) {
+            if (!window.confirm(tx('confirmBulk', '„%s“ für %d Eintrag/Einträge ausführen?').replace('%s', label).replace('%d', selected))) {
                 event.preventDefault();
             }
         });
@@ -389,7 +394,7 @@
                 selBox.appendChild(d);
             });
             order.value = selected.join(',');
-            if (selected.length === 0) { selBox.innerHTML = '<span class="muted">noch nichts ausgewählt</span>'; }
+            if (selected.length === 0) { selBox.innerHTML = '<span class="muted">' + tx('nothingSelected', 'noch nichts ausgewählt') + '</span>'; }
         }
 
         function sync() {
@@ -418,7 +423,7 @@
         if (input.closest('.dropzone')) { return; }
         var zone = document.createElement('div');
         zone.className = 'dropzone';
-        zone.innerHTML = '<span class="dropzone__text">' + (input.multiple ? 'Bilder hierher ziehen' : 'Bild hierher ziehen') + ' <small>oder klicken zum Auswählen</small></span><div class="dropzone__list"></div>';
+        zone.innerHTML = '<span class="dropzone__text">' + (input.multiple ? tx('dropMany', 'Bilder hierher ziehen') : tx('dropOne', 'Bild hierher ziehen')) + ' <small>' + tx('dropHint', 'oder klicken zum Auswählen') + '</small></span><div class="dropzone__list"></div>';
         input.parentNode.insertBefore(zone, input);
         zone.appendChild(input);
         input.classList.add('dropzone__input');

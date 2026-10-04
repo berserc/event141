@@ -34,7 +34,7 @@ final class EventExtrasController
         $event = EventAdminController::load((int) ($args['id'] ?? 0));
 
         View::display('admin/events/sponsors', [
-            'title'    => $event['name'] . ' – Sponsoren',
+            'title'    => $event['name'] . ' – ' . t('Sponsoren'),
             'event'    => $event,
             'sponsors' => EventRepo::sponsors((int) $event['id']),
         ], 'layouts/admin');
@@ -50,7 +50,7 @@ final class EventExtrasController
         $name  = post('name');
 
         if ($name === '') {
-            Flash::error('Bitte den Namen des Sponsors angeben.');
+            Flash::error(t('Bitte den Namen des Sponsors angeben.'));
             Url::redirect('/admin/events/' . $event['id'] . '/sponsoren');
         }
 
@@ -99,11 +99,11 @@ final class EventExtrasController
                 }
             }
         } catch (RuntimeException $e) {
-            Flash::error('Logo nicht übernommen: ' . $e->getMessage());
+            Flash::error(t('Logo nicht übernommen: %s', $e->getMessage()));
         }
 
         Audit::log('sponsor_saved', 'event', (int) $event['id'], $name);
-        Flash::success('Sponsor gespeichert.');
+        Flash::success(t('Sponsor gespeichert.'));
         Url::redirect('/admin/events/' . $event['id'] . '/sponsoren');
     }
 
@@ -122,7 +122,7 @@ final class EventExtrasController
 
             Database::run('DELETE FROM event_sponsors WHERE id = ?', [(int) $row['id']]);
             Audit::log('sponsor_deleted', 'event', (int) $event['id'], (string) $row['name']);
-            Flash::success('Sponsor entfernt.');
+            Flash::success(t('Sponsor entfernt.'));
         }
 
         Url::redirect('/admin/events/' . $event['id'] . '/sponsoren');
@@ -137,7 +137,7 @@ final class EventExtrasController
         $event = EventAdminController::load((int) ($args['id'] ?? 0));
 
         View::display('admin/events/lists', [
-            'title'     => $event['name'] . ' – Listen & Druck',
+            'title'     => $event['name'] . ' – ' . t('Listen & Druck'),
             'event'     => $event,
             'entries'   => EntryRepo::forEvent((int) $event['id'], ['status' => 'bestaetigt']),
             'conflicts' => self::cabinConflicts((int) $event['id']),
@@ -174,7 +174,7 @@ final class EventExtrasController
             $n++;
         }
 
-        Flash::success("Checkliste gespeichert ($n Sportler).");
+        Flash::success(t('Checkliste gespeichert (%d Sportler).', $n));
         Url::redirect('/admin/events/' . $event['id'] . '/listen');
     }
 
@@ -224,7 +224,7 @@ final class EventExtrasController
         );
 
         return array_map(
-            static fn (array $r): string => 'Kampf #' . $r['bout_no'] . ': ' . $r['rn'] . ' und ' . $r['ln'] . ' sind beide in Kabine „' . $r['rc'] . '“.',
+            static fn (array $r): string => t('Kampf #%s: %s und %s sind beide in Kabine „%s“.', $r['bout_no'], $r['rn'], $r['ln'], $r['rc']),
             $rows
         );
     }
@@ -242,8 +242,8 @@ final class EventExtrasController
         Database::update('events', (int) $event['id'], ['live_mode' => $on, 'updated_at' => gmdate('Y-m-d H:i:s')]);
         Audit::log('event_live_mode', 'event', (int) $event['id'], $on ? 'an' : 'aus');
         Flash::success($on
-            ? 'Live-Modus an: die Beginnzeiten richten sich jetzt nach den echten Start- und Endzeiten der Kämpfe.'
-            : 'Live-Modus aus: die Beginnzeiten werden aus Startzeit und geplanter Dauer berechnet.');
+            ? t('Live-Modus an: die Beginnzeiten richten sich jetzt nach den echten Start- und Endzeiten der Kämpfe.')
+            : t('Live-Modus aus: die Beginnzeiten werden aus Startzeit und geplanter Dauer berechnet.'));
         Url::redirectRaw((string) ($_SERVER['HTTP_REFERER'] ?? Url::to('/admin/events/' . $event['id'] . '/zeitplan')));
     }
 
@@ -253,7 +253,7 @@ final class EventExtrasController
     {
         AuthController::requireWrite();
 
-        View::display('admin/events/import', ['title' => 'Fightcard importieren'], 'layouts/admin');
+        View::display('admin/events/import', ['title' => t('Fightcard importieren')], 'layouts/admin');
     }
 
     /** Import einer fights.json (Datei-Upload oder Adresse einer bestehenden Event-Website). */
@@ -289,7 +289,9 @@ final class EventExtrasController
         $data = json_decode($json, true);
 
         if (!is_array($data)) {
-            Flash::error('Keine gültige fights.json gefunden' . ($site !== '' ? ' unter ' . $site . '/data/fights.json' : '') . '.');
+            Flash::error($site !== ''
+                ? t('Keine gültige fights.json gefunden unter %s.', $site . '/data/fights.json')
+                : t('Keine gültige fights.json gefunden.'));
             Url::redirect('/admin/events/import');
         }
 
@@ -301,12 +303,12 @@ final class EventExtrasController
         try {
             $result = Fightcard::import($data, (array) (json_decode($pool, true) ?: []), $base, Auth::id(), post_bool('replace') === 1);
         } catch (\Throwable $e) {
-            Flash::error('Import fehlgeschlagen: ' . $e->getMessage());
+            Flash::error(t('Import fehlgeschlagen: %s', $e->getMessage()));
             Url::redirect('/admin/events/import');
         }
 
         Audit::log('event_imported', 'event', $result['event_id'], $result['bouts'] . ' Kämpfe');
-        Flash::success(sprintf(
+        Flash::success(t(
             'Fightcard importiert: %d Kämpfe, %d neue Sportler, %d neue Gyms, %d Mediendateien. Das Event ist noch nicht veröffentlicht.',
             $result['bouts'],
             $result['athletes'],

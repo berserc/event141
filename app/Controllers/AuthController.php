@@ -21,7 +21,7 @@ final class AuthController
         }
 
         View::display('admin/login', [
-            'title'  => 'Anmeldung',
+            'title'  => t('Anmeldung'),
             'errors' => Flash::errors(),
             'old'    => Flash::oldInput(),
         ], 'layouts/blank');
@@ -36,19 +36,19 @@ final class AuthController
         $password = (string) ($_POST['password'] ?? '');
 
         if (Auth::isThrottled($ip)) {
-            Flash::error('Zu viele Fehlversuche. Bitte in 15 Minuten erneut versuchen.');
+            Flash::error(t('Zu viele Fehlversuche. Bitte in 15 Minuten erneut versuchen.'));
             Url::redirect('/admin/login');
         }
 
         if ($username === '' || $password === '') {
-            Flash::error('Bitte Benutzername und Passwort eingeben.');
+            Flash::error(t('Bitte Benutzername und Passwort eingeben.'));
             Flash::withInput(['username' => $username]);
             Url::redirect('/admin/login');
         }
 
         if (!Auth::attempt($username, $password)) {
             Auth::recordFailedAttempt($ip, $username);
-            Flash::error('Benutzername oder Passwort ist falsch.');
+            Flash::error(t('Benutzername oder Passwort ist falsch.'));
             Flash::withInput(['username' => $username]);
             Url::redirect('/admin/login');
         }
@@ -59,7 +59,7 @@ final class AuthController
         $user = Auth::user();
 
         if ($user !== null && (int) $user['must_change_password'] === 1) {
-            Flash::info('Bitte vergeben Sie zuerst ein eigenes Passwort.');
+            Flash::info(t('Bitte vergeben Sie zuerst ein eigenes Passwort.'));
             Url::redirect('/admin/profil');
         }
 
@@ -79,7 +79,7 @@ final class AuthController
         self::requireLogin();
 
         View::display('admin/profile', [
-            'title'  => 'Mein Konto',
+            'title'  => t('Mein Konto'),
             'user'   => Auth::user(),
             'errors' => Flash::errors(),
         ], 'layouts/admin');
@@ -97,20 +97,20 @@ final class AuthController
         $errors  = [];
 
         if (!password_verify($current, (string) $user['password_hash'])) {
-            $errors['current_password'] = 'Das aktuelle Passwort stimmt nicht.';
+            $errors['current_password'] = t('Das aktuelle Passwort stimmt nicht.');
         }
 
         if (mb_strlen($new) < Auth::MIN_PASSWORD_LENGTH) {
-            $errors['new_password'] = 'Das neue Passwort muss mindestens ' . Auth::MIN_PASSWORD_LENGTH . ' Zeichen haben.';
+            $errors['new_password'] = t('Das neue Passwort muss mindestens %d Zeichen haben.', Auth::MIN_PASSWORD_LENGTH);
         }
 
         if ($new !== $confirm) {
-            $errors['new_password_confirm'] = 'Die Wiederholung stimmt nicht überein.';
+            $errors['new_password_confirm'] = t('Die Wiederholung stimmt nicht überein.');
         }
 
         if ($errors !== []) {
             Flash::withInput([], $errors);
-            Flash::error('Das Passwort wurde nicht geändert.');
+            Flash::error(t('Das Passwort wurde nicht geändert.'));
             Url::redirect('/admin/profil');
         }
 
@@ -121,7 +121,7 @@ final class AuthController
         ]);
 
         Audit::log('password_changed', 'user', (int) $user['id']);
-        Flash::success('Passwort geändert.');
+        Flash::success(t('Passwort geändert.'));
         Url::redirect('/admin/profil');
     }
 
@@ -132,7 +132,7 @@ final class AuthController
             return;
         }
 
-        Flash::error('Bitte melden Sie sich an.');
+        Flash::error(t('Bitte melden Sie sich an.'));
         Url::redirect('/admin/login');
     }
 
@@ -145,7 +145,7 @@ final class AuthController
         }
 
         http_response_code(403);
-        View::display('errors/403', ['title' => 'Kein Zugriff'], 'layouts/admin');
+        View::display('errors/403', ['title' => t('Kein Zugriff')], 'layouts/admin');
         exit;
     }
 

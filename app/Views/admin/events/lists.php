@@ -10,7 +10,7 @@ use App\Core\Auth;
  * @var list<string>              $conflicts
  */
 $id       = (int) $event['id'];
-$subtitle = 'Listen & Druck';
+$subtitle = t('Listen & Druck');
 $canWrite = Auth::canWrite();
 require __DIR__ . '/_head.php';
 
@@ -19,35 +19,35 @@ sort($kabinen);
 ?>
 <div class="stat-grid stat-grid--compact">
     <a class="stat" href="<?= e(url('/admin/events/' . $id . '/druck/aushang')) ?>" target="_blank" rel="noopener">
-        <span class="stat__value">🖨</span><span class="stat__label">Fightcard-Aushang (Kabinen, Kampfgericht)</span>
+        <span class="stat__value">🖨</span><span class="stat__label"><?= e(t('Fightcard-Aushang (Kabinen, Kampfgericht)')) ?></span>
     </a>
     <a class="stat" href="<?= e(url('/admin/events/' . $id . '/druck/check')) ?>" target="_blank" rel="noopener">
-        <span class="stat__value">☑</span><span class="stat__label">Kämpfer-Checkliste (Waage, Musik, Arzt)</span>
+        <span class="stat__value">☑</span><span class="stat__label"><?= e(t('Kämpfer-Checkliste (Waage, Musik, Arzt)')) ?></span>
     </a>
     <a class="stat <?= $conflicts !== [] ? 'stat--danger' : '' ?>" href="<?= e(url('/admin/events/' . $id . '/druck/kabinen')) ?>" target="_blank" rel="noopener">
-        <span class="stat__value">🚪</span><span class="stat__label">Kabineneinteilung + Türschilder</span>
+        <span class="stat__value">🚪</span><span class="stat__label"><?= e(t('Kabineneinteilung + Türschilder')) ?></span>
     </a>
     <a class="stat" href="<?= e(url('/admin/events/' . $id . '/anmeldungen.csv')) ?>">
-        <span class="stat__value">⬇</span><span class="stat__label">Teilnehmer als CSV (Excel)</span>
+        <span class="stat__value">⬇</span><span class="stat__label"><?= e(t('Teilnehmer als CSV (Excel)')) ?></span>
     </a>
 </div>
-<p class="muted">Die Druckansichten öffnen in einem neuen Tab – dort mit Strg+P drucken oder als PDF speichern.</p>
+<p class="muted"><?= e(t('Die Druckansichten öffnen in einem neuen Tab – dort mit Strg+P drucken oder als PDF speichern.')) ?></p>
 
 <?php foreach ($conflicts as $c): ?>
-    <div class="notice notice--danger"><strong>Kabinen-Konflikt:</strong> <?= e($c) ?></div>
+    <div class="notice notice--danger"><strong><?= e(t('Kabinen-Konflikt:')) ?></strong> <?= e($c) ?></div>
 <?php endforeach; ?>
 
 <form method="post" action="<?= e(url('/admin/events/' . $id . '/listen')) ?>" class="card">
     <?= csrf_field() ?>
     <div class="card__head">
-        <h2>Checkliste</h2>
-        <?php if ($canWrite): ?><button class="btn btn--primary btn--sm" type="submit">Checkliste speichern</button><?php endif; ?>
+        <h2><?= e(t('Checkliste')) ?></h2>
+        <?php if ($canWrite): ?><button class="btn btn--primary btn--sm" type="submit"><?= e(t('Checkliste speichern')) ?></button><?php endif; ?>
     </div>
     <datalist id="kabinen"><?php foreach ($kabinen as $k): ?><option value="<?= e($k) ?>"></option><?php endforeach; ?></datalist>
 
     <div class="table-scroll">
         <table class="table table--compact">
-            <thead><tr><th>Sportler</th><th>Gym</th><th>Klasse</th><th>Gewicht Waage (kg)</th><th>Einlaufmusik</th><th>Ärztl. Unters.</th><th>Kabine</th></tr></thead>
+            <thead><tr><th><?= e(t('Sportler##einzahl')) ?></th><th><?= e(t('Gym')) ?></th><th><?= e(t('Klasse')) ?></th><th><?= e(t('Gewicht Waage (kg)')) ?></th><th><?= e(t('Einlaufmusik')) ?></th><th><?= e(t('Ärztl. Unters.')) ?></th><th><?= e(t('Kabine')) ?></th></tr></thead>
             <tbody>
             <?php foreach ($entries as $x): ?>
                 <tr>
@@ -55,14 +55,14 @@ sort($kabinen);
                     <td><?= e($x['gym_name']) ?></td>
                     <td><small><?= e($x['category_name'] ?? '') ?></small></td>
                     <td><input name="rows[<?= (int) $x['id'] ?>][weighed]" class="input--xs" inputmode="decimal" value="<?= $x['weighed'] !== null ? e(number_format((float) $x['weighed'], 1, ',', '')) : '' ?>" <?= $canWrite ? '' : 'disabled' ?>></td>
-                    <td><input name="rows[<?= (int) $x['id'] ?>][music]" value="<?= e($x['music']) ?>" placeholder="Titel / Datei" <?= $canWrite ? '' : 'disabled' ?>></td>
+                    <td><input name="rows[<?= (int) $x['id'] ?>][music]" value="<?= e($x['music']) ?>" placeholder="<?= e(t('Titel / Datei')) ?>" <?= $canWrite ? '' : 'disabled' ?>></td>
                     <td><input type="checkbox" name="rows[<?= (int) $x['id'] ?>][medical_ok]" value="1" <?= (int) $x['medical_ok'] === 1 ? 'checked' : '' ?> <?= $canWrite ? '' : 'disabled' ?>></td>
-                    <td><input name="rows[<?= (int) $x['id'] ?>][cabin]" list="kabinen" class="input--time" value="<?= e($x['cabin']) ?>" placeholder="z. B. 1" <?= $canWrite ? '' : 'disabled' ?>></td>
+                    <td><input name="rows[<?= (int) $x['id'] ?>][cabin]" list="kabinen" class="input--time" value="<?= e($x['cabin']) ?>" placeholder="<?= e(t('z. B. 1')) ?>" <?= $canWrite ? '' : 'disabled' ?>></td>
                 </tr>
             <?php endforeach; ?>
-            <?php if ($entries === []): ?><tr><td colspan="7" class="empty">Noch keine bestätigten Anmeldungen.</td></tr><?php endif; ?>
+            <?php if ($entries === []): ?><tr><td colspan="7" class="empty"><?= e(t('Noch keine bestätigten Anmeldungen.')) ?></td></tr><?php endif; ?>
             </tbody>
         </table>
     </div>
-    <p class="field__hint">Kabinen-Regel: Gegner dürfen nicht in derselben Kabine sein – Konflikte werden oben rot gemeldet. Gyms am besten zusammenlassen.</p>
+    <p class="field__hint"><?= e(t('Kabinen-Regel: Gegner dürfen nicht in derselben Kabine sein – Konflikte werden oben rot gemeldet. Gyms am besten zusammenlassen.')) ?></p>
 </form>

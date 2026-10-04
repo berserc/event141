@@ -5,33 +5,31 @@ use App\Core\Auth;
 /** @var list<array<string,mixed>> $users */
 ?>
 <div class="page-head">
-    <h1>Benutzer</h1>
+    <h1><?= e(t('Benutzer')) ?></h1>
     <div class="page-head__actions">
-        <a class="btn btn--primary" href="<?= e(url('/admin/benutzer/neu')) ?>">Neuer Benutzer</a>
+        <a class="btn btn--primary" href="<?= e(url('/admin/benutzer/neu')) ?>"><?= e(t('Neuer Benutzer')) ?></a>
     </div>
 </div>
 
 <div class="card">
     <p class="role-help">
-        <strong>Organisation</strong> verwaltet Events, Gyms, Sportler, Anmeldungen und Zeitplan.
-        <strong>Ringleitung</strong> trägt nur Kampfstatus und Ergebnisse ein (Ringansicht).
-        <strong>Admin</strong> zusätzlich Benutzer, Seiten und Einstellungen.
+        <?= t('<strong>Organisation</strong> verwaltet Events, Gyms, Sportler, Anmeldungen und Zeitplan. <strong>Ringleitung</strong> trägt nur Kampfstatus und Ergebnisse ein (Ringansicht). <strong>Admin</strong> zusätzlich Benutzer, Seiten und Einstellungen.') ?>
     </p>
     <div class="table-scroll">
         <table class="table">
-            <thead><tr><th>Benutzername</th><th>Name</th><th>Rolle</th><th>Status</th><th>Letzte Anmeldung</th><th></th></tr></thead>
+            <thead><tr><th><?= e(t('Benutzername')) ?></th><th><?= e(t('Name')) ?></th><th><?= e(t('Rolle')) ?></th><th><?= e(t('Status')) ?></th><th><?= e(t('Letzte Anmeldung')) ?></th><th></th></tr></thead>
             <tbody>
             <?php foreach ($users as $user): ?>
                 <tr>
                     <td><a class="strong" href="<?= e(url('/admin/benutzer/' . $user['id'])) ?>"><?= e($user['username']) ?></a></td>
                     <td><?= e($user['name']) ?></td>
-                    <td><?= e(Auth::ROLES[$user['role']] ?? $user['role']) ?></td>
+                    <td><?= e(t(Auth::ROLES[$user['role']] ?? $user['role'])) ?></td>
                     <td>
-                        <?php if ((int) $user['active'] === 1): ?><span class="pill pill--aktiv">aktiv</span><?php else: ?><span class="pill pill--offen">gesperrt</span><?php endif; ?>
-                        <?php if ((int) $user['must_change_password'] === 1): ?><span class="badge">Passwortwechsel offen</span><?php endif; ?>
+                        <?php if ((int) $user['active'] === 1): ?><span class="pill pill--aktiv"><?= e(t('aktiv')) ?></span><?php else: ?><span class="pill pill--offen"><?= e(t('gesperrt')) ?></span><?php endif; ?>
+                        <?php if ((int) $user['must_change_password'] === 1): ?><span class="badge"><?= e(t('Passwortwechsel offen')) ?></span><?php endif; ?>
                     </td>
                     <td><?= e(format_datetime($user['last_login_at'] === null ? null : (string) $user['last_login_at'])) ?: '–' ?></td>
-                    <td class="row-actions"><a href="<?= e(url('/admin/benutzer/' . $user['id'])) ?>">Bearbeiten</a></td>
+                    <td class="row-actions"><a href="<?= e(url('/admin/benutzer/' . $user['id'])) ?>"><?= e(t('Bearbeiten')) ?></a></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

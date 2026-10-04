@@ -33,7 +33,7 @@ final class Mailer
         $fromName = trim(Setting::get('smtp_from_name')) ?: (Setting::get('club_name') ?: 'Gym141');
 
         if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
-            return 'Ungültige Empfängeradresse.';
+            return t('Ungültige Empfängeradresse.');
         }
 
         if (!self::smtpConfigured()) {
@@ -44,7 +44,7 @@ final class Mailer
 
             return @mail($to, self::encodeHeader($subject), $body, $headers)
                 ? ''
-                : 'PHP mail() ist auf diesem Server nicht verfügbar – bitte SMTP-Zugangsdaten hinterlegen.';
+                : t('PHP mail() ist auf diesem Server nicht verfügbar – bitte SMTP-Zugangsdaten hinterlegen.');
         }
 
         try {
@@ -52,7 +52,7 @@ final class Mailer
 
             return '';
         } catch (\Throwable $e) {
-            return 'SMTP-Versand fehlgeschlagen: ' . $e->getMessage();
+            return t('SMTP-Versand fehlgeschlagen: %s', $e->getMessage());
         }
     }
 
@@ -75,7 +75,7 @@ final class Mailer
         $sock    = @stream_socket_client($adresse, $errno, $error, 15, STREAM_CLIENT_CONNECT, $context);
 
         if ($sock === false) {
-            throw new \RuntimeException("Verbindung zu $host:$port fehlgeschlagen ($error).");
+            throw new \RuntimeException(t('Verbindung zu %s:%d fehlgeschlagen (%s).', $host, $port, (string) $error));
         }
 
         stream_set_timeout($sock, 15);
@@ -100,7 +100,7 @@ final class Mailer
             $code    = (int) substr($antwort, 0, 3);
 
             if (!in_array($code, $ok, true)) {
-                throw new \RuntimeException(trim($antwort) ?: 'keine Antwort auf ' . strtok($cmd, ' '));
+                throw new \RuntimeException(trim($antwort) ?: t('keine Antwort auf %s', (string) strtok($cmd, ' ')));
             }
 
             return $antwort;
@@ -115,7 +115,7 @@ final class Mailer
             $sende('STARTTLS', [220]);
 
             if (!stream_socket_enable_crypto($sock, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
-                throw new \RuntimeException('STARTTLS-Verschlüsselung fehlgeschlagen.');
+                throw new \RuntimeException(t('STARTTLS-Verschlüsselung fehlgeschlagen.'));
             }
 
             $sende('EHLO ' . $selbst, [250]);

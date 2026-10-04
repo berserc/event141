@@ -8,7 +8,7 @@
  */
 ?>
 <!DOCTYPE html>
-<html lang="de">
+<html lang="<?= e(lang()) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="robots" content="noindex, nofollow">
@@ -43,7 +43,7 @@
     </style>
 </head>
 <body>
-<div class="toolbar"><button type="button" onclick="window.print()">Drucken / als PDF speichern</button></div>
+<div class="toolbar"><button type="button" onclick="window.print()"><?= e(t('Drucken / als PDF speichern')) ?></button></div>
 <?= $content ?>
 </body>
 </html>

@@ -34,11 +34,11 @@ foreach ($entries as $x) {
     }
 }
 ?>
-<h1><?= e($event['name']) ?> – Kämpfer-Check</h1>
-<p class="sub"><?= e(format_date_long($event['starts_on'])) ?> · <?= count($rows) ?> Sportler · Stand <?= e(date('d.m.Y H:i')) ?></p>
+<h1><?= e($event['name']) ?> – <?= e(t('Kämpfer-Check')) ?></h1>
+<p class="sub"><?= e(format_date_long($event['starts_on'])) ?> · <?= e(t('%d Sportler', count($rows))) ?> · <?= e(t('Stand %s', date(lang() === 'en' ? 'j M Y H:i' : 'd.m.Y H:i'))) ?></p>
 
 <table>
-    <thead><tr><th class="num">Kampf</th><th>Name</th><th>Gym</th><th>Klasse</th><th>Gewicht Waage (kg)</th><th>Musik</th><th class="num">Ärztl. Unters.</th></tr></thead>
+    <thead><tr><th class="num"><?= e(t('Kampf')) ?></th><th><?= e(t('Name')) ?></th><th><?= e(t('Gym')) ?></th><th><?= e(t('Klasse')) ?></th><th><?= e(t('Gewicht Waage (kg)')) ?></th><th><?= e(t('Musik')) ?></th><th class="num"><?= e(t('Ärztl. Unters.')) ?></th></tr></thead>
     <tbody>
     <?php foreach ($rows as $r): ?>
         <tr>
@@ -47,7 +47,7 @@ foreach ($entries as $x) {
             <td><small><?= e($r['gym_name']) ?></small></td>
             <td><small><?= e($r['_class']) ?></small></td>
             <td class="fill num"><?= $r['weighed'] !== null ? e(number_format((float) $r['weighed'], 1, ',', '')) : '' ?></td>
-            <td><?= $r['music'] !== '' ? '<small>' . e($r['music']) . '</small>' : '<small style="color:#c8102e">fehlt</small>' ?></td>
+            <td><?= $r['music'] !== '' ? '<small>' . e($r['music']) . '</small>' : '<small style="color:#c8102e">' . e(t('fehlt')) . '</small>' ?></td>
             <td class="fill num"><span class="box<?= (int) $r['medical_ok'] === 1 ? ' on' : '' ?>"></span></td>
         </tr>
     <?php endforeach; ?>

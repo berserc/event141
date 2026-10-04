@@ -23,18 +23,33 @@ foreach ($list as $b) {
     }
 }
 
-$fmtMin = static fn ($v): string => rtrim(rtrim(number_format((float) $v, 1, ',', ''), '0'), ',');
+$komma  = lang() === 'en' ? '.' : ',';
+$fmtMin = static fn ($v): string => rtrim(rtrim(number_format((float) $v, 1, $komma, ''), '0'), $komma);
 
 $resultText = static function (array $b): string {
     if ((string) $b['status'] !== 'beendet') {
         return '';
     }
 
+    // Siegart · Runde · Anmerkung; die Zeile selbst als ganzer Satz je Sprache
     $w    = (string) $b['winner'];
-    $text = $w === 'draw' ? 'Unentschieden' : ($w === 'red' ? 'Sieg ' . BoutRepo::cornerName($b, 'red') : ($w === 'blue' ? 'Sieg ' . BoutRepo::cornerName($b, 'blue') : 'Kein Sieger'));
-    $more = trim($b['method'] . ((string) $b['result_round'] !== '' ? ' · Runde ' . $b['result_round'] : '') . ((string) $b['result_note'] !== '' ? ' · ' . $b['result_note'] : ''), ' ·');
+    $more = implode(' · ', array_filter([
+        t((string) $b['method']),
+        (string) $b['result_round'] !== '' ? t('Runde %s', $b['result_round']) : '',
+        (string) $b['result_note'],
+    ], static fn (string $x): bool => trim($x) !== ''));
 
-    return $text . ($more !== '' ? ' – ' . $more : '');
+    if ($w === 'red' || $w === 'blue') {
+        $name = BoutRepo::cornerName($b, $w);
+
+        return $more !== '' ? t('Sieg %1$s – %2$s', $name, $more) : t('Sieg %s', $name);
+    }
+
+    if ($w === 'draw') {
+        return $more !== '' ? t('Unentschieden – %s', $more) : t('Unentschieden');
+    }
+
+    return $more !== '' ? t('Kein Sieger – %s', $more) : t('Kein Sieger');
 };
 
 $ageOf = static function (array $b, string $s): ?int {
@@ -52,13 +67,13 @@ $chips = static function (array $b, string $s) use ($ageOf): string {
     $out = [];
 
     if ((int) $b['show_record'] === 1) {
-        $out[] = '<span class="chip chip--gold">Bilanz ' . (int) $b[$s . '_w'] . '–' . (int) $b[$s . '_l'] . '–' . (int) $b[$s . '_d'] . '</span>';
+        $out[] = '<span class="chip chip--gold">' . e(t('Bilanz %s', (int) $b[$s . '_w'] . '–' . (int) $b[$s . '_l'] . '–' . (int) $b[$s . '_d'])) . '</span>';
     }
 
     $age = $ageOf($b, $s);
 
     if ($age !== null) {
-        $out[] = '<span class="chip chip--gold">Alter ' . $age . '</span>';
+        $out[] = '<span class="chip chip--gold">' . e(t('Alter %d', $age)) . '</span>';
     }
 
     return $out === [] ? '' : '<span class="chips">' . implode('', $out) . '</span>';
@@ -71,32 +86,32 @@ $story = static function (array $b, string $extra = ''): string {
     }
 
     return '<details class="fight-story' . $extra . '" data-story="' . (int) $b['id'] . '">'
-        . '<summary><span class="fight-story__more">▾ Story lesen</span><span class="fight-story__less">▴ Weniger anzeigen</span></summary>'
+        . '<summary><span class="fight-story__more">▾ ' . e(t('Story lesen')) . '</span><span class="fight-story__less">▴ ' . e(t('Weniger anzeigen')) . '</span></summary>'
         . '<div class="fight-story__body">' . nl2p((string) $b['description']) . '</div></details>';
 };
 
 $ribbon = '<span class="winner-ribbon">Winner</span>';
 ?>
 <?php if ($list === []): ?>
-    <p class="muted">Die Fightcard wird noch zusammengestellt.</p>
+    <p class="muted"><?= e(t('Die Fightcard wird noch zusammengestellt.')) ?></p>
 <?php endif; ?>
 
 <?php if ($main !== null): ?>
     <?php $bout = $main; $red = BoutRepo::cornerName($main, 'red') ?: 'TBA'; $blue = BoutRepo::cornerName($main, 'blue') ?: 'TBA'; ?>
     <a class="main-event main-event--<?= e($main['status']) ?>" href="<?= e(url($base . '/kampf/' . $main['id'])) ?>">
         <span class="main-event__badge">
-            <?= e($main['title'] !== '' ? $main['title'] : 'Hauptkampf') ?> · Kampf <?= (int) $main['bout_no'] ?>
+            <?= e($main['title'] !== '' ? $main['title'] : t('Hauptkampf')) ?> · <?= e(t('Kampf %d', (int) $main['bout_no'])) ?>
             <?php if ($main['status'] === 'laufend'): ?><span class="live-badge">LIVE</span><?php endif; ?>
         </span>
         <?php if ((string) $main['belt_label'] !== ''): ?>
             <span class="main-event__belt-label"><?= e($main['belt_label']) ?></span>
-            <?php if ((string) ($event['belt_path'] ?? '') !== ''): ?><span class="belt-hero"><img src="<?= e(upload_url($event['belt_path'])) ?>" alt="Titelgürtel – <?= e($main['belt_label']) ?>"></span><?php endif; ?>
+            <?php if ((string) ($event['belt_path'] ?? '') !== ''): ?><span class="belt-hero"><img src="<?= e(upload_url($event['belt_path'])) ?>" alt="<?= e(t('Titelgürtel – %s', $main['belt_label'])) ?>"></span><?php endif; ?>
         <?php endif; ?>
         <span class="main-event__body">
             <span class="main-event__fighter main-event__fighter--red<?= $main['winner'] === 'red' ? ' is-winner' : '' ?>">
                 <span class="main-event__photo"><?php $side = 'red'; $lazy = false; require __DIR__ . '/_media.php'; ?><?= $main['winner'] === 'red' ? $ribbon : '' ?></span>
                 <span class="main-event__name"><?= e($red) ?></span>
-                <?php if ($main['red_nick'] !== '' && $main['red_nick'] !== null): ?><span class="main-event__nick">„<?= e($main['red_nick']) ?>“</span><?php endif; ?>
+                <?php if ($main['red_nick'] !== '' && $main['red_nick'] !== null): ?><span class="main-event__nick"><?= e(t('„%s“', $main['red_nick'])) ?></span><?php endif; ?>
                 <span class="main-event__gym"><?= e($main['red_gym'] ?? '') ?></span>
                 <?= $chips($main, 'red') ?>
             </span>
@@ -107,13 +122,13 @@ $ribbon = '<span class="winner-ribbon">Winner</span>';
             <span class="main-event__fighter main-event__fighter--blue<?= $main['winner'] === 'blue' ? ' is-winner' : '' ?>">
                 <span class="main-event__photo"><?php $side = 'blue'; $lazy = false; require __DIR__ . '/_media.php'; ?><?= $main['winner'] === 'blue' ? $ribbon : '' ?></span>
                 <span class="main-event__name"><?= e($blue) ?></span>
-                <?php if ($main['blue_nick'] !== '' && $main['blue_nick'] !== null): ?><span class="main-event__nick">„<?= e($main['blue_nick']) ?>“</span><?php endif; ?>
+                <?php if ($main['blue_nick'] !== '' && $main['blue_nick'] !== null): ?><span class="main-event__nick"><?= e(t('„%s“', $main['blue_nick'])) ?></span><?php endif; ?>
                 <span class="main-event__gym"><?= e($main['blue_gym'] ?? '') ?></span>
                 <?= $chips($main, 'blue') ?>
             </span>
         </span>
         <span class="main-event__meta">
-            <?= e(implode(' · ', array_filter([$main['style'], $main['weight_label'] ?: ($main['category_name'] ?? ''), (int) $main['rounds'] . ' × ' . $fmtMin($main['round_minutes']) . ' Min.']))) ?>
+            <?= e(implode(' · ', array_filter([$main['style'], $main['weight_label'] ?: ($main['category_name'] ?? ''), t('%d × %s Min.', (int) $main['rounds'], $fmtMin($main['round_minutes']))]))) ?>
             <?php if (isset($times[(int) $main['id']])): ?> · <span class="start-time" data-sched="<?= (int) $main['id'] ?>"><?= e($times[(int) $main['id']]['label']) ?></span><?php endif; ?>
         </span>
         <?php if ($resultText($main) !== ''): ?><span class="main-event__result"><?= e($resultText($main)) ?></span><?php endif; ?>
@@ -128,7 +143,7 @@ $ribbon = '<span class="winner-ribbon">Winner</span>';
 
         <?php if ((int) $bout['is_break'] === 1): ?>
             <div class="break-row break-row--<?= e($bout['status']) ?>">
-                <span><?= e($bout['title'] ?: 'Pause') ?><?= $bout['note'] !== '' ? ' · ' . e($bout['note']) : '' ?></span>
+                <span><?= e(t($bout['title'] ?: 'Pause')) ?><?= $bout['note'] !== '' ? ' · ' . e($bout['note']) : '' ?></span>
                 <?php if (isset($times[(int) $bout['id']])): ?><span class="start-time" data-sched="<?= (int) $bout['id'] ?>"><?= e($times[(int) $bout['id']]['label']) ?></span><?php endif; ?>
             </div>
             <?php continue; ?>
@@ -149,10 +164,10 @@ $ribbon = '<span class="winner-ribbon">Winner</span>';
             </span>
             <span class="fight-row__mid">
                 <?php if ($bout['status'] === 'laufend'): ?><span class="live-badge">LIVE</span>
-                <?php elseif ($bout['status'] === 'abgesagt'): ?><span class="badge-dark">abgesagt</span>
+                <?php elseif ($bout['status'] === 'abgesagt'): ?><span class="badge-dark"><?= e(t('abgesagt')) ?></span>
                 <?php else: ?><span class="fight-row__vs">VS</span><?php endif; ?>
                 <small><?= e(implode(' · ', array_filter([$bout['title'], $bout['style'], $bout['weight_label'] ?: ($bout['category_name'] ?? '')]))) ?></small>
-                <small><?= (int) $bout['rounds'] ?> × <?= e($fmtMin($bout['round_minutes'])) ?> Min.<?php if (isset($times[(int) $bout['id']])): ?> · <span class="start-time" data-sched="<?= (int) $bout['id'] ?>"><?= e($times[(int) $bout['id']]['label']) ?></span><?php endif; ?></small>
+                <small><?= e(t('%d × %s Min.', (int) $bout['rounds'], $fmtMin($bout['round_minutes']))) ?><?php if (isset($times[(int) $bout['id']])): ?> · <span class="start-time" data-sched="<?= (int) $bout['id'] ?>"><?= e($times[(int) $bout['id']]['label']) ?></span><?php endif; ?></small>
                 <?php if ($resultText($bout) !== ''): ?><small class="fight-row__result"><?= e($resultText($bout)) ?></small><?php endif; ?>
             </span>
             <span class="fight-row__corner fight-row__corner--blue<?= $bout['winner'] === 'blue' ? ' is-winner' : '' ?>">

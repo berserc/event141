@@ -28,7 +28,7 @@ final class EventMediaController
         $id    = (int) $event['id'];
 
         View::display('admin/events/media', [
-            'title'        => $event['name'] . ' – Galerie & Bericht',
+            'title'        => $event['name'] . ' – ' . t('Galerie & Bericht'),
             'event'        => $event,
             'galleries'    => GalleryRepo::forEvent($id),
             'reportImages' => GalleryRepo::mediaIds('report', $id),
@@ -54,7 +54,7 @@ final class EventMediaController
         ]);
         GalleryRepo::setMedia('report', $id, $id, self::pickedIds('report_images'));
         Audit::log('report_saved', 'event', $id, 'Bericht gespeichert');
-        Flash::success('Bericht gespeichert.');
+        Flash::success(t('Bericht gespeichert.'));
         Url::redirect('/admin/events/' . $id . '/galerie');
     }
 
@@ -71,7 +71,7 @@ final class EventMediaController
         $event   = EventAdminController::load((int) ($args['id'] ?? 0));
         $gallery = GalleryRepo::find((int) ($args['gid'] ?? 0), (int) $event['id']);
         if ($gallery === null) {
-            Flash::error('Galerie nicht gefunden.');
+            Flash::error(t('Galerie nicht gefunden.'));
             Url::redirect('/admin/events/' . $event['id'] . '/galerie');
         }
         $this->galleryForm($event, $gallery);
@@ -88,7 +88,7 @@ final class EventMediaController
             }
         }
         View::display('admin/events/gallery-form', [
-            'title'    => $event['name'] . ' – ' . ($gallery === null ? 'Neue Galerie' : $gallery['title']),
+            'title'    => $event['name'] . ' – ' . ($gallery === null ? t('Neue Galerie') : $gallery['title']),
             'event'    => $event,
             'gallery'  => $data,
             'isNew'    => $gallery === null,
@@ -113,7 +113,7 @@ final class EventMediaController
         $gid = GalleryRepo::create($data);
         GalleryRepo::setImages($gid, self::pickedIds('image_ids'));
         Audit::log('gallery_created', 'event', $id, (string) $data['title']);
-        Flash::success('Galerie angelegt.');
+        Flash::success(t('Galerie angelegt.'));
         Url::redirect('/admin/events/' . $id . '/galerie/' . $gid);
     }
 
@@ -125,7 +125,7 @@ final class EventMediaController
         $id      = (int) $event['id'];
         $gallery = GalleryRepo::find((int) ($args['gid'] ?? 0), $id);
         if ($gallery === null) {
-            Flash::error('Galerie nicht gefunden.');
+            Flash::error(t('Galerie nicht gefunden.'));
             Url::redirect('/admin/events/' . $id . '/galerie');
         }
         $gid = (int) $gallery['id'];
@@ -137,7 +137,7 @@ final class EventMediaController
         GalleryRepo::update($gid, $data);
         GalleryRepo::setImages($gid, self::pickedIds('image_ids'));
         Audit::log('gallery_updated', 'event', $id, (string) $data['title']);
-        Flash::success('Galerie gespeichert.');
+        Flash::success(t('Galerie gespeichert.'));
         Url::redirect('/admin/events/' . $id . '/galerie/' . $gid);
     }
 
@@ -163,7 +163,7 @@ final class EventMediaController
         if ($gallery !== null) {
             GalleryRepo::delete((int) $gallery['id']);
             Audit::log('gallery_deleted', 'event', (int) $event['id'], (string) $gallery['title']);
-            Flash::success('Galerie gelöscht – die Bilder bleiben in der Bildbibliothek.');
+            Flash::success(t('Galerie gelöscht – die Bilder bleiben in der Bildbibliothek.'));
         }
         Url::redirect('/admin/events/' . $event['id'] . '/galerie');
     }
@@ -177,12 +177,12 @@ final class EventMediaController
         $id    = (int) $event['id'];
         $bid   = (int) ($args['bid'] ?? 0);
         if (Database::value('SELECT id FROM event_bouts WHERE id = ? AND event_id = ?', [$bid, $id]) === null) {
-            Flash::error('Kampf nicht gefunden.');
+            Flash::error(t('Kampf nicht gefunden.'));
             Url::redirect('/admin/events/' . $id . '/kaempfe');
         }
         GalleryRepo::setMedia('bout', $bid, $id, self::pickedIds('bout_images'));
         Audit::log('bout_images', 'event', $id, 'Kampf #' . $bid . ': Bilder gespeichert');
-        Flash::success('Bilder zum Kampf gespeichert.');
+        Flash::success(t('Bilder zum Kampf gespeichert.'));
         Url::redirect('/admin/events/' . $id . '/kampf/' . $bid . '#bilder');
     }
 
@@ -207,7 +207,7 @@ final class EventMediaController
         $errors = [];
         $title  = trim(post('title'));
         if ($title === '') {
-            $errors['title'] = 'Bitte einen Titel eingeben.';
+            $errors['title'] = t('Bitte einen Titel eingeben.');
         }
         $cover = post_int('cover_image_id');
 

@@ -15,11 +15,11 @@ $pickerUid    = 'pick-' . preg_replace('/[^a-z0-9]/i', '', $pickerField) . '-' .
 ?>
 <div class="image-picker js-image-picker<?= $pickerSingle ? ' image-picker--single' : '' ?>" id="<?= e($pickerUid) ?>" data-field="<?= e($pickerField) ?>" data-selected="<?= e(implode(',', $pickerSelected)) ?>">
     <?php if ($pickerImages === []): ?>
-        <p class="muted">Noch keine Bilder in der Bildbibliothek – unter <a href="<?= e(url('/admin/medien')) ?>">Bilder</a> hochladen.</p>
+        <p class="muted"><?= t('Noch keine Bilder in der Bildbibliothek – unter <a href="%s">Bilder</a> hochladen.', e(url('/admin/medien'))) ?></p>
     <?php else: ?>
         <div class="image-picker__bar">
-            <input type="search" class="image-picker__q" placeholder="Suchen: Tag, Bildtext, Dateiname … (mehrere Wörter = alle müssen passen)" autocomplete="off">
-            <label class="check"><input type="checkbox" class="image-picker__only"> nur Ausgewählte</label>
+            <input type="search" class="image-picker__q" placeholder="<?= e(t('Suchen: Tag, Bildtext, Dateiname … (mehrere Wörter = alle müssen passen)')) ?>" autocomplete="off">
+            <label class="check"><input type="checkbox" class="image-picker__only"> <?= e(t('nur Ausgewählte')) ?></label>
             <span class="muted image-picker__count"></span>
         </div>
         <div class="image-picker__tags"></div>
@@ -38,7 +38,7 @@ $pickerUid    = 'pick-' . preg_replace('/[^a-z0-9]/i', '', $pickerField) . '-' .
         </div>
         <?php if (!$pickerSingle): ?>
             <div class="image-picker__order">
-                <span class="muted">Reihenfolge – ziehen zum Sortieren, ✕ entfernt:</span>
+                <span class="muted"><?= e(t('Reihenfolge – ziehen zum Sortieren, ✕ entfernt:')) ?></span>
                 <div class="image-picker__sel"></div>
             </div>
         <?php endif; ?>

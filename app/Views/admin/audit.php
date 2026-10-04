@@ -8,14 +8,14 @@
  */
 ?>
 <div class="page-head">
-    <h1>Protokoll</h1>
-    <p class="page-head__sub"><?= (int) $total ?> Einträge</p>
+    <h1><?= e(t('Protokoll')) ?></h1>
+    <p class="page-head__sub"><?= e(t('%d Einträge', (int) $total)) ?></p>
 </div>
 
 <div class="card">
     <div class="table-scroll">
         <table class="table table--compact">
-            <thead><tr><th>Zeit</th><th>Benutzer</th><th>Aktion</th><th>Objekt</th><th>Details</th><th>IP</th></tr></thead>
+            <thead><tr><th><?= e(t('Zeit')) ?></th><th><?= e(t('Benutzer##einzahl')) ?></th><th><?= e(t('Aktion')) ?></th><th><?= e(t('Objekt')) ?></th><th><?= e(t('Details')) ?></th><th>IP</th></tr></thead>
             <tbody>
             <?php foreach ($entries as $row): ?>
                 <tr>
@@ -28,14 +28,14 @@
                 </tr>
             <?php endforeach; ?>
             <?php if ($entries === []): ?>
-                <tr><td colspan="6" class="empty">Noch keine Einträge.</td></tr>
+                <tr><td colspan="6" class="empty"><?= e(t('Noch keine Einträge.')) ?></td></tr>
             <?php endif; ?>
             </tbody>
         </table>
     </div>
 
     <?php if ($pages > 1): ?>
-        <nav class="pager" aria-label="Seiten">
+        <nav class="pager" aria-label="<?= e(t('Seiten')) ?>">
             <?php for ($p = 1; $p <= $pages; $p++): ?>
                 <?php if ($p === $page): ?>
                     <span class="pager__current"><?= $p ?></span>

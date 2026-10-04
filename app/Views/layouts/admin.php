@@ -59,12 +59,12 @@ $nav = [
 $currentPath = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 ?>
 <!DOCTYPE html>
-<html lang="de">
+<html lang="<?= e(lang()) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title><?= e($title !== '' ? $title . ' | Verwaltung' : 'Verwaltung') ?></title>
+    <title><?= e($title !== '' ? $title . ' | ' . t('Verwaltung') : t('Verwaltung')) ?></title>
     <link rel="stylesheet" href="<?= e(asset('css/site.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/admin.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/event.css')) ?>">
@@ -82,7 +82,7 @@ try {
 
 <?php if (!empty($showEnvBanner)): ?>
     <div class="env-banner" role="status">
-        Testumgebung – hier gearbeitete Änderungen erscheinen <strong>nicht</strong> auf der Produktivseite.
+        <?= t('Testumgebung – hier gearbeitete Änderungen erscheinen <strong>nicht</strong> auf der Produktivseite.') ?>
     </div>
 <?php endif; ?>
 
@@ -95,13 +95,13 @@ try {
     <div class="admin-top__inner">
         <button class="admin-burger" type="button" aria-controls="admin-nav" aria-expanded="false">
             <span></span><span></span><span></span>
-            <span class="sr-only">Menü</span>
+            <span class="sr-only"><?= e(t('Menü')) ?></span>
         </button>
 
         <button class="admin-nav-toggle" type="button" data-nav-collapse
-                title="Menü ein-/ausblenden" aria-controls="admin-nav">
+                title="<?= e(t('Menü ein-/ausblenden')) ?>" aria-controls="admin-nav">
             <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path class="nav-toggle-hide" d="M9.8 3.2 5 8l4.8 4.8 1.1-1.1L7.2 8l3.7-3.7z" fill="currentColor"/><path class="nav-toggle-show" d="M6.2 3.2 11 8l-4.8 4.8-1.1-1.1L8.8 8 5.1 4.3z" fill="currentColor"/></svg>
-            <span class="sr-only">Menü ein-/ausblenden</span>
+            <span class="sr-only"><?= e(t('Menü ein-/ausblenden')) ?></span>
         </button>
 
         <a class="admin-top__brand" href="<?= e(url('/admin')) ?>">
@@ -110,18 +110,20 @@ try {
 
         <div class="admin-top__right">
             <?php if ($publicSite ?? true): ?>
-                <a class="admin-top__link" href="<?= e(url('/')) ?>" target="_blank" rel="noopener">Website ansehen</a>
+                <a class="admin-top__link" href="<?= e(url('/')) ?>" target="_blank" rel="noopener"><?= e(t('Website ansehen')) ?></a>
             <?php endif; ?>
+
+            <?= lang_switch('lang-switch lang-switch--admin') ?>
 
             <?php if (!empty($authUser)): ?>
                 <a class="admin-top__user" href="<?= e(url('/admin/profil')) ?>">
                     <?= e($authUser['name'] !== '' ? $authUser['name'] : $authUser['username']) ?>
-                    <small><?= e(Auth::ROLES[$authUser['role']] ?? $authUser['role']) ?></small>
+                    <small><?= e(t(Auth::ROLES[$authUser['role']] ?? $authUser['role'])) ?></small>
                 </a>
 
                 <form method="post" action="<?= e(url('/admin/logout')) ?>" class="inline">
                     <?= csrf_field() ?>
-                    <button class="btn btn--ghost btn--sm" type="submit">Abmelden</button>
+                    <button class="btn btn--ghost btn--sm" type="submit"><?= e(t('Abmelden')) ?></button>
                 </form>
             <?php endif; ?>
         </div>
@@ -129,7 +131,7 @@ try {
 </header>
 
 <div class="admin-shell">
-    <nav id="admin-nav" class="admin-nav" aria-label="Verwaltungsnavigation">
+    <nav id="admin-nav" class="admin-nav" aria-label="<?= e(t('Verwaltungsnavigation')) ?>">
         <?php
         $bestMatch = '';
         foreach ($nav as $items) {
@@ -147,9 +149,9 @@ try {
             $href = url($path);
             ?>
             <a href="<?= e($href) ?>" class="admin-nav__item<?= $href === $bestMatch && $bestMatch !== '' ? ' is-active' : '' ?>">
-                <span class="admin-nav__label"><?= $icon($symbol) ?><?= e($label) ?></span>
+                <span class="admin-nav__label"><?= $icon($symbol) ?><?= e(t($label)) ?></span>
                 <?php if ($path === '/admin/gyms' && $pendingGyms > 0): ?>
-                    <span class="badge badge--warn" title="Neue, unbestätigte Gyms"><?= (int) $pendingGyms ?></span>
+                    <span class="badge badge--warn" title="<?= e(t('Neue, unbestätigte Gyms')) ?>"><?= (int) $pendingGyms ?></span>
                 <?php endif; ?>
             </a>
             <?php
@@ -170,7 +172,7 @@ try {
             <?php else: ?>
                 <details class="admin-nav__section" data-nav-group="<?= e($gruppe) ?>" open>
                     <summary class="admin-nav__group">
-                        <?= e($gruppe) ?>
+                        <?= e(t($gruppe)) ?>
                         <svg class="admin-nav__chevron" width="12" height="12" viewBox="0 0 16 16" aria-hidden="true">
                             <path d="M4.5 6l3.5 3.5L11.5 6l1 1-4.5 4.5L3.5 7z" fill="currentColor"/>
                         </svg>
@@ -182,7 +184,7 @@ try {
 
         <?php if ($gymArea ?? true): ?>
             <a class="admin-nav__item admin-nav__item--muted" href="<?= e(url('/gym/login')) ?>" target="_blank" rel="noopener">
-                <span class="admin-nav__label"><?= $icon('user') ?>Gym-Bereich ↗</span>
+                <span class="admin-nav__label"><?= $icon('user') ?><?= e(t('Gym-Bereich')) ?> ↗</span>
             </a>
         <?php endif; ?>
     </nav>
@@ -202,6 +204,16 @@ try {
     </main>
 </div>
 
+<script>window.I18N = <?= json_encode([
+    'selectFirst'     => t('Bitte zuerst mindestens einen Eintrag auswählen.'),
+    'confirmBulk'     => t('„%s“ für %d Eintrag/Einträge ausführen?'),
+    'nothingSelected' => t('noch nichts ausgewählt'),
+    'dropMany'        => t('Bilder hierher ziehen'),
+    'dropOne'         => t('Bild hierher ziehen'),
+    'dropHint'        => t('oder klicken zum Auswählen'),
+    'editorLang'      => lang(),
+    'blockFormats'    => t('Absatz=p; Überschrift 2=h2; Überschrift 3=h3; Überschrift 4=h4'),
+], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
 <script src="<?= e(asset('js/admin.js')) ?>" defer></script>
 <?php if (str_contains($content, 'js-richtext')): ?>
     <script src="<?= e(url('/assets/vendor/tinymce/tinymce.min.js')) ?>" defer></script>

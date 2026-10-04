@@ -127,6 +127,15 @@ php -S localhost:8124 -t public public/router.php
 6. Am Wettkampftag: **Ringansicht** je Ring – Kämpfe starten, Ergebnisse eintragen.
    Sieger rücken automatisch auf; die Website zeigt Live-Status und Ergebnisse.
 
+## Sprachen
+
+Die Oberfläche (Website, Gym-Bereich, Verwaltung) ist zwischen **Deutsch und
+Englisch** umschaltbar – Umschalter in der Kopfzeile, Vorgabe unter
+*Einstellungen*. Quellsprache ist Deutsch: `t('Deutscher Text')` schlägt die
+Übersetzung in `app/lang/<sprache>/*.php` nach und fällt auf den deutschen Text
+zurück. Eine weitere Sprache ist ein weiterer Ordner plus ein Eintrag in
+`App\Core\I18n::LANGS`. `php bin/i18n-check.php` meldet Texte ohne Übersetzung.
+
 ## Regelsätze
 
 Unter `app/Rulesets/` liegen die Wettkampfstrukturen der Verbände als

@@ -37,24 +37,24 @@ final class Upload
         $tmp = (string) ($file['tmp_name'] ?? '');
 
         if ($tmp === '' || !is_uploaded_file($tmp)) {
-            throw new RuntimeException('Die Datei konnte nicht gelesen werden.');
+            throw new RuntimeException(t('Die Datei konnte nicht gelesen werden.'));
         }
 
         if ((int) ($file['size'] ?? 0) > self::MAX_BYTES) {
-            throw new RuntimeException('Die Datei ist größer als 8 MB.');
+            throw new RuntimeException(t('Die Datei ist größer als 8 MB.'));
         }
 
         $info = @getimagesize($tmp);
 
         if ($info === false || !isset(self::ALLOWED[$info[2]])) {
-            throw new RuntimeException('Nur JPG-, PNG-, GIF- oder WEBP-Bilder sind erlaubt.');
+            throw new RuntimeException(t('Nur JPG-, PNG-, GIF- oder WEBP-Bilder sind erlaubt.'));
         }
 
         $extension = self::ALLOWED[$info[2]];
         $dir       = rtrim((string) Config::get('upload_dir'), '/\\') . '/' . trim($subDir, '/');
 
         if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
-            throw new RuntimeException('Das Upload-Verzeichnis konnte nicht angelegt werden.');
+            throw new RuntimeException(t('Das Upload-Verzeichnis konnte nicht angelegt werden.'));
         }
 
         // Zeitstempel im Dateinamen umgeht den Browser-Cache nach einem Bildwechsel.
@@ -64,7 +64,7 @@ final class Upload
         $resized = self::resize($tmp, $target, $info, $maxWidth);
 
         if (!$resized && !move_uploaded_file($tmp, $target)) {
-            throw new RuntimeException('Die Datei konnte nicht gespeichert werden.');
+            throw new RuntimeException(t('Die Datei konnte nicht gespeichert werden.'));
         }
 
         @chmod($target, 0644);
@@ -99,11 +99,11 @@ final class Upload
         $tmp = (string) ($file['tmp_name'] ?? '');
 
         if ($tmp === '' || !is_uploaded_file($tmp)) {
-            throw new RuntimeException('Die Datei konnte nicht gelesen werden.');
+            throw new RuntimeException(t('Die Datei konnte nicht gelesen werden.'));
         }
 
         if ((int) ($file['size'] ?? 0) > self::VIDEO_MAX_BYTES) {
-            throw new RuntimeException('Das Video ist größer als 100 MB.');
+            throw new RuntimeException(t('Das Video ist größer als 100 MB.'));
         }
 
         $mime = function_exists('finfo_open')
@@ -111,20 +111,20 @@ final class Upload
             : (string) ($file['type'] ?? '');
 
         if (!isset(self::VIDEO_ALLOWED[$mime])) {
-            throw new RuntimeException('Nur MP4- oder WebM-Videos sind erlaubt.');
+            throw new RuntimeException(t('Nur MP4- oder WebM-Videos sind erlaubt.'));
         }
 
         $dir = rtrim((string) Config::get('upload_dir'), '/\\') . '/' . trim($subDir, '/');
 
         if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
-            throw new RuntimeException('Das Upload-Verzeichnis konnte nicht angelegt werden.');
+            throw new RuntimeException(t('Das Upload-Verzeichnis konnte nicht angelegt werden.'));
         }
 
         $filename = $basename . '-' . time() . '.' . self::VIDEO_ALLOWED[$mime];
         $target   = $dir . '/' . $filename;
 
         if (!move_uploaded_file($tmp, $target)) {
-            throw new RuntimeException('Die Datei konnte nicht gespeichert werden.');
+            throw new RuntimeException(t('Die Datei konnte nicht gespeichert werden.'));
         }
 
         @chmod($target, 0644);
@@ -206,11 +206,11 @@ final class Upload
     private static function errorMessage(int $code): string
     {
         return match ($code) {
-            UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'Die Datei ist zu groß.',
-            UPLOAD_ERR_PARTIAL                        => 'Der Upload wurde abgebrochen.',
-            UPLOAD_ERR_NO_TMP_DIR                     => 'Auf dem Server fehlt ein temporäres Verzeichnis.',
-            UPLOAD_ERR_CANT_WRITE                     => 'Die Datei konnte nicht geschrieben werden.',
-            default                                   => 'Beim Upload ist ein Fehler aufgetreten.',
+            UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => t('Die Datei ist zu groß.'),
+            UPLOAD_ERR_PARTIAL                        => t('Der Upload wurde abgebrochen.'),
+            UPLOAD_ERR_NO_TMP_DIR                     => t('Auf dem Server fehlt ein temporäres Verzeichnis.'),
+            UPLOAD_ERR_CANT_WRITE                     => t('Die Datei konnte nicht geschrieben werden.'),
+            default                                   => t('Beim Upload ist ein Fehler aufgetreten.'),
         };
     }
 }

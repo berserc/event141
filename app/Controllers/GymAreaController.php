@@ -31,12 +31,12 @@ final class GymAreaController
     public function showRegister(): void
     {
         if (Setting::get('gym_signup', '1') === '0') {
-            Flash::info('Die Selbstregistrierung ist deaktiviert – bitte den Veranstalter kontaktieren.');
+            Flash::info(t('Die Selbstregistrierung ist deaktiviert – bitte den Veranstalter kontaktieren.'));
             Url::redirect('/gym/login');
         }
 
         View::display('gym/register', [
-            'title'  => 'Gym registrieren',
+            'title'  => t('Gym registrieren'),
             'gym'    => Flash::oldInput() + GymAdminController::empty(),
             'errors' => Flash::errors(),
         ], 'layouts/gym');
@@ -56,23 +56,23 @@ final class GymAreaController
         $confirm  = (string) ($_POST['login_password_confirm'] ?? '');
 
         if ($data['login_email'] === '') {
-            $errors['login_email'] = 'Bitte eine E-Mail-Adresse für die Anmeldung angeben.';
+            $errors['login_email'] = t('Bitte eine E-Mail-Adresse für die Anmeldung angeben.');
         }
 
         if (mb_strlen($password) < Auth::MIN_PASSWORD_LENGTH) {
-            $errors['login_password'] = 'Das Passwort muss mindestens ' . Auth::MIN_PASSWORD_LENGTH . ' Zeichen haben.';
+            $errors['login_password'] = t('Das Passwort muss mindestens %d Zeichen haben.', Auth::MIN_PASSWORD_LENGTH);
         } elseif ($password !== $confirm) {
-            $errors['login_password_confirm'] = 'Die Wiederholung stimmt nicht überein.';
+            $errors['login_password_confirm'] = t('Die Wiederholung stimmt nicht überein.');
         }
 
         // Einfacher Spam-Schutz: verstecktes Feld muss leer bleiben.
         if (post('website_url') !== '') {
-            $errors['name'] = 'Registrierung abgelehnt.';
+            $errors['name'] = t('Registrierung abgelehnt.');
         }
 
         if ($errors !== []) {
             Flash::withInput($_POST, $errors);
-            Flash::error('Bitte die markierten Felder prüfen.');
+            Flash::error(t('Bitte die markierten Felder prüfen.'));
             Url::redirect('/gym/registrieren');
         }
 
@@ -89,7 +89,7 @@ final class GymAreaController
         Audit::logAs(null, 'gym:' . $data['login_email'], 'gym_registered', 'gym', $id, (string) $data['name']);
         GymAuth::attempt($data['login_email'], $password);
 
-        Flash::success('Willkommen! Das Gym ist registriert. Als Nächstes Sportler anlegen – oder direkt aus Gym141 holen.');
+        Flash::success(t('Willkommen! Das Gym ist registriert. Als Nächstes Sportler anlegen – oder direkt aus Gym141 holen.'));
         Url::redirect('/gym');
     }
 
@@ -102,7 +102,7 @@ final class GymAreaController
         }
 
         View::display('gym/login', [
-            'title'  => 'Gym-Anmeldung',
+            'title'  => t('Gym-Anmeldung'),
             'old'    => Flash::oldInput(),
             'signup' => Setting::get('gym_signup', '1') !== '0',
         ], 'layouts/gym');
@@ -117,13 +117,13 @@ final class GymAreaController
         $password = (string) ($_POST['password'] ?? '');
 
         if (Auth::isThrottled($ip)) {
-            Flash::error('Zu viele Fehlversuche. Bitte in 15 Minuten erneut versuchen.');
+            Flash::error(t('Zu viele Fehlversuche. Bitte in 15 Minuten erneut versuchen.'));
             Url::redirect('/gym/login');
         }
 
         if (!GymAuth::attempt($email, $password)) {
             Auth::recordFailedAttempt($ip, 'gym:' . $email);
-            Flash::error('E-Mail oder Passwort ist falsch – oder das Gym ist gesperrt.');
+            Flash::error(t('E-Mail oder Passwort ist falsch – oder das Gym ist gesperrt.'));
             Flash::withInput(['email' => $email]);
             Url::redirect('/gym/login');
         }
@@ -160,7 +160,7 @@ final class GymAreaController
         $gym = self::requireGym();
 
         View::display('gym/athletes', [
-            'title'    => 'Sportler',
+            'title'    => t('Sportler'),
             'gym'      => $gym,
             'athletes' => AthleteRepo::forGym((int) $gym['id']),
         ], 'layouts/gym');
@@ -171,7 +171,7 @@ final class GymAreaController
         $gym = self::requireGym();
 
         View::display('gym/athlete-form', [
-            'title'   => 'Neuer Sportler',
+            'title'   => t('Neuer Sportler'),
             'gym'     => $gym,
             'athlete' => Flash::oldInput() + AthleteAdminController::empty(),
             'errors'  => Flash::errors(),
@@ -202,7 +202,7 @@ final class GymAreaController
 
         if ($errors !== []) {
             Flash::withInput($_POST, $errors);
-            Flash::error('Bitte die markierten Felder prüfen.');
+            Flash::error(t('Bitte die markierten Felder prüfen.'));
             Url::redirect('/gym/sportler/neu');
         }
 
@@ -212,10 +212,10 @@ final class GymAreaController
         try {
             AthleteAdminController::handlePhoto($id);
         } catch (RuntimeException $e) {
-            Flash::error('Foto nicht übernommen: ' . $e->getMessage());
+            Flash::error(t('Foto nicht übernommen: %s', $e->getMessage()));
         }
 
-        Flash::success('Sportler angelegt.');
+        Flash::success(t('Sportler angelegt.'));
         Url::redirect('/gym/sportler');
     }
 
@@ -229,7 +229,7 @@ final class GymAreaController
 
         if ($errors !== []) {
             Flash::withInput($_POST, $errors);
-            Flash::error('Bitte die markierten Felder prüfen.');
+            Flash::error(t('Bitte die markierten Felder prüfen.'));
             Url::redirect('/gym/sportler/' . $athlete['id']);
         }
 
@@ -239,10 +239,10 @@ final class GymAreaController
         try {
             AthleteAdminController::handlePhoto((int) $athlete['id']);
         } catch (RuntimeException $e) {
-            Flash::error('Foto nicht übernommen: ' . $e->getMessage());
+            Flash::error(t('Foto nicht übernommen: %s', $e->getMessage()));
         }
 
-        Flash::success('Sportler gespeichert.');
+        Flash::success(t('Sportler gespeichert.'));
         Url::redirect('/gym/sportler');
     }
 
@@ -255,7 +255,7 @@ final class GymAreaController
         $entries = (int) Database::value('SELECT COUNT(*) FROM event_entries WHERE athlete_id = ?', [(int) $athlete['id']]);
 
         if ($entries > 0) {
-            Flash::error('Der Sportler hat Anmeldungen – bitte zuerst abmelden oder den Sportler deaktivieren.');
+            Flash::error(t('Der Sportler hat Anmeldungen – bitte zuerst abmelden oder den Sportler deaktivieren.'));
             Url::redirect('/gym/sportler/' . $athlete['id']);
         }
 
@@ -264,7 +264,7 @@ final class GymAreaController
         }
 
         Database::run('DELETE FROM athletes WHERE id = ?', [(int) $athlete['id']]);
-        Flash::success('Sportler gelöscht.');
+        Flash::success(t('Sportler gelöscht.'));
         Url::redirect('/gym/sportler');
     }
 
@@ -277,7 +277,7 @@ final class GymAreaController
         [$members, $error] = GymAdminController::fetchMembers($gym, query('q'));
 
         View::display('gym/gym141', [
-            'title'   => 'Gym141-Kopplung',
+            'title'   => t('Gym141-Kopplung'),
             'gym'     => $gym,
             'members' => $members,
             'error'   => $error,
@@ -294,13 +294,13 @@ final class GymAreaController
         $gym = self::requireGym();
         Csrf::verify();
 
-        if (($pro = \App\Core\License::proFeatureError('Die Gym141-Kopplung')) !== null) {
-            Flash::error($pro . ' (Bitte an den Veranstalter wenden.)');
+        if (($pro = \App\Core\License::proFeatureError(t('Die Gym141-Kopplung'))) !== null) {
+            Flash::error(t('%s (Bitte an den Veranstalter wenden.)', $pro));
             Url::redirect('/gym/gym141');
         }
 
         if (count(\App\Models\ApiKeyRepo::all((int) $gym['id'])) >= 5) {
-            Flash::error('Maximal fünf Schlüssel je Gym – bitte zuerst einen alten löschen.');
+            Flash::error(t('Maximal fünf Schlüssel je Gym – bitte zuerst einen alten löschen.'));
             Url::redirect('/gym/gym141');
         }
 
@@ -317,7 +317,7 @@ final class GymAreaController
         Csrf::verify();
 
         Database::run('DELETE FROM api_keys WHERE id = ? AND gym_id = ?', [(int) ($args['id'] ?? 0), (int) $gym['id']]);
-        Flash::success('Schlüssel gelöscht.');
+        Flash::success(t('Schlüssel gelöscht.'));
         Url::redirect('/gym/gym141');
     }
 
@@ -356,7 +356,7 @@ final class GymAreaController
         $event = EventRepo::find((int) ($args['id'] ?? 0));
 
         if ($event === null || ((int) $event['published'] !== 1 && !EventRepo::registrationOpen($event) && !GymAuth::isAdminView())) {
-            Flash::error('Event nicht gefunden.');
+            Flash::error(t('Event nicht gefunden.'));
             Url::redirect('/gym');
         }
 
@@ -379,7 +379,7 @@ final class GymAreaController
         Csrf::verify();
 
         if ($event === null || !EventRepo::registrationOpen($event)) {
-            Flash::error('Die Anmeldung für dieses Event ist nicht (mehr) möglich.');
+            Flash::error(t('Die Anmeldung für dieses Event ist nicht (mehr) möglich.'));
             Url::redirect('/gym');
         }
 
@@ -394,14 +394,14 @@ final class GymAreaController
         }
 
         if ($categories !== [] && $category === null) {
-            Flash::error('Bitte eine Kategorie wählen.');
+            Flash::error(t('Bitte eine Kategorie wählen.'));
             Url::redirect('/gym/event/' . $event['id']);
         }
 
         $ids = array_values(array_filter(array_map('intval', (array) ($_POST['athlete_ids'] ?? []))));
 
         if ($ids === []) {
-            Flash::error('Bitte mindestens einen Sportler auswählen.');
+            Flash::error(t('Bitte mindestens einen Sportler auswählen.'));
             Url::redirect('/gym/event/' . $event['id']);
         }
 
@@ -423,7 +423,7 @@ final class GymAreaController
             }
 
             if ($max > 0 && $aktuell + $neu >= $max) {
-                $warn[] = 'Teilnehmerlimit erreicht – ' . person_name($athlete) . ' nicht angemeldet.';
+                $warn[] = t('Teilnehmerlimit erreicht – %s nicht angemeldet.', person_name($athlete));
                 continue;
             }
 
@@ -448,11 +448,11 @@ final class GymAreaController
                 $alter = age_from($athlete['birthdate'], (string) $event['starts_on']);
 
                 if ($alter !== null && (($category['age_min'] !== null && $alter < (int) $category['age_min']) || ($category['age_max'] !== null && $alter > (int) $category['age_max']))) {
-                    $warn[] = person_name($athlete) . ' (' . $alter . ' J.) liegt außerhalb des Alters der Kategorie.';
+                    $warn[] = t('%s (%d J.) liegt außerhalb des Alters der Kategorie.', person_name($athlete), $alter);
                 }
 
                 if ($athlete['weight'] !== null && $category['weight_max'] !== null && (float) $athlete['weight'] > (float) $category['weight_max']) {
-                    $warn[] = person_name($athlete) . ' (' . format_weight($athlete['weight']) . ') ist schwerer als das Limit der Kategorie.';
+                    $warn[] = t('%s (%s) ist schwerer als das Limit der Kategorie.', person_name($athlete), format_weight($athlete['weight']));
                 }
             }
 
@@ -471,11 +471,13 @@ final class GymAreaController
         Audit::logAs(null, 'gym:' . $gym['login_email'], 'gym_entries', 'event', (int) $event['id'], $gym['name'] . ': ' . $neu . ' angemeldet');
 
         if ($neu > 0) {
-            Flash::success($neu . ' Sportler angemeldet' . ($category !== null ? ' (' . $category['name'] . ')' : '') . '. Der Veranstalter bestätigt die Anmeldung.');
+            Flash::success($category !== null
+                ? t('%d Sportler angemeldet (%s). Der Veranstalter bestätigt die Anmeldung.', $neu, $category['name'])
+                : t('%d Sportler angemeldet. Der Veranstalter bestätigt die Anmeldung.', $neu));
         }
 
         if ($dup > 0) {
-            Flash::info($dup . ' Sportler waren in dieser Kategorie schon angemeldet.');
+            Flash::info(t('%d Sportler waren in dieser Kategorie schon angemeldet.', $dup));
         }
 
         foreach ($warn as $w) {
@@ -498,7 +500,7 @@ final class GymAreaController
         $event = EventRepo::find((int) $entry['event_id']);
 
         if ($event === null || !EventRepo::registrationOpen($event)) {
-            Flash::error('Abmeldung nur, solange die Anmeldung offen ist – bitte den Veranstalter kontaktieren.');
+            Flash::error(t('Abmeldung nur, solange die Anmeldung offen ist – bitte den Veranstalter kontaktieren.'));
             Url::redirect('/gym/event/' . $entry['event_id']);
         }
 
@@ -508,7 +510,7 @@ final class GymAreaController
             Database::update('event_entries', (int) $entry['id'], ['status' => 'abgemeldet', 'updated_at' => gmdate('Y-m-d H:i:s')]);
         }
 
-        Flash::success('Abgemeldet.');
+        Flash::success(t('Abgemeldet.'));
         Url::redirect('/gym/event/' . $entry['event_id']);
     }
 
@@ -519,7 +521,7 @@ final class GymAreaController
         $gym = self::requireGym();
 
         View::display('gym/profile', [
-            'title'  => 'Gym-Daten',
+            'title'  => t('Gym-Daten'),
             'gym'    => Flash::oldInput() + $gym,
             'errors' => Flash::errors(),
         ], 'layouts/gym');
@@ -533,16 +535,16 @@ final class GymAreaController
         [$data, $errors] = GymAdminController::validate((int) $gym['id'], true);
 
         if ($data['login_email'] === '') {
-            $errors['login_email'] = 'Die Anmelde-E-Mail darf nicht leer sein.';
+            $errors['login_email'] = t('Die Anmelde-E-Mail darf nicht leer sein.');
         }
 
         $password = (string) ($_POST['login_password'] ?? '');
 
         if ($password !== '') {
             if (!password_verify((string) ($_POST['current_password'] ?? ''), (string) $gym['login_password_hash'])) {
-                $errors['current_password'] = 'Das aktuelle Passwort stimmt nicht.';
+                $errors['current_password'] = t('Das aktuelle Passwort stimmt nicht.');
             } elseif (mb_strlen($password) < Auth::MIN_PASSWORD_LENGTH) {
-                $errors['login_password'] = 'Mindestens ' . Auth::MIN_PASSWORD_LENGTH . ' Zeichen.';
+                $errors['login_password'] = t('Mindestens %d Zeichen.', Auth::MIN_PASSWORD_LENGTH);
             } else {
                 $data['login_password_hash'] = password_hash($password, PASSWORD_DEFAULT);
             }
@@ -550,7 +552,7 @@ final class GymAreaController
 
         if ($errors !== []) {
             Flash::withInput($_POST, $errors);
-            Flash::error('Bitte die markierten Felder prüfen.');
+            Flash::error(t('Bitte die markierten Felder prüfen.'));
             Url::redirect('/gym/profil');
         }
 
@@ -560,10 +562,10 @@ final class GymAreaController
         try {
             GymAdminController::handleLogo((int) $gym['id'], (string) $gym['slug']);
         } catch (RuntimeException $e) {
-            Flash::error('Logo nicht übernommen: ' . $e->getMessage());
+            Flash::error(t('Logo nicht übernommen: %s', $e->getMessage()));
         }
 
-        Flash::success('Gym-Daten gespeichert.');
+        Flash::success(t('Gym-Daten gespeichert.'));
         Url::redirect('/gym/profil');
     }
 
@@ -574,7 +576,7 @@ final class GymAreaController
         $gym = GymAuth::gym();
 
         if ($gym === null) {
-            Flash::error('Bitte als Gym anmelden.');
+            Flash::error(t('Bitte als Gym anmelden.'));
             Url::redirect('/gym/login');
         }
 
@@ -586,7 +588,7 @@ final class GymAreaController
         $athlete = Database::one('SELECT * FROM athletes WHERE id = ? AND gym_id = ?', [$id, (int) $gym['id']]);
 
         if ($athlete === null) {
-            Flash::error('Sportler nicht gefunden.');
+            Flash::error(t('Sportler nicht gefunden.'));
             Url::redirect('/gym/sportler');
         }
 

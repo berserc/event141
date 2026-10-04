@@ -125,7 +125,7 @@ final class EntryRepo
         $name = trim((string) $entry['first_name'] . ' ' . (string) $entry['last_name']);
 
         if ((string) ($entry['nickname'] ?? '') !== '') {
-            $name .= ' „' . $entry['nickname'] . '“';
+            $name = t('%s „%s“', $name, (string) $entry['nickname']);
         }
 
         return $withGym ? $name . ' (' . ($entry['gym_short'] ?: $entry['gym_name']) . ')' : $name;

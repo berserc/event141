@@ -19,7 +19,7 @@ final class PageAdminController
         AuthController::requireRole('superuser');
 
         View::display('admin/pages/index', [
-            'title' => 'Seiten',
+            'title' => t('Seiten'),
             'pages' => PageRepo::all(),
         ], 'layouts/admin');
     }
@@ -29,7 +29,7 @@ final class PageAdminController
         AuthController::requireRole('superuser');
 
         View::display('admin/pages/form', [
-            'title'  => 'Neue Seite',
+            'title'  => t('Neue Seite'),
             'page'   => Flash::oldInput() + ['id' => 0, 'slug' => '', 'title' => '', 'body' => '', 'in_footer' => 1, 'sort_order' => 0, 'published' => 1],
             'errors' => Flash::errors(),
             'isNew'  => true,
@@ -43,7 +43,7 @@ final class PageAdminController
         $page = PageRepo::find((int) ($args['id'] ?? 0));
 
         if ($page === null) {
-            Flash::error('Seite nicht gefunden.');
+            Flash::error(t('Seite nicht gefunden.'));
             Url::redirect('/admin/seiten');
         }
 
@@ -71,7 +71,7 @@ final class PageAdminController
         $id           = Database::insert('pages', $data);
 
         Audit::log('page_created', 'page', $id, (string) $data['title']);
-        Flash::success('Seite angelegt.');
+        Flash::success(t('Seite angelegt.'));
         Url::redirect('/admin/seiten/' . $id);
     }
 
@@ -84,7 +84,7 @@ final class PageAdminController
         $page = PageRepo::find($id);
 
         if ($page === null) {
-            Flash::error('Seite nicht gefunden.');
+            Flash::error(t('Seite nicht gefunden.'));
             Url::redirect('/admin/seiten');
         }
 
@@ -101,7 +101,7 @@ final class PageAdminController
         Database::update('pages', $id, $data);
 
         Audit::log('page_updated', 'page', $id, (string) $data['title']);
-        Flash::success('Seite gespeichert.');
+        Flash::success(t('Seite gespeichert.'));
         Url::redirect('/admin/seiten/' . $id);
     }
 
@@ -114,19 +114,19 @@ final class PageAdminController
         $page = PageRepo::find($id);
 
         if ($page === null) {
-            Flash::error('Seite nicht gefunden.');
+            Flash::error(t('Seite nicht gefunden.'));
             Url::redirect('/admin/seiten');
         }
 
         if (in_array((string) $page['slug'], ['impressum', 'datenschutz'], true)) {
-            Flash::error('Impressum und Datenschutz müssen bleiben – Inhalt bitte anpassen statt löschen.');
+            Flash::error(t('Impressum und Datenschutz müssen bleiben – Inhalt bitte anpassen statt löschen.'));
             Url::redirect('/admin/seiten/' . $id);
         }
 
         Database::run('DELETE FROM pages WHERE id = ?', [$id]);
 
         Audit::log('page_deleted', 'page', $id, (string) $page['title']);
-        Flash::success('Seite gelöscht.');
+        Flash::success(t('Seite gelöscht.'));
         Url::redirect('/admin/seiten');
     }
 
@@ -137,7 +137,7 @@ final class PageAdminController
         $title  = post('title');
 
         if ($title === '') {
-            $errors['title'] = 'Bitte einen Titel angeben.';
+            $errors['title'] = t('Bitte einen Titel angeben.');
         }
 
         return [[

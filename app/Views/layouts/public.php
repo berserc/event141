@@ -16,7 +16,7 @@ $pageTitle = $title !== '' ? $title . ' | ' . $orgName : $orgName;
 $gymArea   = $gymArea ?? true;
 ?>
 <!DOCTYPE html>
-<html lang="de">
+<html lang="<?= e(lang()) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -34,11 +34,11 @@ $gymArea   = $gymArea ?? true;
     <link rel="icon" href="<?= e(asset('img/favicon.svg')) ?>" type="image/svg+xml">
 </head>
 <body class="page page--<?= e($activePage) ?>">
-<a class="skip-link" href="#inhalt">Direkt zum Inhalt</a>
+<a class="skip-link" href="#inhalt"><?= e(t('Direkt zum Inhalt')) ?></a>
 
 <?php if (!empty($showEnvBanner)): ?>
     <div class="env-banner" role="status">
-        Testumgebung – Änderungen hier wirken sich <strong>nicht</strong> auf die Produktivseite aus.
+        <?= t('Testumgebung – Änderungen hier wirken sich <strong>nicht</strong> auf die Produktivseite aus.') ?>
     </div>
 <?php endif; ?>
 
@@ -56,11 +56,12 @@ $gymArea   = $gymArea ?? true;
             </span>
         </a>
 
-        <nav class="site-nav" aria-label="Hauptnavigation">
-            <a href="<?= e(url('/')) ?>"<?= $activePage === 'home' ? ' aria-current="page"' : '' ?>>Events</a>
+        <nav class="site-nav" aria-label="<?= e(t('Hauptnavigation')) ?>">
+            <a href="<?= e(url('/')) ?>"<?= $activePage === 'home' ? ' aria-current="page"' : '' ?>><?= e(t('Events')) ?></a>
             <?php if ($gymArea): ?>
-                <a href="<?= e(url('/gym')) ?>" class="site-nav__gym">Gym-Login</a>
+                <a href="<?= e(url('/gym')) ?>" class="site-nav__gym"><?= e(t('Gym-Login')) ?></a>
             <?php endif; ?>
+            <?= lang_switch() ?>
         </nav>
     </div>
 </header>
@@ -98,17 +99,18 @@ $gymArea   = $gymArea ?? true;
             <?php endif; ?>
         </div>
 
-        <nav class="site-footer__col site-footer__nav" aria-label="Rechtliches">
+        <nav class="site-footer__col site-footer__nav" aria-label="<?= e(t('Rechtliches')) ?>">
             <?php foreach ($footerPages as $footerPage): ?>
                 <a href="<?= e(url('/seite/' . $footerPage['slug'])) ?>"><?= e($footerPage['title']) ?></a>
             <?php endforeach; ?>
             <?php if ($gymArea): ?>
-                <a href="<?= e(url('/gym/registrieren')) ?>">Gym registrieren</a>
+                <a href="<?= e(url('/gym/registrieren')) ?>"><?= e(t('Gym registrieren')) ?></a>
             <?php endif; ?>
         </nav>
     </div>
     <p class="site-footer__powered">Powered by <a href="https://event141.com" rel="noopener">Event141</a></p>
 </footer>
+<script>window.I18N = <?= json_encode(['close' => t('Schließen'), 'prev' => t('Zurück'), 'next' => t('Weiter')], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
 <script src="<?= e(asset('js/media.js')) ?>" defer></script>
 <script src="<?= e(asset('js/event.js')) ?>" defer></script>
 <script src="<?= e(asset('js/gallery.js')) ?>" defer></script>

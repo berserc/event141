@@ -17,7 +17,7 @@ final class RulesetController
         AuthController::requireLogin();
 
         View::display('admin/rulesets/index', [
-            'title'    => 'Regelsätze',
+            'title'    => t('Regelsätze'),
             'rulesets' => Ruleset::all(),
         ], 'layouts/admin');
     }
@@ -29,12 +29,12 @@ final class RulesetController
         $ruleset = Ruleset::find((string) ($args['code'] ?? ''));
 
         if ($ruleset === null) {
-            Flash::error('Regelsatz nicht gefunden.');
+            Flash::error(t('Regelsatz nicht gefunden.'));
             Url::redirect('/admin/regelsaetze');
         }
 
         View::display('admin/rulesets/show', [
-            'title'   => $ruleset['name'],
+            'title'   => t((string) $ruleset['name']),
             'ruleset' => $ruleset,
         ], 'layouts/admin');
     }

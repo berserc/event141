@@ -9,14 +9,14 @@
 <section class="event-title-bar">
     <div class="wrap">
         <p class="muted"><a href="<?= e(url('/e/' . $event['slug'])) ?>"><?= e($event['name']) ?></a></p>
-        <h1>Teilnehmer <small class="muted"><?= (int) $total ?></small></h1>
+        <h1><?= e(t('Teilnehmer')) ?> <small class="muted"><?= (int) $total ?></small></h1>
     </div>
 </section>
 <?php require __DIR__ . '/_event-nav.php'; ?>
 
 <section class="wrap">
     <?php if ($byGym === []): ?>
-        <p class="muted">Noch keine bestätigten Teilnehmer.</p>
+        <p class="muted"><?= e(t('Noch keine bestätigten Teilnehmer.')) ?></p>
     <?php endif; ?>
     <div class="gym-grid">
         <?php foreach ($byGym as $gymName => $rows): ?>

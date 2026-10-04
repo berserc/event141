@@ -24,7 +24,7 @@ final class AthleteAdminController
         AuthController::requireLogin();
 
         View::display('admin/athletes/index', [
-            'title'    => 'Sportler',
+            'title'    => t('Sportler'),
             'athletes' => AthleteRepo::search(query('q'), (int) query('gym', '0'), 500),
             'gyms'     => GymRepo::options(),
             'q'        => query('q'),
@@ -37,7 +37,7 @@ final class AthleteAdminController
         AuthController::requireWrite();
 
         View::display('admin/athletes/form', [
-            'title'   => 'Neuer Sportler',
+            'title'   => t('Neuer Sportler'),
             'athlete' => Flash::oldInput() + self::empty() + ['gym_id' => (int) query('gym', '0')],
             'gyms'    => GymRepo::options(),
             'entries' => [],
@@ -55,7 +55,7 @@ final class AthleteAdminController
         $athlete = AthleteRepo::find((int) ($args['id'] ?? 0));
 
         if ($athlete === null) {
-            Flash::error('Sportler nicht gefunden.');
+            Flash::error(t('Sportler nicht gefunden.'));
             Url::redirect('/admin/sportler');
         }
 
@@ -87,12 +87,12 @@ final class AthleteAdminController
         $gym = GymRepo::find(post_int('gym_id'));
 
         if ($gym === null) {
-            $errors['gym_id'] = 'Bitte ein Gym wählen.';
+            $errors['gym_id'] = t('Bitte ein Gym wählen.');
         }
 
         if ($errors !== []) {
             Flash::withInput($_POST, $errors);
-            Flash::error('Bitte die markierten Felder prüfen.');
+            Flash::error(t('Bitte die markierten Felder prüfen.'));
             Url::redirect('/admin/sportler/neu');
         }
 
@@ -102,11 +102,11 @@ final class AthleteAdminController
         try {
             self::handlePhoto($id);
         } catch (RuntimeException $e) {
-            Flash::error('Foto nicht übernommen: ' . $e->getMessage());
+            Flash::error(t('Foto nicht übernommen: %s', $e->getMessage()));
         }
 
         Audit::log('athlete_created', 'athlete', $id, person_name($data));
-        Flash::success('Sportler angelegt.');
+        Flash::success(t('Sportler angelegt.'));
         Url::redirect('/admin/sportler/' . $id);
     }
 
@@ -119,7 +119,7 @@ final class AthleteAdminController
         $athlete = AthleteRepo::find($id);
 
         if ($athlete === null) {
-            Flash::error('Sportler nicht gefunden.');
+            Flash::error(t('Sportler nicht gefunden.'));
             Url::redirect('/admin/sportler');
         }
 
@@ -133,7 +133,7 @@ final class AthleteAdminController
 
         if ($errors !== []) {
             Flash::withInput($_POST, $errors);
-            Flash::error('Bitte die markierten Felder prüfen.');
+            Flash::error(t('Bitte die markierten Felder prüfen.'));
             Url::redirect('/admin/sportler/' . $id);
         }
 
@@ -148,11 +148,11 @@ final class AthleteAdminController
         try {
             self::handlePhoto($id);
         } catch (RuntimeException $e) {
-            Flash::error('Foto nicht übernommen: ' . $e->getMessage());
+            Flash::error(t('Foto nicht übernommen: %s', $e->getMessage()));
         }
 
         Audit::log('athlete_updated', 'athlete', $id, Audit::diff($athlete, $data));
-        Flash::success('Sportler gespeichert.');
+        Flash::success(t('Sportler gespeichert.'));
         Url::redirect('/admin/sportler/' . $id);
     }
 
@@ -171,7 +171,7 @@ final class AthleteAdminController
         $entries = (int) Database::value('SELECT COUNT(*) FROM event_entries WHERE athlete_id = ?', [$id]);
 
         if ($entries > 0) {
-            Flash::error('Der Sportler hat Anmeldungen – bitte stattdessen deaktivieren.');
+            Flash::error(t('Der Sportler hat Anmeldungen – bitte stattdessen deaktivieren.'));
             Url::redirect('/admin/sportler/' . $id);
         }
 
@@ -181,7 +181,7 @@ final class AthleteAdminController
 
         Database::run('DELETE FROM athletes WHERE id = ?', [$id]);
         Audit::log('athlete_deleted', 'athlete', $id, person_name($athlete));
-        Flash::success('Sportler gelöscht.');
+        Flash::success(t('Sportler gelöscht.'));
         Url::redirect('/admin/sportler');
     }
 
@@ -206,13 +206,13 @@ final class AthleteAdminController
         $last   = post('last_name');
 
         if ($first === '' || $last === '') {
-            $errors['first_name'] = 'Vor- und Zuname sind Pflicht.';
+            $errors['first_name'] = t('Vor- und Zuname sind Pflicht.');
         }
 
         $birth = parse_date(post('birthdate'));
 
         if (post('birthdate') !== '' && $birth === null) {
-            $errors['birthdate'] = 'Ungültiges Datum.';
+            $errors['birthdate'] = t('Ungültiges Datum.');
         }
 
         $gender = post('gender');
@@ -224,7 +224,7 @@ final class AthleteAdminController
         $email = post('email');
 
         if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors['email'] = 'Keine gültige E-Mail-Adresse.';
+            $errors['email'] = t('Keine gültige E-Mail-Adresse.');
         }
 
         return [[

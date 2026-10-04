@@ -32,16 +32,16 @@ final class EventAdminController
     {
         $id   = (int) $event['id'];
         $tabs = [
-            ['Übersicht', '/admin/events/' . $id],
-            ['Aufbau', '/admin/events/' . $id . '/aufbau'],
-            ['Kategorien', '/admin/events/' . $id . '/kategorien'],
-            ['Anmeldungen', '/admin/events/' . $id . '/anmeldungen'],
-            [$event['type'] === 'gala' ? 'Fightcard' : 'Kämpfe', '/admin/events/' . $id . '/kaempfe'],
-            ['Zeitplan', '/admin/events/' . $id . '/zeitplan'],
-            ['Ergebnisse', '/admin/events/' . $id . '/ergebnisse'],
-            ['Sponsoren', '/admin/events/' . $id . '/sponsoren'],
-            ['Galerie & Bericht', '/admin/events/' . $id . '/galerie'],
-            ['Listen & Druck', '/admin/events/' . $id . '/listen'],
+            [t('Übersicht'), '/admin/events/' . $id],
+            [t('Aufbau'), '/admin/events/' . $id . '/aufbau'],
+            [t('Kategorien'), '/admin/events/' . $id . '/kategorien'],
+            [t('Anmeldungen'), '/admin/events/' . $id . '/anmeldungen'],
+            [$event['type'] === 'gala' ? t('Fightcard') : t('Kämpfe'), '/admin/events/' . $id . '/kaempfe'],
+            [t('Zeitplan'), '/admin/events/' . $id . '/zeitplan'],
+            [t('Ergebnisse'), '/admin/events/' . $id . '/ergebnisse'],
+            [t('Sponsoren'), '/admin/events/' . $id . '/sponsoren'],
+            [t('Galerie & Bericht'), '/admin/events/' . $id . '/galerie'],
+            [t('Listen & Druck'), '/admin/events/' . $id . '/listen'],
         ];
 
         return $tabs;
@@ -54,7 +54,7 @@ final class EventAdminController
 
         if ($event === null) {
             http_response_code(404);
-            View::display('errors/404-admin', ['title' => 'Nicht gefunden'], 'layouts/admin');
+            View::display('errors/404-admin', ['title' => t('Nicht gefunden')], 'layouts/admin');
             exit;
         }
 
@@ -66,7 +66,7 @@ final class EventAdminController
         AuthController::requireLogin();
 
         View::display('admin/events/index', [
-            'title'  => 'Events',
+            'title'  => t('Events'),
             'events' => EventRepo::all(),
         ], 'layouts/admin');
     }
@@ -76,7 +76,7 @@ final class EventAdminController
         AuthController::requireWrite();
 
         View::display('admin/events/form', [
-            'title'  => 'Neues Event',
+            'title'  => t('Neues Event'),
             'event'  => Flash::oldInput() + $this->empty(),
             'errors' => Flash::errors(),
             'isNew'  => true,
@@ -112,7 +112,7 @@ final class EventAdminController
         $id    = (int) ($args['id'] ?? 0);
         $event = self::load($id);
 
-        if (($pro = \App\Core\License::proFeatureError('Die Ticket141-Kopplung')) !== null) {
+        if (($pro = \App\Core\License::proFeatureError(t('Die Ticket141-Kopplung'))) !== null) {
             Flash::error($pro);
             Url::redirect('/admin/events/' . $id);
         }
@@ -120,7 +120,7 @@ final class EventAdminController
         $client = Ticket141Client::fromSettings();
 
         if (!$client->configured() || !$client->hasKey()) {
-            Flash::error('Ticket141 ist nicht eingerichtet – Adresse und API-Schlüssel unter Einstellungen → Ticket141 eintragen.');
+            Flash::error(t('Ticket141 ist nicht eingerichtet – Adresse und API-Schlüssel unter Einstellungen → Ticket141 eintragen.'));
             Url::redirect('/admin/events/' . $id);
         }
 
@@ -142,12 +142,12 @@ final class EventAdminController
 
         $status = (string) ($res['event']['status'] ?? '');
         $hint   = $res['created'] || $status === 'entwurf'
-            ? ' Das Ticket141-Event ist ein Entwurf: dort Kategorien mit Preisen anlegen und den Verkauf starten.'
+            ? ' ' . t('Das Ticket141-Event ist ein Entwurf: dort Kategorien mit Preisen anlegen und den Verkauf starten.')
             : '';
 
         Flash::success(
-            ($res['created'] ? 'Event in Ticket141 angelegt' : 'Ticket141-Stammdaten aktualisiert') . ' („' . $slug . '“).' . $hint
-            . ($res['admin_url'] !== '' ? ' Verwaltung: ' . $res['admin_url'] : '')
+            ($res['created'] ? t('Event in Ticket141 angelegt („%s“).', $slug) : t('Ticket141-Stammdaten aktualisiert („%s“).', $slug)) . $hint
+            . ($res['admin_url'] !== '' ? ' ' . t('Verwaltung: %s', $res['admin_url']) : '')
         );
         Url::redirect('/admin/events/' . $id);
     }
@@ -247,7 +247,7 @@ final class EventAdminController
 
         if ($errors !== []) {
             Flash::withInput($_POST, $errors);
-            Flash::error('Bitte die markierten Felder prüfen.');
+            Flash::error(t('Bitte die markierten Felder prüfen.'));
             Url::redirect('/admin/events/neu');
         }
 
@@ -262,11 +262,11 @@ final class EventAdminController
         try {
             $this->handleImages($id, $data['slug']);
         } catch (RuntimeException $e) {
-            Flash::error('Event angelegt, aber ein Bild wurde nicht übernommen: ' . $e->getMessage());
+            Flash::error(t('Event angelegt, aber ein Bild wurde nicht übernommen: %s', $e->getMessage()));
         }
 
         Audit::log('event_created', 'event', $id, (string) $data['name']);
-        Flash::success('Event angelegt. Als Nächstes: Aufbau (Tage, Abschnitte, Wettkampfstätten) und Kategorien.');
+        Flash::success(t('Event angelegt. Als Nächstes: Aufbau (Tage, Abschnitte, Wettkampfstätten) und Kategorien.'));
         Url::redirect('/admin/events/' . $id . '/aufbau');
     }
 
@@ -288,7 +288,7 @@ final class EventAdminController
 
         if ($errors !== []) {
             Flash::withInput($_POST, $errors);
-            Flash::error('Bitte die markierten Felder prüfen.');
+            Flash::error(t('Bitte die markierten Felder prüfen.'));
             Url::redirect('/admin/events/' . $id);
         }
 
@@ -301,19 +301,19 @@ final class EventAdminController
         try {
             $this->handleImages($id, $data['slug']);
         } catch (RuntimeException $e) {
-            Flash::error('Ein Bild wurde nicht übernommen: ' . $e->getMessage());
+            Flash::error(t('Ein Bild wurde nicht übernommen: %s', $e->getMessage()));
         }
 
         if ($data['type'] !== $event['type']) {
             Flash::info(
                 $data['type'] === 'gala'
-                    ? 'Typ auf Gala umgestellt: Kämpfe werden jetzt als Fightcard manuell zusammengestellt. Bestehende Turnierkämpfe bleiben erhalten.'
-                    : 'Typ auf Turnier umgestellt: je Kategorie lässt sich jetzt ein Turnierbaum erzeugen. Bestehende Fightcard-Kämpfe bleiben erhalten.'
+                    ? t('Typ auf Gala umgestellt: Kämpfe werden jetzt als Fightcard manuell zusammengestellt. Bestehende Turnierkämpfe bleiben erhalten.')
+                    : t('Typ auf Turnier umgestellt: je Kategorie lässt sich jetzt ein Turnierbaum erzeugen. Bestehende Fightcard-Kämpfe bleiben erhalten.')
             );
         }
 
         Audit::log('event_updated', 'event', $id, Audit::diff($event, $data));
-        Flash::success('Event gespeichert.');
+        Flash::success(t('Event gespeichert.'));
         Url::redirect('/admin/events/' . $id);
     }
 
@@ -327,7 +327,7 @@ final class EventAdminController
         $status = post('status');
 
         if (!isset(EventRepo::STATUS[$status])) {
-            Flash::error('Unbekannter Status.');
+            Flash::error(t('Unbekannter Status.'));
             Url::redirect('/admin/events/' . $id);
         }
 
@@ -338,7 +338,7 @@ final class EventAdminController
 
         Database::update('events', $id, ['status' => $status, 'updated_at' => gmdate('Y-m-d H:i:s')]);
         Audit::log('event_status', 'event', $id, $event['status'] . ' → ' . $status);
-        Flash::success('Status: ' . EventRepo::STATUS[$status]);
+        Flash::success(t('Status: %s', t(EventRepo::STATUS[$status])));
         Url::redirectRaw((string) ($_SERVER['HTTP_REFERER'] ?? Url::to('/admin/events/' . $id)));
     }
 
@@ -354,7 +354,7 @@ final class EventAdminController
         if (isset(self::IMAGE_FIELDS[$field]) && (string) $event[$field] !== '') {
             Upload::delete((string) $event[$field]);
             Database::update('events', $id, [$field => '']);
-            Flash::success('Bild entfernt.');
+            Flash::success(t('Bild entfernt.'));
         }
 
         Url::redirect('/admin/events/' . $id);
@@ -376,7 +376,7 @@ final class EventAdminController
 
         Database::run('DELETE FROM events WHERE id = ?', [$id]);
         Audit::log('event_deleted', 'event', $id, (string) $event['name']);
-        Flash::success('Event „' . $event['name'] . '“ samt Anmeldungen und Kämpfen gelöscht.');
+        Flash::success(t('Event „%s“ samt Anmeldungen und Kämpfen gelöscht.', $event['name']));
         Url::redirect('/admin/events');
     }
 
@@ -405,7 +405,7 @@ final class EventAdminController
         $name   = post('name');
 
         if ($name === '') {
-            $errors['name'] = 'Bitte einen Namen angeben.';
+            $errors['name'] = t('Bitte einen Namen angeben.');
         }
 
         $type = post('type');
@@ -418,11 +418,11 @@ final class EventAdminController
         $endsOn   = parse_date(post('ends_on'));
 
         if ($startsOn === null) {
-            $errors['starts_on'] = 'Bitte ein gültiges Datum angeben.';
+            $errors['starts_on'] = t('Bitte ein gültiges Datum angeben.');
         }
 
         if ($endsOn !== null && $startsOn !== null && $endsOn < $startsOn) {
-            $errors['ends_on'] = 'Das Ende liegt vor dem Beginn.';
+            $errors['ends_on'] = t('Das Ende liegt vor dem Beginn.');
         }
 
         if ($endsOn === $startsOn) {
@@ -432,7 +432,7 @@ final class EventAdminController
         $email = post('contact_email');
 
         if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors['contact_email'] = 'Keine gültige E-Mail-Adresse.';
+            $errors['contact_email'] = t('Keine gültige E-Mail-Adresse.');
         }
 
         $status = post('status');

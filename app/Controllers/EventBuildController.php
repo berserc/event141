@@ -24,7 +24,7 @@ final class EventBuildController
         $event = EventAdminController::load((int) ($args['id'] ?? 0));
 
         View::display('admin/events/build', [
-            'title'  => $event['name'] . ' – Aufbau',
+            'title'  => $event['name'] . ' – ' . t('Aufbau'),
             'event'  => $event,
             'days'   => EventRepo::structure((int) $event['id']),
             'venues' => EventRepo::venues((int) $event['id']),
@@ -41,7 +41,7 @@ final class EventBuildController
         $date  = parse_date(post('day_date'));
 
         if ($date === null) {
-            Flash::error('Bitte ein gültiges Datum angeben.');
+            Flash::error(t('Bitte ein gültiges Datum angeben.'));
             Url::redirect('/admin/events/' . $event['id'] . '/aufbau');
         }
 
@@ -59,7 +59,7 @@ final class EventBuildController
             $dup = Database::one('SELECT id FROM event_days WHERE event_id = ? AND day_date = ?', [(int) $event['id'], $date]);
 
             if ($dup !== null) {
-                Flash::error('Diesen Tag gibt es schon.');
+                Flash::error(t('Diesen Tag gibt es schon.'));
                 Url::redirect('/admin/events/' . $event['id'] . '/aufbau');
             }
 
@@ -67,7 +67,7 @@ final class EventBuildController
             Database::insert('event_days', $data);
         }
 
-        Flash::success('Tag gespeichert.');
+        Flash::success(t('Tag gespeichert.'));
         Url::redirect('/admin/events/' . $event['id'] . '/aufbau');
     }
 
@@ -81,7 +81,7 @@ final class EventBuildController
         $this->own('event_days', $dayId, (int) $event['id']);
 
         Database::run('DELETE FROM event_days WHERE id = ?', [$dayId]);
-        Flash::success('Tag samt Abschnitten entfernt (Kämpfe bleiben erhalten und sind jetzt „nicht eingeplant“).');
+        Flash::success(t('Tag samt Abschnitten entfernt (Kämpfe bleiben erhalten und sind jetzt „nicht eingeplant“).'));
         Url::redirect('/admin/events/' . $event['id'] . '/aufbau');
     }
 
@@ -98,7 +98,7 @@ final class EventBuildController
         $this->own('event_days', $dayId, (int) $event['id']);
 
         if ($name === '') {
-            Flash::error('Bitte einen Namen für den Abschnitt angeben.');
+            Flash::error(t('Bitte einen Namen für den Abschnitt angeben.'));
             Url::redirect('/admin/events/' . $event['id'] . '/aufbau');
         }
 
@@ -126,7 +126,7 @@ final class EventBuildController
             Database::insert('event_sessions', $data);
         }
 
-        Flash::success('Abschnitt gespeichert.');
+        Flash::success(t('Abschnitt gespeichert.'));
         Url::redirect('/admin/events/' . $event['id'] . '/aufbau');
     }
 
@@ -140,7 +140,7 @@ final class EventBuildController
         $this->own('event_sessions', $sessionId, (int) $event['id']);
 
         Database::run('DELETE FROM event_sessions WHERE id = ?', [$sessionId]);
-        Flash::success('Abschnitt entfernt.');
+        Flash::success(t('Abschnitt entfernt.'));
         Url::redirect('/admin/events/' . $event['id'] . '/aufbau');
     }
 
@@ -154,7 +154,7 @@ final class EventBuildController
         $name    = post('name');
 
         if ($name === '') {
-            Flash::error('Bitte einen Namen für die Wettkampfstätte angeben (z. B. Ring 1).');
+            Flash::error(t('Bitte einen Namen für die Wettkampfstätte angeben (z. B. Ring 1).'));
             Url::redirect('/admin/events/' . $event['id'] . '/aufbau');
         }
 
@@ -187,7 +187,7 @@ final class EventBuildController
             Database::insert('event_venues', $data);
         }
 
-        Flash::success('Wettkampfstätte gespeichert.');
+        Flash::success(t('Wettkampfstätte gespeichert.'));
         Url::redirect('/admin/events/' . $event['id'] . '/aufbau');
     }
 
@@ -201,7 +201,7 @@ final class EventBuildController
         $this->own('event_venues', $venueId, (int) $event['id']);
 
         Database::run('DELETE FROM event_venues WHERE id = ?', [$venueId]);
-        Flash::success('Wettkampfstätte entfernt.');
+        Flash::success(t('Wettkampfstätte entfernt.'));
         Url::redirect('/admin/events/' . $event['id'] . '/aufbau');
     }
 
@@ -214,7 +214,7 @@ final class EventBuildController
         $event = EventAdminController::load((int) ($args['id'] ?? 0));
 
         View::display('admin/events/categories', [
-            'title'      => $event['name'] . ' – Kategorien',
+            'title'      => $event['name'] . ' – ' . t('Kategorien'),
             'event'      => $event,
             'categories' => EventRepo::categories((int) $event['id']),
             'errors'     => Flash::errors(),
@@ -232,8 +232,8 @@ final class EventBuildController
         $name       = post('name');
 
         if ($name === '') {
-            Flash::withInput($_POST, ['name' => 'Bitte einen Namen angeben.']);
-            Flash::error('Bitte einen Namen für die Kategorie angeben.');
+            Flash::withInput($_POST, ['name' => t('Bitte einen Namen angeben.')]);
+            Flash::error(t('Bitte einen Namen für die Kategorie angeben.'));
             Url::redirect('/admin/events/' . $event['id'] . '/kategorien');
         }
 
@@ -278,7 +278,7 @@ final class EventBuildController
         }
 
         Audit::log('category_saved', 'event', (int) $event['id'], $name);
-        Flash::success('Kategorie gespeichert.');
+        Flash::success(t('Kategorie gespeichert.'));
         Url::redirect('/admin/events/' . $event['id'] . '/kategorien');
     }
 
@@ -294,13 +294,13 @@ final class EventBuildController
         $entries = (int) Database::value('SELECT COUNT(*) FROM event_entries WHERE category_id = ?', [$categoryId]);
 
         if ($entries > 0) {
-            Flash::error('Die Kategorie hat noch Anmeldungen – bitte zuerst umbuchen oder abmelden.');
+            Flash::error(t('Die Kategorie hat noch Anmeldungen – bitte zuerst umbuchen oder abmelden.'));
             Url::redirect('/admin/events/' . $event['id'] . '/kategorien');
         }
 
         Database::run('DELETE FROM event_bouts WHERE category_id = ?', [$categoryId]);
         Database::run('DELETE FROM event_categories WHERE id = ?', [$categoryId]);
-        Flash::success('Kategorie entfernt.');
+        Flash::success(t('Kategorie entfernt.'));
         Url::redirect('/admin/events/' . $event['id'] . '/kategorien');
     }
 
@@ -314,7 +314,7 @@ final class EventBuildController
         $source = EventRepo::find(post_int('source_event_id'));
 
         if ($source === null || (int) $source['id'] === (int) $event['id']) {
-            Flash::error('Bitte ein anderes Event als Vorlage wählen.');
+            Flash::error(t('Bitte ein anderes Event als Vorlage wählen.'));
             Url::redirect('/admin/events/' . $event['id'] . '/kategorien');
         }
 
@@ -340,7 +340,7 @@ final class EventBuildController
             $n++;
         }
 
-        Flash::success($n . ' Kategorien aus „' . $source['name'] . '“ übernommen.');
+        Flash::success(t('%d Kategorien aus „%s“ übernommen.', $n, $source['name']));
         Url::redirect('/admin/events/' . $event['id'] . '/kategorien');
     }
 
@@ -355,7 +355,7 @@ final class EventBuildController
         $ruleset = \App\Core\Ruleset::find(post('ruleset'));
 
         if ($ruleset === null) {
-            Flash::error('Regelsatz nicht gefunden.');
+            Flash::error(t('Regelsatz nicht gefunden.'));
             Url::redirect($back);
         }
 
@@ -369,22 +369,23 @@ final class EventBuildController
         $genders     = array_values(array_intersect($pick('gender'), ['m', 'w']));
 
         if ($disciplines === [] || $classes === [] || $genders === []) {
-            Flash::error('Bitte mindestens eine Disziplin, eine Altersklasse und ein Geschlecht wählen.');
+            Flash::error(t('Bitte mindestens eine Disziplin, eine Altersklasse und ein Geschlecht wählen.'));
             Url::redirect($back);
         }
 
         $rows = \App\Core\Ruleset::expand($ruleset, $disciplines, $classes, $genders);
 
         if ($rows === []) {
-            Flash::error('Diese Auswahl ergibt keine Kategorien (die gewählten Altersklassen gibt es in den gewählten Disziplinen nicht).');
+            Flash::error(t('Diese Auswahl ergibt keine Kategorien (die gewählten Altersklassen gibt es in den gewählten Disziplinen nicht).'));
             Url::redirect($back);
         }
 
         $result = \App\Core\Ruleset::apply((int) $event['id'], $rows);
 
         Audit::log('ruleset_applied', 'event', (int) $event['id'], $ruleset['name'] . ': ' . $result['created'] . ' Kategorien');
-        Flash::success($result['created'] . ' Kategorien aus „' . $ruleset['name'] . '“ angelegt'
-            . ($result['skipped'] > 0 ? ' (' . $result['skipped'] . ' gab es schon)' : '') . '.');
+        Flash::success($result['skipped'] > 0
+            ? t('%d Kategorien aus „%s“ angelegt (%d gab es schon).', $result['created'], t($ruleset['name']), $result['skipped'])
+            : t('%d Kategorien aus „%s“ angelegt.', $result['created'], t($ruleset['name'])));
         Url::redirect($back);
     }
 
@@ -394,7 +395,7 @@ final class EventBuildController
         $row = Database::one("SELECT id FROM $table WHERE id = ? AND event_id = ?", [$id, $eventId]);
 
         if ($row === null) {
-            Flash::error('Datensatz nicht gefunden.');
+            Flash::error(t('Datensatz nicht gefunden.'));
             Url::redirect('/admin/events/' . $eventId . '/aufbau');
         }
     }

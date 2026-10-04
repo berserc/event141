@@ -27,7 +27,7 @@ final class GymAdminController
         AuthController::requireLogin();
 
         View::display('admin/gyms/index', [
-            'title'  => 'Gyms & Vereine',
+            'title'  => t('Gyms & Vereine'),
             'gyms'   => GymRepo::all(query('q'), query('status')),
             'q'      => query('q'),
             'status' => query('status'),
@@ -39,7 +39,7 @@ final class GymAdminController
         AuthController::requireWrite();
 
         View::display('admin/gyms/form', [
-            'title'    => 'Neues Gym',
+            'title'    => t('Neues Gym'),
             'gym'      => Flash::oldInput() + self::empty(),
             'athletes' => [],
             'entries'  => [],
@@ -73,7 +73,7 @@ final class GymAdminController
 
         if ($errors !== []) {
             Flash::withInput($_POST, $errors);
-            Flash::error('Bitte die markierten Felder prüfen.');
+            Flash::error(t('Bitte die markierten Felder prüfen.'));
             Url::redirect('/admin/gyms/neu');
         }
 
@@ -91,11 +91,11 @@ final class GymAdminController
         try {
             self::handleLogo($id, $data['slug']);
         } catch (RuntimeException $e) {
-            Flash::error('Logo nicht übernommen: ' . $e->getMessage());
+            Flash::error(t('Logo nicht übernommen: %s', $e->getMessage()));
         }
 
         Audit::log('gym_created', 'gym', $id, (string) $data['name']);
-        Flash::success('Gym angelegt.');
+        Flash::success(t('Gym angelegt.'));
         Url::redirect('/admin/gyms/' . $id);
     }
 
@@ -111,7 +111,7 @@ final class GymAdminController
 
         if ($errors !== []) {
             Flash::withInput($_POST, $errors);
-            Flash::error('Bitte die markierten Felder prüfen.');
+            Flash::error(t('Bitte die markierten Felder prüfen.'));
             Url::redirect('/admin/gyms/' . $id);
         }
 
@@ -125,7 +125,7 @@ final class GymAdminController
 
         if ($password !== '') {
             if (mb_strlen($password) < Auth::MIN_PASSWORD_LENGTH) {
-                Flash::error('Das Passwort muss mindestens ' . Auth::MIN_PASSWORD_LENGTH . ' Zeichen haben.');
+                Flash::error(t('Das Passwort muss mindestens %d Zeichen haben.', Auth::MIN_PASSWORD_LENGTH));
                 Url::redirect('/admin/gyms/' . $id);
             }
 
@@ -138,11 +138,11 @@ final class GymAdminController
         try {
             self::handleLogo($id, (string) $gym['slug']);
         } catch (RuntimeException $e) {
-            Flash::error('Logo nicht übernommen: ' . $e->getMessage());
+            Flash::error(t('Logo nicht übernommen: %s', $e->getMessage()));
         }
 
         Audit::log('gym_updated', 'gym', $id, Audit::diff($gym, $data));
-        Flash::success('Gym gespeichert.' . ($password !== '' ? ' Neues Login-Passwort gesetzt.' : ''));
+        Flash::success(t('Gym gespeichert.') . ($password !== '' ? ' ' . t('Neues Login-Passwort gesetzt.') : ''));
         Url::redirect('/admin/gyms/' . $id);
     }
 
@@ -158,7 +158,7 @@ final class GymAdminController
         if (isset(GymRepo::STATUS[$status])) {
             Database::update('gyms', $id, ['status' => $status, 'updated_at' => gmdate('Y-m-d H:i:s')]);
             Audit::log('gym_status', 'gym', $id, $gym['status'] . ' → ' . $status);
-            Flash::success($gym['name'] . ': ' . GymRepo::STATUS[$status]);
+            Flash::success($gym['name'] . ': ' . t(GymRepo::STATUS[$status]));
         }
 
         Url::redirectRaw((string) ($_SERVER['HTTP_REFERER'] ?? Url::to('/admin/gyms')));
@@ -187,13 +187,13 @@ final class GymAdminController
         $entries = (int) Database::value('SELECT COUNT(*) FROM event_entries WHERE gym_id = ?', [$id]);
 
         if ($entries > 0) {
-            Flash::error('Das Gym hat noch Anmeldungen – bitte sperren statt löschen.');
+            Flash::error(t('Das Gym hat noch Anmeldungen – bitte sperren statt löschen.'));
             Url::redirect('/admin/gyms/' . $id);
         }
 
         Database::update('gyms', $id, ['deleted_at' => gmdate('Y-m-d H:i:s'), 'login_email' => '', 'status' => 'gesperrt']);
         Audit::log('gym_deleted', 'gym', $id, (string) $gym['name']);
-        Flash::success('Gym gelöscht.');
+        Flash::success(t('Gym gelöscht.'));
         Url::redirect('/admin/gyms');
     }
 
@@ -256,8 +256,8 @@ final class GymAdminController
     /** Verbindung herstellen: Login bei Gym141, Token speichern. */
     public static function connect(array $gym, string $url, string $username, string $password): bool
     {
-        if (($pro = \App\Core\License::proFeatureError('Die Gym141-Kopplung')) !== null) {
-            Flash::error($pro . ' (Hinweis für Gyms: bitte an den Veranstalter wenden.)');
+        if (($pro = \App\Core\License::proFeatureError(t('Die Gym141-Kopplung'))) !== null) {
+            Flash::error(t('%s (Hinweis für Gyms: bitte an den Veranstalter wenden.)', $pro));
 
             return false;
         }
@@ -266,7 +266,7 @@ final class GymAdminController
             $client = new Gym141Client($url);
             $login  = $client->login($username, $password);
         } catch (RuntimeException $e) {
-            Flash::error('Verbindung fehlgeschlagen: ' . $e->getMessage());
+            Flash::error(t('Verbindung fehlgeschlagen: %s', $e->getMessage()));
 
             return false;
         }
@@ -280,7 +280,7 @@ final class GymAdminController
         ]);
 
         Audit::log('gym141_connected', 'gym', (int) $gym['id'], $client->baseUrl());
-        Flash::success('Mit Gym141 verbunden: ' . ($login['club']['name'] ?? $client->baseUrl()) . '. Jetzt Mitglieder auswählen.');
+        Flash::success(t('Mit Gym141 verbunden: %s. Jetzt Mitglieder auswählen.', $login['club']['name'] ?? $client->baseUrl()));
 
         return true;
     }
@@ -302,7 +302,7 @@ final class GymAdminController
         ]);
 
         Audit::log('gym141_disconnected', 'gym', (int) $gym['id']);
-        Flash::success('Verbindung zu Gym141 getrennt. Bereits übernommene Sportler bleiben erhalten.');
+        Flash::success(t('Verbindung zu Gym141 getrennt. Bereits übernommene Sportler bleiben erhalten.'));
     }
 
     /** @return array{0:list<array<string,mixed>>,1:string} Mitglieder + Fehlertext */
@@ -333,7 +333,7 @@ final class GymAdminController
         $ids = array_values(array_filter(array_map('intval', (array) ($_POST['member_ids'] ?? []))));
 
         if ($ids === []) {
-            Flash::error('Bitte mindestens ein Mitglied auswählen.');
+            Flash::error(t('Bitte mindestens ein Mitglied auswählen.'));
 
             return false;
         }
@@ -350,7 +350,7 @@ final class GymAdminController
 
         Database::update('gyms', (int) $gym['id'], ['gym141_synced_at' => gmdate('Y-m-d H:i:s')]);
         Audit::log('gym141_import', 'gym', (int) $gym['id'], $result['created'] . ' neu, ' . $result['updated'] . ' aktualisiert');
-        Flash::success(sprintf('%d Sportler neu übernommen, %d aktualisiert.', $result['created'], $result['updated']));
+        Flash::success(t('%d Sportler neu übernommen, %d aktualisiert.', $result['created'], $result['updated']));
 
         return true;
     }
@@ -375,7 +375,7 @@ final class GymAdminController
 
         if ($gym === null) {
             http_response_code(404);
-            View::display('errors/404-admin', ['title' => 'Nicht gefunden'], 'layouts/admin');
+            View::display('errors/404-admin', ['title' => t('Nicht gefunden')], 'layouts/admin');
             exit;
         }
 
@@ -403,21 +403,21 @@ final class GymAdminController
         $name   = post('name');
 
         if ($name === '') {
-            $errors['name'] = 'Bitte den Namen des Gyms/Vereins angeben.';
+            $errors['name'] = t('Bitte den Namen des Gyms/Vereins angeben.');
         }
 
         $email = post('email');
 
         if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors['email'] = 'Keine gültige E-Mail-Adresse.';
+            $errors['email'] = t('Keine gültige E-Mail-Adresse.');
         }
 
         $loginEmail = post('login_email');
 
         if ($loginEmail !== '' && !filter_var($loginEmail, FILTER_VALIDATE_EMAIL)) {
-            $errors['login_email'] = 'Keine gültige E-Mail-Adresse.';
+            $errors['login_email'] = t('Keine gültige E-Mail-Adresse.');
         } elseif (GymRepo::loginEmailTaken($loginEmail, $id)) {
-            $errors['login_email'] = 'Mit dieser E-Mail-Adresse gibt es schon ein Gym-Konto.';
+            $errors['login_email'] = t('Mit dieser E-Mail-Adresse gibt es schon ein Gym-Konto.');
         }
 
         $data = [

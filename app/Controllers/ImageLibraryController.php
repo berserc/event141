@@ -31,7 +31,7 @@ final class ImageLibraryController
         $tag = trim(query('tag'));
 
         View::display('admin/medien/index', [
-            'title'     => 'Bilder',
+            'title'     => t('Bilder'),
             'images'    => ImageRepo::search($q, $tag),
             'total'     => ImageRepo::count(),
             'tagCounts' => ImageRepo::tagCounts(),
@@ -74,13 +74,13 @@ final class ImageLibraryController
 
         if ($ok > 0) {
             Audit::log('images_uploaded', 'image', null, $ok . ' Bild(er), Tags: ' . implode(', ', $tags));
-            Flash::success($ok . ' Bild(er) übernommen.');
+            Flash::success(t('%d Bild(er) übernommen.', $ok));
         }
         if ($errors !== []) {
             Flash::error(implode(' · ', array_slice($errors, 0, 5)) . (count($errors) > 5 ? ' …' : ''));
         }
         if ($ok === 0 && $errors === []) {
-            Flash::error('Keine Datei ausgewählt.');
+            Flash::error(t('Keine Datei ausgewählt.'));
         }
 
         Url::redirect('/admin/medien', ['tag' => $tags[0] ?? '']);
@@ -94,11 +94,11 @@ final class ImageLibraryController
 
         $id = (int) ($args['id'] ?? 0);
         if (ImageRepo::find($id) === null) {
-            Flash::error('Bild nicht gefunden.');
+            Flash::error(t('Bild nicht gefunden.'));
             Url::redirect('/admin/medien');
         }
         ImageRepo::update($id, trim(post('caption')), ImageRepo::parseTags(post('tags')));
-        Flash::success('Bild gespeichert.');
+        Flash::success(t('Bild gespeichert.'));
         $this->back();
     }
 
@@ -113,36 +113,36 @@ final class ImageLibraryController
         $tags   = ImageRepo::parseTags(post('bulk_tags'));
 
         if ($ids === []) {
-            Flash::error('Keine Bilder ausgewählt.');
+            Flash::error(t('Keine Bilder ausgewählt.'));
             $this->back();
         }
 
         switch ($action) {
             case 'addtags':
                 if ($tags === []) {
-                    Flash::error('Bitte Tags eingeben.');
+                    Flash::error(t('Bitte Tags eingeben.'));
                     $this->back();
                 }
                 ImageRepo::addTags($ids, $tags);
-                Flash::success('Tags bei ' . count($ids) . ' Bild(ern) ergänzt.');
+                Flash::success(t('Tags bei %d Bild(ern) ergänzt.', count($ids)));
                 break;
             case 'deltags':
                 if ($tags === []) {
-                    Flash::error('Bitte Tags eingeben.');
+                    Flash::error(t('Bitte Tags eingeben.'));
                     $this->back();
                 }
                 ImageRepo::removeTags($ids, $tags);
-                Flash::success('Tags bei ' . count($ids) . ' Bild(ern) entfernt.');
+                Flash::success(t('Tags bei %d Bild(ern) entfernt.', count($ids)));
                 break;
             case 'delete':
                 foreach ($ids as $id) {
                     ImageRepo::delete($id);
                 }
                 Audit::log('images_deleted', 'image', null, count($ids) . ' Bild(er)');
-                Flash::success(count($ids) . ' Bild(er) gelöscht.');
+                Flash::success(t('%d Bild(er) gelöscht.', count($ids)));
                 break;
             default:
-                Flash::error('Unbekannte Aktion.');
+                Flash::error(t('Unbekannte Aktion.'));
         }
 
         $this->back();

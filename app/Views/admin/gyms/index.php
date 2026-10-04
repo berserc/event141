@@ -10,31 +10,31 @@ use App\Models\GymRepo;
  */
 ?>
 <div class="page-head">
-    <h1>Gyms &amp; Vereine</h1>
+    <h1><?= e(t('Gyms & Vereine')) ?></h1>
     <?php if (Auth::canWrite()): ?>
         <div class="page-head__actions">
-            <a class="btn btn--primary" href="<?= e(url('/admin/gyms/neu')) ?>">Neues Gym</a>
+            <a class="btn btn--primary" href="<?= e(url('/admin/gyms/neu')) ?>"><?= e(t('Neues Gym')) ?></a>
         </div>
     <?php endif; ?>
 </div>
 
 <div class="card">
     <form method="get" class="filters">
-        <input type="search" name="q" value="<?= e($q) ?>" placeholder="Name, Ort, Kontakt …">
+        <input type="search" name="q" value="<?= e($q) ?>" placeholder="<?= e(t('Name, Ort, Kontakt …')) ?>">
         <select name="status">
-            <option value="">alle Status</option>
+            <option value=""><?= e(t('alle Status')) ?></option>
             <?php foreach (GymRepo::STATUS as $k => $l): ?>
-                <option value="<?= e($k) ?>" <?= $status === $k ? 'selected' : '' ?>><?= e($l) ?></option>
+                <option value="<?= e($k) ?>" <?= $status === $k ? 'selected' : '' ?>><?= e(t($l)) ?></option>
             <?php endforeach; ?>
         </select>
-        <button class="btn btn--sm" type="submit">Filtern</button>
-        <a class="btn btn--sm btn--ghost" href="<?= e(url('/admin/gyms')) ?>">Zurücksetzen</a>
+        <button class="btn btn--sm" type="submit"><?= e(t('Filtern')) ?></button>
+        <a class="btn btn--sm btn--ghost" href="<?= e(url('/admin/gyms')) ?>"><?= e(t('Zurücksetzen')) ?></a>
     </form>
 
     <div class="table-scroll">
         <table class="table">
             <thead>
-            <tr><th>Logo</th><th>Gym / Verein</th><th>Ort</th><th>Kontakt</th><th>Login</th><th>Gym141</th><th class="num">Sportler</th><th class="num">Anmeld.</th><th>Status</th><th></th></tr>
+            <tr><th><?= e(t('Logo')) ?></th><th><?= e(t('Gym / Verein')) ?></th><th><?= e(t('Ort')) ?></th><th><?= e(t('Kontakt')) ?></th><th><?= e(t('Login')) ?></th><th>Gym141</th><th class="num"><?= e(t('Sportler')) ?></th><th class="num"><?= e(t('Anmeld.')) ?></th><th><?= e(t('Status')) ?></th><th></th></tr>
             </thead>
             <tbody>
             <?php foreach ($gyms as $g): ?>
@@ -44,7 +44,7 @@ use App\Models\GymRepo;
                     <td><?= e(trim($g['zip'] . ' ' . $g['city'])) ?> <?= $g['country'] !== 'AT' ? e(flag_emoji($g['country'])) : '' ?></td>
                     <td><?= e($g['contact_name']) ?><?= $g['email'] !== '' ? '<br><small>' . mail_link($g['email']) . '</small>' : '' ?></td>
                     <td><?= $g['login_email'] !== '' ? '<small>' . e($g['login_email']) . '</small>' : '<span class="muted">–</span>' ?></td>
-                    <td><?= $g['gym141_token'] !== '' ? '<span class="badge badge--ok">verbunden</span>' : '' ?></td>
+                    <td><?= $g['gym141_token'] !== '' ? '<span class="badge badge--ok">' . e(t('verbunden')) . '</span>' : '' ?></td>
                     <td class="num"><?= (int) $g['athlete_count'] ?></td>
                     <td class="num"><?= (int) $g['entry_count'] ?></td>
                     <td>
@@ -53,22 +53,22 @@ use App\Models\GymRepo;
                                 <?= csrf_field() ?>
                                 <select name="status" onchange="this.form.submit()" class="select--inline pill pill--gym-<?= e($g['status']) ?>">
                                     <?php foreach (GymRepo::STATUS as $k => $l): ?>
-                                        <option value="<?= e($k) ?>" <?= $g['status'] === $k ? 'selected' : '' ?>><?= e($l) ?></option>
+                                        <option value="<?= e($k) ?>" <?= $g['status'] === $k ? 'selected' : '' ?>><?= e(t($l)) ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </form>
                         <?php else: ?>
-                            <span class="pill pill--gym-<?= e($g['status']) ?>"><?= e(GymRepo::STATUS[$g['status']] ?? $g['status']) ?></span>
+                            <span class="pill pill--gym-<?= e($g['status']) ?>"><?= e(t(GymRepo::STATUS[$g['status']] ?? $g['status'])) ?></span>
                         <?php endif; ?>
                     </td>
                     <td class="row-actions">
-                        <a href="<?= e(url('/admin/gyms/' . $g['id'])) ?>">Öffnen</a>
-                        <a href="<?= e(url('/admin/sportler', ['gym' => $g['id']])) ?>">Sportler</a>
+                        <a href="<?= e(url('/admin/gyms/' . $g['id'])) ?>"><?= e(t('Öffnen')) ?></a>
+                        <a href="<?= e(url('/admin/sportler', ['gym' => $g['id']])) ?>"><?= e(t('Sportler')) ?></a>
                     </td>
                 </tr>
             <?php endforeach; ?>
             <?php if ($gyms === []): ?>
-                <tr><td colspan="10" class="empty">Keine Gyms gefunden.</td></tr>
+                <tr><td colspan="10" class="empty"><?= e(t('Keine Gyms gefunden.')) ?></td></tr>
             <?php endif; ?>
             </tbody>
         </table>

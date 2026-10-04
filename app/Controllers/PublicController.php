@@ -36,9 +36,9 @@ final class PublicController
 
         View::display('public/home', [
             'title'      => '',
-            'metaDesc'   => Setting::get('org_name') . ' – Events, Turniere und Fight Nights: Termine, Kämpfe, Ergebnisse.',
+            'metaDesc'   => t('%s – Events, Turniere und Fight Nights: Termine, Kämpfe, Ergebnisse.', Setting::get('org_name')),
             'events'     => EventRepo::published(),
-            'introTitle' => Setting::get('home_title', 'Unsere Events'),
+            'introTitle' => t(Setting::get('home_title', 'Unsere Events')),
             'introText'  => Setting::get('home_text', ''),
             'activePage' => 'home',
         ]);
@@ -105,7 +105,7 @@ final class PublicController
             return;
         }
         View::display('public/report', [
-            'title'      => (string) ($event['report_title'] ?: 'Bericht') . ' – ' . $event['name'],
+            'title'      => (string) ($event['report_title'] ?: t('Bericht')) . ' – ' . $event['name'],
             'metaDesc'   => mb_substr(trim(preg_replace('/\s+/', ' ', (string) $event['report_text']) ?? ''), 0, 160),
             'event'      => $event,
             'cover'      => (int) ($event['report_cover_id'] ?? 0) > 0 ? \App\Models\ImageRepo::find((int) $event['report_cover_id']) : null,
@@ -120,7 +120,7 @@ final class PublicController
     {
         $event = $this->loadEvent($args);
         View::display('public/galleries', [
-            'title'      => 'Galerie – ' . $event['name'],
+            'title'      => t('Galerie') . ' – ' . $event['name'],
             'event'      => $event,
             'galleries'  => \App\Models\GalleryRepo::forEvent((int) $event['id'], true),
             'activePage' => 'event',
@@ -168,7 +168,7 @@ final class PublicController
 
         $bouts = self::visible(BoutRepo::forEvent($eventId));
         $data  = [
-            'title'      => $event['name'] . ' – ' . ($event['type'] === 'gala' ? 'Fightcard' : 'Turnierplan'),
+            'title'      => $event['name'] . ' – ' . ($event['type'] === 'gala' ? t('Fightcard') : t('Turnierplan')),
             'event'      => $event,
             'bouts'      => $bouts,
             'times'      => Timetable::compute($event, $bouts),
@@ -234,7 +234,7 @@ final class PublicController
         $event = $this->loadEvent($args);
 
         View::display('public/schedule', [
-            'title'      => $event['name'] . ' – Zeitplan',
+            'title'      => $event['name'] . ' – ' . t('Zeitplan'),
             'event'      => $event,
             'schedule'   => BoutRepo::schedule((int) $event['id']),
             'times'      => Timetable::compute($event, BoutRepo::forEvent((int) $event['id'])),
@@ -263,7 +263,7 @@ final class PublicController
         ksort($byGym, SORT_NATURAL | SORT_FLAG_CASE);
 
         View::display('public/entries', [
-            'title'      => $event['name'] . ' – Teilnehmer',
+            'title'      => $event['name'] . ' – ' . t('Teilnehmer'),
             'event'      => $event,
             'byGym'      => $byGym,
             'total'      => count($rows),
@@ -285,7 +285,7 @@ final class PublicController
         $bouts = self::visible(BoutRepo::forEvent((int) $event['id']));
 
         View::display('public/results', [
-            'title'      => $event['name'] . ' – Ergebnisse',
+            'title'      => $event['name'] . ' – ' . t('Ergebnisse'),
             'event'      => $event,
             'finished'   => array_values(array_filter($bouts, static fn (array $b): bool => $b['status'] === 'beendet' && (int) $b['is_break'] === 0 && $b['method'] !== 'Freilos')),
             'winners'    => BoutController::categoryWinners((int) $event['id']),
@@ -408,12 +408,12 @@ final class PublicController
         if (str_contains((string) ($_SERVER['REQUEST_URI'] ?? ''), '/api/')) {
             header('Content-Type: application/json; charset=UTF-8');
             header('Access-Control-Allow-Origin: *');
-            echo json_encode(['error' => 'Unbekannter Endpunkt.']);
+            echo json_encode(['error' => t('Unbekannter Endpunkt.')]);
 
             return;
         }
 
-        View::display('errors/404', ['title' => 'Seite nicht gefunden', 'activePage' => '']);
+        View::display('errors/404', ['title' => t('Seite nicht gefunden'), 'activePage' => '']);
     }
 
     private function loadEvent(array $args): array

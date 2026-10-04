@@ -22,7 +22,7 @@ $vergangen = array_values(array_filter($events, static fn (array $e): bool => (s
 
 <section class="wrap">
     <?php if ($kommend === []): ?>
-        <p class="muted">Derzeit ist kein Event angekündigt.</p>
+        <p class="muted"><?= e(t('Derzeit ist kein Event angekündigt.')) ?></p>
     <?php endif; ?>
 
     <div class="event-grid">
@@ -36,16 +36,16 @@ $vergangen = array_values(array_filter($events, static fn (array $e): bool => (s
                 <span class="event-tile__body">
                     <span class="event-tile__date"><?= e(format_date_range($ev['starts_on'], $ev['ends_on'])) ?></span>
                     <span class="event-tile__title"><?= e($ev['name']) ?></span>
-                    <span class="event-tile__meta"><?= e(EventRepo::TYPES[$ev['type']] ?? '') ?><?= $ev['venue_city'] !== '' ? ' · ' . e($ev['venue_city']) : '' ?></span>
+                    <span class="event-tile__meta"><?= e(t(EventRepo::TYPES[$ev['type']] ?? '')) ?><?= $ev['venue_city'] !== '' ? ' · ' . e($ev['venue_city']) : '' ?></span>
                     <?php if ($ev['status'] === 'laufend'): ?><span class="live-badge">LIVE</span><?php endif; ?>
-                    <?php if (EventRepo::registrationOpen($ev)): ?><span class="badge-dark badge-dark--bestaetigt">Anmeldung offen</span><?php endif; ?>
+                    <?php if (EventRepo::registrationOpen($ev)): ?><span class="badge-dark badge-dark--bestaetigt"><?= e(t('Anmeldung offen')) ?></span><?php endif; ?>
                 </span>
             </a>
         <?php endforeach; ?>
     </div>
 
     <?php if ($vergangen !== []): ?>
-        <h2 class="section-heading">Vergangene Events</h2>
+        <h2 class="section-heading"><?= e(t('Vergangene Events')) ?></h2>
         <ul class="event-list">
             <?php foreach ($vergangen as $ev): ?>
                 <li><a href="<?= e(url('/e/' . $ev['slug'])) ?>"><?= e($ev['name']) ?></a> <small class="muted"><?= e(format_date_range($ev['starts_on'], $ev['ends_on'])) ?></small></li>

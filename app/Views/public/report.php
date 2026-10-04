@@ -12,7 +12,7 @@ $base = '/e/' . $event['slug'];
 <section class="event-title-bar">
     <div class="wrap">
         <p class="muted"><a href="<?= e(url($base)) ?>"><?= e($event['short_name'] ?: $event['name']) ?></a> · <?= e(format_date_range($event['starts_on'], $event['ends_on'])) ?></p>
-        <h1><?= e((string) ($event['report_title'] ?: 'Bericht')) ?></h1>
+        <h1><?= e((string) ($event['report_title'] ?: t('Bericht'))) ?></h1>
     </div>
 </section>
 <?php require __DIR__ . '/_event-nav.php'; ?>
@@ -36,5 +36,5 @@ $base = '/e/' . $event['slug'];
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
-    <p style="margin-top:2rem"><a class="btn btn--ghost btn--on-dark" href="<?= e(url($base)) ?>">← Zum Event</a></p>
+    <p style="margin-top:2rem"><a class="btn btn--ghost btn--on-dark" href="<?= e(url($base)) ?>">← <?= e(t('Zum Event')) ?></a></p>
 </article>

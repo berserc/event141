@@ -39,36 +39,36 @@ $liveNow = array_values(array_filter($bouts, static fn (array $b): bool => $b['s
     <div class="event-hero__shade"></div>
     <div class="wrap event-hero__content">
         <?php if ($event['logo_path'] !== ''): ?><img class="event-hero__logo" src="<?= e(upload_url($event['logo_path'])) ?>" alt="<?= e($event['name']) ?>"><?php endif; ?>
-        <p class="event-hero__kicker"><?= e(EventRepo::TYPES[$event['type']] ?? '') ?><?= $event['sport'] !== '' ? ' · ' . e($event['sport']) : '' ?></p>
+        <p class="event-hero__kicker"><?= e(t(EventRepo::TYPES[$event['type']] ?? '')) ?><?= $event['sport'] !== '' ? ' · ' . e($event['sport']) : '' ?></p>
         <h1><?= e($event['name']) ?></h1>
         <?php if ($event['tagline'] !== ''): ?><p class="event-hero__tagline"><?= e($event['tagline']) ?></p><?php endif; ?>
         <p class="event-hero__facts">
             <strong><?= e(format_date_long($event['starts_on'])) ?><?= $event['ends_on'] ? ' – ' . e(format_date_long($event['ends_on'])) : '' ?></strong>
-            <?= $event['doors_time'] !== '' ? '· Einlass ' . e($event['doors_time']) : '' ?>
-            <?= $event['start_time'] !== '' ? '· Beginn ' . e($event['start_time']) . ' Uhr' : '' ?>
+            <?= $event['doors_time'] !== '' ? '· ' . e(t('Einlass %s', $event['doors_time'])) : '' ?>
+            <?= $event['start_time'] !== '' ? '· ' . e(t('Beginn %s Uhr', $event['start_time'])) : '' ?>
             <?php if ($address !== ''): ?><br><?= e($address) ?><?php endif; ?>
         </p>
 
         <?php if ($liveNow !== []): ?>
             <a class="live-bar" href="<?= e(url($base . '/kampf/' . $liveNow[0]['id'])) ?>">
                 <span class="live-badge">LIVE</span>
-                <span>Jetzt im Ring: <strong><?= e(BoutRepo::cornerName($liveNow[0], 'red') ?: 'TBA') ?></strong> vs. <strong><?= e(BoutRepo::cornerName($liveNow[0], 'blue') ?: 'TBA') ?></strong><?= count($venues) > 1 && $liveNow[0]['venue_name'] ? ' · ' . e($liveNow[0]['venue_name']) : '' ?></span>
+                <span><?= t('Jetzt im Ring: <strong>%1$s</strong> vs. <strong>%2$s</strong>', e(BoutRepo::cornerName($liveNow[0], 'red') ?: 'TBA'), e(BoutRepo::cornerName($liveNow[0], 'blue') ?: 'TBA')) ?><?= count($venues) > 1 && $liveNow[0]['venue_name'] ? ' · ' . e($liveNow[0]['venue_name']) : '' ?></span>
             </a>
         <?php elseif (!$vorbei && (int) $event['show_countdown'] === 1 && $startTs > time()): ?>
-            <div class="countdown" data-countdown="<?= (int) $startTs ?>" aria-label="Countdown bis zum Beginn">
-                <span><b data-cd="d">–</b><small>Tage</small></span>
-                <span><b data-cd="h">–</b><small>Std.</small></span>
-                <span><b data-cd="m">–</b><small>Min.</small></span>
-                <span><b data-cd="s">–</b><small>Sek.</small></span>
+            <div class="countdown" data-countdown="<?= (int) $startTs ?>" aria-label="<?= e(t('Countdown bis zum Beginn')) ?>">
+                <span><b data-cd="d">–</b><small><?= e(t('Tage')) ?></small></span>
+                <span><b data-cd="h">–</b><small><?= e(t('Std.')) ?></small></span>
+                <span><b data-cd="m">–</b><small><?= e(t('Min.')) ?></small></span>
+                <span><b data-cd="s">–</b><small><?= e(t('Sek.')) ?></small></span>
             </div>
         <?php endif; ?>
 
         <p class="event-hero__actions">
-            <?php if ($ticket141 !== null && !$vorbei): ?><a class="btn btn--primary" href="#tickets">Tickets sichern</a>
-            <?php elseif ($event['ticket_url'] !== '' && !$vorbei): ?><a class="btn btn--primary" href="<?= e($event['ticket_url']) ?>" target="_blank" rel="noopener">Tickets sichern</a><?php endif; ?>
-            <a class="btn btn--ghost btn--on-dark" href="<?= $isGala ? '#fightcard' : e(url($base . '/kaempfe')) ?>"><?= $isGala ? 'Fightcard' : 'Turnierplan' ?></a>
+            <?php if ($ticket141 !== null && !$vorbei): ?><a class="btn btn--primary" href="#tickets"><?= e(t('Tickets sichern')) ?></a>
+            <?php elseif ($event['ticket_url'] !== '' && !$vorbei): ?><a class="btn btn--primary" href="<?= e($event['ticket_url']) ?>" target="_blank" rel="noopener"><?= e(t('Tickets sichern')) ?></a><?php endif; ?>
+            <a class="btn btn--ghost btn--on-dark" href="<?= $isGala ? '#fightcard' : e(url($base . '/kaempfe')) ?>"><?= e($isGala ? t('Fightcard') : t('Turnierplan')) ?></a>
             <?php if (EventRepo::registrationOpen($event) && ($gymArea ?? true)): ?>
-                <a class="btn btn--ghost btn--on-dark" href="<?= e(url('/gym/event/' . $event['id'])) ?>">Sportler anmelden (Gyms)</a>
+                <a class="btn btn--ghost btn--on-dark" href="<?= e(url('/gym/event/' . $event['id'])) ?>"><?= e(t('Sportler anmelden (Gyms)')) ?></a>
             <?php endif; ?>
         </p>
     </div>
@@ -78,8 +78,8 @@ $liveNow = array_values(array_filter($bouts, static fn (array $b): bool => $b['s
 
 <?php if ($isGala): ?>
     <section class="wrap page-section" id="fightcard">
-        <h2 class="section-heading">Die Fightcard</h2>
-        <p class="section-sub">Klick auf einen Kampf für alle Details</p>
+        <h2 class="section-heading"><?= e(t('Die Fightcard')) ?></h2>
+        <p class="section-sub"><?= e(t('Klick auf einen Kampf für alle Details')) ?></p>
         <div data-fightcard="<?= e(url($base . '/kaempfe', ['fragment' => 1])) ?>">
             <?php require __DIR__ . '/_fightcard.php'; ?>
         </div>
@@ -87,17 +87,17 @@ $liveNow = array_values(array_filter($bouts, static fn (array $b): bool => $b['s
 <?php elseif ($live !== [] || $nextBouts !== []): ?>
     <section class="wrap page-section">
         <?php if ($live !== []): ?>
-            <h2 class="section-heading"><span class="live-badge">LIVE</span> Gerade im Ring</h2>
+            <h2 class="section-heading"><span class="live-badge">LIVE</span> <?= e(t('Gerade im Ring')) ?></h2>
             <div class="fightcard">
                 <?php foreach ($live as $bout): ?><?php require __DIR__ . '/_bout.php'; ?><?php endforeach; ?>
             </div>
         <?php endif; ?>
         <?php if ($nextBouts !== []): ?>
-            <h2 class="section-heading">Nächste Kämpfe</h2>
+            <h2 class="section-heading"><?= e(t('Nächste Kämpfe')) ?></h2>
             <div class="fightcard">
                 <?php foreach ($nextBouts as $bout): ?><?php require __DIR__ . '/_bout.php'; ?><?php endforeach; ?>
             </div>
-            <p><a class="btn btn--ghost btn--on-dark" href="<?= e(url($base . '/zeitplan')) ?>">Ganzer Zeitplan</a></p>
+            <p><a class="btn btn--ghost btn--on-dark" href="<?= e(url($base . '/zeitplan')) ?>"><?= e(t('Ganzer Zeitplan')) ?></a></p>
         <?php endif; ?>
     </section>
 <?php endif; ?>
@@ -105,23 +105,23 @@ $liveNow = array_values(array_filter($bouts, static fn (array $b): bool => $b['s
 <?php $galleries = $galleries ?? []; $reportCover = $reportCover ?? null; $hatBericht = (int) ($event['report_published'] ?? 0) === 1 && trim((string) ($event['report_text'] ?? '')) !== ''; ?>
 <?php if ($hatBericht): ?>
     <section class="wrap page-section" id="bericht">
-        <h2 class="section-heading">Der Bericht</h2>
+        <h2 class="section-heading"><?= e(t('Der Bericht')) ?></h2>
         <a class="report-teaser" href="<?= e(url($base . '/bericht')) ?>">
             <?php if ($reportCover !== null): ?><span class="report-teaser__img"><img src="<?= e(upload_url((string) $reportCover['file'])) ?>" alt="" loading="lazy"></span><?php endif; ?>
             <span class="report-teaser__body">
-                <strong><?= e((string) ($event['report_title'] ?: 'Bericht')) ?></strong>
+                <strong><?= e((string) ($event['report_title'] ?: t('Bericht'))) ?></strong>
                 <?= text_blocks((string) $event['report_text'], 2) ?>
-                <em>Ganzen Bericht lesen →</em>
+                <em><?= e(t('Ganzen Bericht lesen')) ?> →</em>
             </span>
         </a>
     </section>
 <?php endif; ?>
 <?php if ($galleries !== []): ?>
     <section class="wrap page-section" id="galerie">
-        <h2 class="section-heading">Die Galerie</h2>
+        <h2 class="section-heading"><?= e(t('Die Galerie')) ?></h2>
         <div class="gallery-cards">
             <?php foreach ($galleries as $g): ?>
-                <a class="gallery-card" href="<?= e(url($base . '/galerie/' . $g['slug'])) ?>"><?php if (!empty($g['cover_thumb'])): ?><img src="<?= e(upload_url((string) $g['cover_thumb'])) ?>" alt="" loading="lazy"><?php endif; ?><strong><?= e((string) $g['title']) ?></strong><span><?= (int) $g['image_count'] ?> Bilder</span></a>
+                <a class="gallery-card" href="<?= e(url($base . '/galerie/' . $g['slug'])) ?>"><?php if (!empty($g['cover_thumb'])): ?><img src="<?= e(upload_url((string) $g['cover_thumb'])) ?>" alt="" loading="lazy"><?php endif; ?><strong><?= e((string) $g['title']) ?></strong><span><?= e(t('%d Bilder', (int) $g['image_count'])) ?></span></a>
             <?php endforeach; ?>
         </div>
     </section>
@@ -141,38 +141,38 @@ $liveNow = array_values(array_filter($bouts, static fn (array $b): bool => $b['s
 
         <?php if ($days !== [] && (!$isGala || count($days) > 1)): ?>
             <div class="side-card">
-                <h3>Ablauf</h3>
+                <h3><?= e(t('Ablauf')) ?></h3>
                 <?php foreach ($days as $d): ?>
-                    <p><strong><?= e(format_date_long($d['day_date'])) ?></strong><?= $d['label'] !== '' ? ' – ' . e($d['label']) : '' ?></p>
+                    <p><strong><?= e(format_date_long($d['day_date'])) ?></strong><?= $d['label'] !== '' ? ' – ' . e(t($d['label'])) : '' ?></p>
                     <?php if ($d['sessions'] !== []): ?>
                         <ul>
                             <?php foreach ($d['sessions'] as $s): ?>
-                                <li><?= $s['starts_at'] !== '' ? e($s['starts_at']) . ' ' : '' ?><?= e($s['name']) ?></li>
+                                <li><?= $s['starts_at'] !== '' ? e($s['starts_at']) . ' ' : '' ?><?= e(t($s['name'])) ?></li>
                             <?php endforeach; ?>
                         </ul>
                     <?php endif; ?>
                 <?php endforeach; ?>
                 <?php if (count($venues) > 1): ?>
-                    <p class="muted"><?= count($venues) ?> Wettkampfstätten: <?= e(implode(', ', array_column($venues, 'name'))) ?></p>
+                    <p class="muted"><?= e(t('%d Wettkampfstätten: %s', count($venues), implode(', ', array_column($venues, 'name')))) ?></p>
                 <?php endif; ?>
             </div>
         <?php endif; ?>
 
         <?php if ($categories !== [] && !$isGala): ?>
             <div class="side-card">
-                <h3>Kategorien</h3>
+                <h3><?= e(t('Kategorien')) ?></h3>
                 <ul>
                     <?php foreach ($categories as $c): ?>
                         <li><?= e($c['name']) ?> <small class="muted"><?= e(EventRepo::categoryInfo($c)) ?></small></li>
                     <?php endforeach; ?>
                 </ul>
-                <p class="muted"><?= (int) $stats['entries']['bestaetigt'] ?> Teilnehmer aus <?= (int) $stats['gyms'] ?> Gyms</p>
+                <p class="muted"><?= e(t('%d Teilnehmer aus %d Gyms', (int) $stats['entries']['bestaetigt'], (int) $stats['gyms'])) ?></p>
             </div>
         <?php endif; ?>
 
         <?php if ($event['contact_email'] !== '' || $event['contact_phone'] !== ''): ?>
             <div class="side-card">
-                <h3>Kontakt</h3>
+                <h3><?= e(t('Kontakt')) ?></h3>
                 <?php if ($event['contact_email'] !== ''): ?><p><?= mail_link($event['contact_email']) ?></p><?php endif; ?>
                 <?php if ($event['contact_phone'] !== ''): ?><p><?= tel_link($event['contact_phone']) ?></p><?php endif; ?>
             </div>
@@ -182,23 +182,23 @@ $liveNow = array_values(array_filter($bouts, static fn (array $b): bool => $b['s
 
 <?php if ($address !== ''): ?>
     <section class="wrap page-section" id="location">
-        <h2 class="section-heading">Die Location</h2>
+        <h2 class="section-heading"><?= e(t('Die Location')) ?></h2>
         <?php if ($event['location_note'] !== ''): ?><p class="section-sub"><?= e($event['location_note']) ?></p><?php endif; ?>
         <div class="location-grid">
             <?php if ((int) $event['show_map'] === 1): ?>
                 <div class="map-wrap" data-map="https://www.google.com/maps?q=<?= e(rawurlencode($address)) ?>&amp;output=embed">
-                    <button class="btn btn--ghost btn--on-dark" type="button" data-map-load>Karte laden (Google Maps)</button>
-                    <small class="muted">Erst beim Laden werden Daten an Google übertragen.</small>
+                    <button class="btn btn--ghost btn--on-dark" type="button" data-map-load><?= e(t('Karte laden (Google Maps)')) ?></button>
+                    <small class="muted"><?= e(t('Erst beim Laden werden Daten an Google übertragen.')) ?></small>
                 </div>
             <?php endif; ?>
             <div class="location-info">
                 <h3><?= e($event['venue_name'] ?: $event['venue_city']) ?></h3>
                 <p>📍 <strong><?= e($event['venue_street']) ?></strong><?= $event['venue_street'] !== '' ? ', ' : '' ?><?= e(trim($event['venue_zip'] . ' ' . $event['venue_city'])) ?></p>
                 <p>📅 <strong><?= e(format_date_long($event['starts_on'])) ?></strong></p>
-                <?php if ($event['doors_time'] !== ''): ?><p>🚪 Einlass ab <strong><?= e($event['doors_time']) ?> Uhr</strong></p><?php endif; ?>
-                <?php if ($event['start_time'] !== ''): ?><p>🥊 Beginn ca. <strong><?= e($event['start_time']) ?> Uhr</strong></p><?php endif; ?>
+                <?php if ($event['doors_time'] !== ''): ?><p>🚪 <?= t('Einlass ab <strong>%s Uhr</strong>', e($event['doors_time'])) ?></p><?php endif; ?>
+                <?php if ($event['start_time'] !== ''): ?><p>🥊 <?= t('Beginn ca. <strong>%s Uhr</strong>', e($event['start_time'])) ?></p><?php endif; ?>
                 <?php if ($event['min_age_note'] !== ''): ?><p>🔞 <?= e($event['min_age_note']) ?></p><?php endif; ?>
-                <p><a class="btn btn--ghost btn--on-dark" href="https://www.google.com/maps/dir/?api=1&amp;destination=<?= e(rawurlencode($address)) ?>" target="_blank" rel="noopener">Route planen</a></p>
+                <p><a class="btn btn--ghost btn--on-dark" href="https://www.google.com/maps/dir/?api=1&amp;destination=<?= e(rawurlencode($address)) ?>" target="_blank" rel="noopener"><?= e(t('Route planen')) ?></a></p>
             </div>
         </div>
     </section>
@@ -206,7 +206,7 @@ $liveNow = array_values(array_filter($bouts, static fn (array $b): bool => $b['s
 
 <?php if ($ticket141 !== null && !$vorbei): ?>
     <section class="wrap page-section" id="tickets">
-        <h2 class="section-heading">Tickets sichern</h2>
+        <h2 class="section-heading"><?= e(t('Tickets sichern')) ?></h2>
         <?php if ($event['ticket_note'] !== ''): ?><p class="section-sub"><?= e($event['ticket_note']) ?></p><?php endif; ?>
         <?php if ($tkCats !== []): ?>
             <div class="ticket-grid">
@@ -234,16 +234,16 @@ $liveNow = array_values(array_filter($bouts, static fn (array $b): bool => $b['s
         <?php if ($tkOpen && $ticket141['embed']): ?>
             <div data-ticket141="<?= e($ticket141['slug']) ?>" data-return="<?= e(\App\Core\Fightcard::requestBase() . url($base)) ?>"></div>
             <script src="<?= e($ticket141['embed_js']) ?>" defer></script>
-            <p class="ticket-actions"><a class="btn btn--ghost btn--on-dark" href="<?= e($tkUrl) ?>" target="_blank" rel="noopener">Shop in neuem Fenster öffnen</a></p>
+            <p class="ticket-actions"><a class="btn btn--ghost btn--on-dark" href="<?= e($tkUrl) ?>" target="_blank" rel="noopener"><?= e(t('Shop in neuem Fenster öffnen')) ?></a></p>
         <?php elseif ($tkOpen): ?>
-            <p class="ticket-actions"><a class="btn btn--primary btn--lg" href="<?= e($tkUrl) ?>" target="_blank" rel="noopener">Tickets kaufen</a></p>
+            <p class="ticket-actions"><a class="btn btn--primary btn--lg" href="<?= e($tkUrl) ?>" target="_blank" rel="noopener"><?= e(t('Tickets kaufen')) ?></a></p>
         <?php else: ?>
-            <p class="ticket-actions muted"><?= e((string) ($tkSale['reason'] ?: 'Der Ticketverkauf ist derzeit nicht geöffnet.')) ?></p>
+            <p class="ticket-actions muted"><?= e((string) ($tkSale['reason'] ?: t('Der Ticketverkauf ist derzeit nicht geöffnet.'))) ?></p>
         <?php endif; ?>
     </section>
 <?php elseif (($tickets !== [] || $event['ticket_url'] !== '') && !$vorbei): ?>
     <section class="wrap page-section" id="tickets">
-        <h2 class="section-heading">Tickets sichern</h2>
+        <h2 class="section-heading"><?= e(t('Tickets sichern')) ?></h2>
         <?php if ($event['ticket_note'] !== ''): ?><p class="section-sub"><?= e($event['ticket_note']) ?></p><?php endif; ?>
         <?php if ($tickets !== []): ?>
             <div class="ticket-grid">
@@ -257,7 +257,7 @@ $liveNow = array_values(array_filter($bouts, static fn (array $b): bool => $b['s
             </div>
         <?php endif; ?>
         <?php if ($event['ticket_url'] !== ''): ?>
-            <p class="ticket-actions"><a class="btn btn--primary" href="<?= e($event['ticket_url']) ?>" target="_blank" rel="noopener">Jetzt Tickets kaufen</a></p>
+            <p class="ticket-actions"><a class="btn btn--primary" href="<?= e($event['ticket_url']) ?>" target="_blank" rel="noopener"><?= e(t('Jetzt Tickets kaufen')) ?></a></p>
         <?php endif; ?>
     </section>
 <?php endif; ?>
@@ -279,7 +279,7 @@ $liveNow = array_values(array_filter($bouts, static fn (array $b): bool => $b['s
     };
     ?>
     <section class="wrap page-section" id="sponsoren">
-        <h2 class="section-heading">Unsere Sponsoren</h2>
+        <h2 class="section-heading"><?= e(t('Unsere Sponsoren')) ?></h2>
         <?php if ($mainSponsors !== []): ?>
             <div class="sponsor-grid sponsor-grid--main"><?php foreach ($mainSponsors as $s) { echo $tile($s, true); } ?></div>
         <?php endif; ?>

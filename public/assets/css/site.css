@@ -1085,3 +1085,9 @@ a.plan-slot:hover {
     background: rgba(255, 255, 255, .55); padding: 0;
 }
 .slideshow__bullet.is-active { background: #fff; }
+
+/* Sprachumschalter (DE · EN) */
+.lang-switch { display: inline-flex; align-items: center; gap: .1rem; padding: .35rem .6rem; font-size: .8rem; font-weight: 700; letter-spacing: .08em; color: var(--ink-soft); white-space: nowrap; }
+.lang-switch a { color: inherit; text-decoration: none; padding: 0 .1rem; background: none !important; }
+.lang-switch a:hover { color: var(--accent-bright); }
+.lang-switch strong { color: var(--accent-bright); }

@@ -30,7 +30,7 @@ final class Gym141Client
         $url = trim($url);
 
         if ($url === '') {
-            throw new RuntimeException('Bitte die Adresse der Gym141-Instanz angeben.');
+            throw new RuntimeException(t('Bitte die Adresse der Gym141-Instanz angeben.'));
         }
 
         if (!preg_match('#^https?://#i', $url)) {
@@ -49,7 +49,7 @@ final class Gym141Client
         }
 
         if (filter_var($url, FILTER_VALIDATE_URL) === false) {
-            throw new RuntimeException('Die Gym141-Adresse ist keine gültige URL.');
+            throw new RuntimeException(t('Die Gym141-Adresse ist keine gültige URL.'));
         }
 
         return $url;
@@ -74,7 +74,7 @@ final class Gym141Client
         ]);
 
         if (!isset($data['token']) || !is_string($data['token'])) {
-            throw new RuntimeException('Gym141 hat kein Token geliefert.');
+            throw new RuntimeException(t('Gym141 hat kein Token geliefert.'));
         }
 
         $this->token = $data['token'];
@@ -146,12 +146,12 @@ final class Gym141Client
 
         if (!is_array($data)) {
             throw new RuntimeException(
-                'Gym141 hat keine gültige Antwort geliefert (HTTP ' . $status . '). Stimmt die Adresse?'
+                t('Gym141 hat keine gültige Antwort geliefert (HTTP %d). Stimmt die Adresse?', $status)
             );
         }
 
         if ($status >= 400) {
-            throw new RuntimeException((string) ($data['error'] ?? ('Gym141-Fehler (HTTP ' . $status . ')')));
+            throw new RuntimeException((string) ($data['error'] ?? t('Gym141-Fehler (HTTP %d)', $status)));
         }
 
         return $data;
@@ -166,7 +166,7 @@ final class Gym141Client
         $ch = curl_init($url);
 
         if ($ch === false) {
-            throw new RuntimeException('Verbindung konnte nicht aufgebaut werden.');
+            throw new RuntimeException(t('Verbindung konnte nicht aufgebaut werden.'));
         }
 
         curl_setopt_array($ch, [
@@ -187,7 +187,7 @@ final class Gym141Client
 
         if ($raw === false) {
             // curl_close() ist seit PHP 8.0 wirkungslos (und ab 8.5 deprecated).
-            throw new RuntimeException('Gym141 nicht erreichbar: ' . curl_error($ch));
+            throw new RuntimeException(t('Gym141 nicht erreichbar: %s', curl_error($ch)));
         }
 
         $status = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
@@ -212,7 +212,7 @@ final class Gym141Client
         $raw = @file_get_contents($url, false, $ctx);
 
         if ($raw === false) {
-            throw new RuntimeException('Gym141 nicht erreichbar: ' . $url);
+            throw new RuntimeException(t('Gym141 nicht erreichbar: %s', $url));
         }
 
         $status = 0;

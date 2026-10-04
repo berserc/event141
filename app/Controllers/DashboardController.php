@@ -25,7 +25,7 @@ final class DashboardController
         $laufend = array_values(array_filter($events, static fn (array $e): bool => $e['status'] === 'laufend'));
 
         View::display('admin/dashboard', [
-            'title'       => 'Übersicht',
+            'title'       => t('Übersicht'),
             'upcoming'    => array_slice(array_reverse($kommend), 0, 8),
             'running'     => $laufend,
             'stats'       => [

@@ -28,13 +28,13 @@
         window.tinymce.init({
             target: feld,
             license_key: 'gpl',
-            language: 'de',
+            language: (window.I18N && window.I18N.editorLang) || 'de',
 
             plugins: 'lists link table code autolink searchreplace',
             menubar: false,
             toolbar: 'undo redo | blocks | bold italic underline | ' +
                      'bullist numlist | link table hr | searchreplace code',
-            block_formats: 'Absatz=p; Überschrift 2=h2; Überschrift 3=h3; Überschrift 4=h4',
+            block_formats: (window.I18N && window.I18N.blockFormats) || 'Absatz=p; Überschrift 2=h2; Überschrift 3=h3; Überschrift 4=h4',
 
             // Spiegelt die Server-Whitelist aus safe_html()
             valid_elements: 'p,br,strong/b,em/i,u,ul,ol,li,h2,h3,h4,' +

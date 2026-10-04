@@ -76,7 +76,7 @@ final class Timetable
                 'start'   => $start,
                 'end'     => $end,
                 'minutes' => $minutes,
-                'label'   => $status === 'beendet' ? $hhmm : ($status === 'laufend' ? 'seit ' . $hhmm : 'ca. ' . $hhmm),
+                'label'   => $status === 'beendet' ? $hhmm : ($status === 'laufend' ? t('seit %s', $hhmm) : t('ca. %s', $hhmm)),
             ];
         }
 

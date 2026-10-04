@@ -48,7 +48,7 @@ final class Ticket141Client
         $url = trim($url);
 
         if ($url === '') {
-            throw new RuntimeException('Bitte die Adresse der Ticket141-Instanz angeben.');
+            throw new RuntimeException(t('Bitte die Adresse der Ticket141-Instanz angeben.'));
         }
 
         if (!preg_match('#^https?://#i', $url)) {
@@ -66,7 +66,7 @@ final class Ticket141Client
         }
 
         if (filter_var($url, FILTER_VALIDATE_URL) === false) {
-            throw new RuntimeException('Die Ticket141-Adresse ist keine gültige URL.');
+            throw new RuntimeException(t('Die Ticket141-Adresse ist keine gültige URL.'));
         }
 
         return $url;
@@ -112,13 +112,13 @@ final class Ticket141Client
         $this->requireConfigured();
 
         if ($this->apiKey === '') {
-            throw new RuntimeException('Bitte einen Ticket141-API-Schlüssel (tk_…) hinterlegen.');
+            throw new RuntimeException(t('Bitte einen Ticket141-API-Schlüssel (tk_…) hinterlegen.'));
         }
 
         $data = $this->request('GET', '/api/v1/ping');
 
         if (($data['service'] ?? '') !== 'ticket141') {
-            throw new RuntimeException('Unter dieser Adresse antwortet kein Ticket141.');
+            throw new RuntimeException(t('Unter dieser Adresse antwortet kein Ticket141.'));
         }
 
         return $data;
@@ -216,7 +216,7 @@ final class Ticket141Client
         $event = (array) ($res['event'] ?? []);
 
         if (($event['slug'] ?? '') === '') {
-            throw new RuntimeException('Ticket141 hat kein Event-Kürzel geliefert.');
+            throw new RuntimeException(t('Ticket141 hat kein Event-Kürzel geliefert.'));
         }
 
         return [
@@ -243,13 +243,13 @@ final class Ticket141Client
     public static function availability(array $category): string
     {
         if (!empty($category['sold_out'])) {
-            return 'ausverkauft';
+            return t('ausverkauft');
         }
 
         $available = $category['available'] ?? null;
 
         if ($available !== null && (int) $available <= 20) {
-            return 'nur noch ' . (int) $available;
+            return t('nur noch %d', (int) $available);
         }
 
         return '';
@@ -258,7 +258,7 @@ final class Ticket141Client
     private function requireConfigured(): void
     {
         if (!$this->configured()) {
-            throw new RuntimeException('Ticket141 ist nicht konfiguriert (Einstellungen → Ticket141).');
+            throw new RuntimeException(t('Ticket141 ist nicht konfiguriert (Einstellungen → Ticket141).'));
         }
     }
 
@@ -294,12 +294,12 @@ final class Ticket141Client
 
         if (!is_array($data)) {
             throw new RuntimeException(
-                'Ticket141 hat keine gültige Antwort geliefert (HTTP ' . $status . '). Stimmt die Adresse?'
+                t('Ticket141 hat keine gültige Antwort geliefert (HTTP %d). Stimmt die Adresse?', $status)
             );
         }
 
         if ($status >= 400) {
-            throw new RuntimeException((string) ($data['error'] ?? ('Ticket141-Fehler (HTTP ' . $status . ')')));
+            throw new RuntimeException((string) ($data['error'] ?? t('Ticket141-Fehler (HTTP %d)', $status)));
         }
 
         return $data;
@@ -314,7 +314,7 @@ final class Ticket141Client
         $ch = curl_init($url);
 
         if ($ch === false) {
-            throw new RuntimeException('Verbindung konnte nicht aufgebaut werden.');
+            throw new RuntimeException(t('Verbindung konnte nicht aufgebaut werden.'));
         }
 
         curl_setopt_array($ch, [
@@ -334,7 +334,7 @@ final class Ticket141Client
         $raw = curl_exec($ch);
 
         if ($raw === false) {
-            throw new RuntimeException('Ticket141 nicht erreichbar: ' . curl_error($ch));
+            throw new RuntimeException(t('Ticket141 nicht erreichbar: %s', curl_error($ch)));
         }
 
         $status = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
@@ -359,7 +359,7 @@ final class Ticket141Client
         $raw = @file_get_contents($url, false, $ctx);
 
         if ($raw === false) {
-            throw new RuntimeException('Ticket141 nicht erreichbar: ' . $url);
+            throw new RuntimeException(t('Ticket141 nicht erreichbar: %s', $url));
         }
 
         $status = 0;

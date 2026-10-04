@@ -274,6 +274,22 @@ angezeigt. Details in `docs/api.md`.
 
 ---
 
+## Sprache (Deutsch / Englisch)
+
+Website, Gym-Bereich und Verwaltung gibt es auf Deutsch und Englisch. Oben
+rechts steht der Umschalter **DE · EN**; die Wahl gilt für diesen Browser und
+bleibt ein Jahr gespeichert. Welche Sprache neue Besucher zuerst sehen, legt
+der Admin unter *Einstellungen → Sprache der Oberfläche* fest.
+
+Übersetzt wird die Oberfläche – Menüs, Beschriftungen, Meldungen, Datums- und
+Zahlenformate, Rundennamen („Halbfinale“ → „Semi-final“) und die
+Standard-Siegarten. **Eingegebene Inhalte** (Event- und Kategorienamen,
+Beschreibungen, Storys, Seiten wie das Impressum) erscheinen so, wie sie
+eingegeben wurden. Für internationale Turniere daher die Kategorien am besten
+aus einem Regelsatz anlegen – die Namen sind englisch.
+
+---
+
 ## Testumgebung
 
 Unter einer **dev.**-Subdomain (oder lokal) läuft dieselbe Anwendung mit

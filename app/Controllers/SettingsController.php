@@ -18,7 +18,7 @@ final class SettingsController
 {
     private const FIELDS = [
         'org_name', 'org_tagline', 'org_street', 'org_zip', 'org_city', 'org_email', 'org_phone',
-        'org_website', 'home_title', 'home_text', 'home_event', 'win_methods',
+        'org_website', 'home_title', 'home_text', 'home_event', 'win_methods', 'default_lang',
     ];
 
     public function index(): void
@@ -26,7 +26,7 @@ final class SettingsController
         AuthController::requireRole('superuser');
 
         View::display('admin/settings', [
-            'title'    => 'Einstellungen',
+            'title'    => t('Einstellungen'),
             'settings' => Setting::all(),
             'events'   => EventRepo::all(),
         ], 'layouts/admin');
@@ -39,7 +39,7 @@ final class SettingsController
 
         $this->persist();
 
-        Flash::success('Einstellungen gespeichert.');
+        Flash::success(t('Einstellungen gespeichert.'));
         Url::redirect('/admin/einstellungen');
     }
 
@@ -54,7 +54,7 @@ final class SettingsController
         $client = Ticket141Client::fromSettings();
 
         if (!$client->configured()) {
-            Flash::info('Einstellungen gespeichert. Keine Ticket141-Adresse hinterlegt – die Kopplung ist aus.');
+            Flash::info(t('Einstellungen gespeichert. Keine Ticket141-Adresse hinterlegt – die Kopplung ist aus.'));
             Url::redirect('/admin/einstellungen');
         }
 
@@ -62,19 +62,19 @@ final class SettingsController
             $ping  = $client->ping();
             $key   = (array) ($ping['key'] ?? []);
             $scope = (string) ($key['scope'] ?? '');
-            $text  = 'Verbindung zu Ticket141 ' . (string) ($ping['version'] ?? '') . ' steht (Schlüssel „' . (string) ($key['name'] ?? '') . '“, Rechte: ' . $scope . ').';
+            $text  = t('Verbindung zu Ticket141 %s steht (Schlüssel „%s“, Rechte: %s).', (string) ($ping['version'] ?? ''), (string) ($key['name'] ?? ''), $scope);
 
             if ($scope !== 'write') {
-                $text .= ' Zum Anlegen von Events braucht der Schlüssel die Rechte „write“.';
+                $text .= ' ' . t('Zum Anlegen von Events braucht der Schlüssel die Rechte „write“.');
             }
 
             if (($key['event'] ?? null) !== null) {
-                $text .= ' Achtung: Der Schlüssel ist auf ein einzelnes Event beschränkt – damit lassen sich keine Events anlegen.';
+                $text .= ' ' . t('Achtung: Der Schlüssel ist auf ein einzelnes Event beschränkt – damit lassen sich keine Events anlegen.');
             }
 
             Flash::success($text);
         } catch (\RuntimeException $e) {
-            Flash::error('Einstellungen gespeichert, aber Ticket141 antwortet nicht: ' . $e->getMessage());
+            Flash::error(t('Einstellungen gespeichert, aber Ticket141 antwortet nicht: %s', $e->getMessage()));
         }
 
         Url::redirect('/admin/einstellungen');
@@ -92,13 +92,17 @@ final class SettingsController
         }
 
         if ($values['org_email'] !== '' && !filter_var($values['org_email'], FILTER_VALIDATE_EMAIL)) {
-            Flash::error('Die E-Mail-Adresse des Veranstalters ist ungültig.');
+            Flash::error(t('Die E-Mail-Adresse des Veranstalters ist ungültig.'));
             Url::redirect('/admin/einstellungen');
         }
 
         // Startseiten-Event muss existieren (oder leer = Eventliste).
         if ($values['home_event'] !== '' && EventRepo::findBySlug($values['home_event']) === null) {
             $values['home_event'] = '';
+        }
+
+        if (!isset(\App\Core\I18n::LANGS[$values['default_lang']])) {
+            $values['default_lang'] = 'de';
         }
 
         Setting::setMany($values);
@@ -149,7 +153,7 @@ final class SettingsController
             return;
         }
 
-        if (($pro = \App\Core\License::proFeatureError('Die Ticket141-Kopplung')) !== null) {
+        if (($pro = \App\Core\License::proFeatureError(t('Die Ticket141-Kopplung'))) !== null) {
             Flash::error($pro);
 
             return;
@@ -172,18 +176,20 @@ final class SettingsController
         Csrf::verify();
 
         if (\App\Core\License::key() === '') {
-            Flash::info('Kein Lizenzschlüssel hinterlegt – Event141 läuft in der Gratis-Version (' . \App\Core\License::FREE_EVENT_LIMIT . ' aktives Event).');
+            Flash::info(t('Kein Lizenzschlüssel hinterlegt – Event141 läuft in der Gratis-Version (%d aktives Event).', \App\Core\License::FREE_EVENT_LIMIT));
             Url::redirect('/admin/einstellungen');
         }
 
         $state = \App\Core\License::refresh();
 
         if (($state['reason'] ?? '') === 'unreachable') {
-            Flash::error('Der Lizenzserver ist gerade nicht erreichbar – der letzte bekannte Stand gilt weiter.');
+            Flash::error(t('Der Lizenzserver ist gerade nicht erreichbar – der letzte bekannte Stand gilt weiter.'));
         } elseif (!empty($state['valid'])) {
-            Flash::success('Lizenz gültig' . (empty($state['expires_at']) ? ' – unbefristet (Lifetime).' : ' bis ' . format_date(substr((string) $state['expires_at'], 0, 10)) . '.'));
+            Flash::success(empty($state['expires_at'])
+                ? t('Lizenz gültig – unbefristet (Lifetime).')
+                : t('Lizenz gültig bis %s.', format_date(substr((string) $state['expires_at'], 0, 10))));
         } else {
-            Flash::error('Lizenz ungültig: ' . (string) ($state['reason'] ?? 'unbekannt'));
+            Flash::error(t('Lizenz ungültig: %s', (string) ($state['reason'] ?? t('unbekannt'))));
         }
 
         Url::redirect('/admin/einstellungen');
@@ -199,7 +205,7 @@ final class SettingsController
         [$page, $offset, $pages] = paginate($total, 100, $page);
 
         View::display('admin/audit', [
-            'title'   => 'Protokoll',
+            'title'   => t('Protokoll'),
             'entries' => Database::all('SELECT * FROM audit_log ORDER BY id DESC LIMIT 100 OFFSET ?', [$offset]),
             'page'    => $page,
             'pages'   => $pages,

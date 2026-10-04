@@ -64,7 +64,7 @@ if ($healthPath === $healthBase . '/health') {
 if (!is_file((string) Config::get('db_path'))) {
     http_response_code(503);
     header('Content-Type: text/html; charset=UTF-8');
-    echo View::render('errors/setup', ['title' => 'Einrichtung erforderlich'], null);
+    echo View::render('errors/setup', ['title' => t('Einrichtung erforderlich')], null);
     exit;
 }
 
@@ -381,5 +381,5 @@ try {
         exit;
     }
 
-    echo View::render('errors/500', ['title' => 'Fehler'], null);
+    echo View::render('errors/500', ['title' => t('Fehler')], null);
 }

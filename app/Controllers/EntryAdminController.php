@@ -31,7 +31,7 @@ final class EntryAdminController
         ];
 
         View::display('admin/events/entries', [
-            'title'      => $event['name'] . ' – Anmeldungen',
+            'title'      => $event['name'] . ' – ' . t('Anmeldungen'),
             'event'      => $event,
             'entries'    => EntryRepo::forEvent((int) $event['id'], $filter),
             'categories' => EventRepo::categories((int) $event['id']),
@@ -53,7 +53,7 @@ final class EntryAdminController
         $category  = post_id('category_id');
 
         if ($athlete === null) {
-            Flash::error('Bitte einen Sportler auswählen.');
+            Flash::error(t('Bitte einen Sportler auswählen.'));
             Url::redirect('/admin/events/' . $event['id'] . '/anmeldungen');
         }
 
@@ -70,7 +70,7 @@ final class EntryAdminController
         );
 
         if ($dup !== null) {
-            Flash::error('Dieser Sportler ist in dieser Kategorie bereits angemeldet.');
+            Flash::error(t('Dieser Sportler ist in dieser Kategorie bereits angemeldet.'));
             Url::redirect('/admin/events/' . $event['id'] . '/anmeldungen');
         }
 
@@ -84,7 +84,7 @@ final class EntryAdminController
         ]);
 
         Audit::log('entry_created', 'event', (int) $event['id'], person_name($athlete));
-        Flash::success(person_name($athlete) . ' angemeldet (bestätigt).');
+        Flash::success(t('%s angemeldet (bestätigt).', person_name($athlete)));
         Url::redirect('/admin/events/' . $event['id'] . '/anmeldungen');
     }
 
@@ -139,7 +139,7 @@ final class EntryAdminController
             Audit::log('entry_updated', 'event', (int) $event['id'], person_name($entry) . ': ' . Audit::diff($entry, $data));
         }
 
-        Flash::success('Anmeldung gespeichert.');
+        Flash::success(t('Anmeldung gespeichert.'));
         Url::redirectRaw((string) ($_SERVER['HTTP_REFERER'] ?? Url::to('/admin/events/' . $event['id'] . '/anmeldungen')));
     }
 
@@ -154,7 +154,7 @@ final class EntryAdminController
         $action = post('action');
 
         if ($ids === []) {
-            Flash::error('Keine Anmeldungen ausgewählt.');
+            Flash::error(t('Keine Anmeldungen ausgewählt.'));
             Url::redirect('/admin/events/' . $event['id'] . '/anmeldungen');
         }
 
@@ -163,18 +163,18 @@ final class EntryAdminController
 
         if ($action === 'loeschen') {
             $n = Database::run("DELETE FROM event_entries WHERE event_id = ? AND id IN ($marks)", $params)->rowCount();
-            Flash::success($n . ' Anmeldung(en) gelöscht.');
+            Flash::success(t('%d Anmeldung(en) gelöscht.', $n));
         } elseif (isset(EntryRepo::STATUS[$action])) {
             $n = Database::run(
                 "UPDATE event_entries SET status = ?, updated_at = ? WHERE event_id = ? AND id IN ($marks)",
                 array_merge([$action, gmdate('Y-m-d H:i:s')], $params)
             )->rowCount();
-            Flash::success($n . ' Anmeldung(en) auf „' . EntryRepo::STATUS[$action] . '“ gesetzt.');
+            Flash::success(t('%d Anmeldung(en) auf „%s“ gesetzt.', $n, t(EntryRepo::STATUS[$action])));
         } elseif ($action === 'bezahlt') {
             Database::run("UPDATE event_entries SET paid = 1 WHERE event_id = ? AND id IN ($marks)", $params);
-            Flash::success('Startgeld als bezahlt markiert.');
+            Flash::success(t('Startgeld als bezahlt markiert.'));
         } else {
-            Flash::error('Unbekannte Aktion.');
+            Flash::error(t('Unbekannte Aktion.'));
         }
 
         Audit::log('entry_bulk', 'event', (int) $event['id'], $action . ': ' . count($ids));
@@ -191,7 +191,7 @@ final class EntryAdminController
 
         Database::run('DELETE FROM event_entries WHERE id = ?', [(int) $entry['id']]);
         Audit::log('entry_deleted', 'event', (int) $event['id'], person_name($entry));
-        Flash::success('Anmeldung gelöscht.');
+        Flash::success(t('Anmeldung gelöscht.'));
         Url::redirect('/admin/events/' . $event['id'] . '/anmeldungen');
     }
 
@@ -208,17 +208,20 @@ final class EntryAdminController
 
         $out = fopen('php://output', 'wb');
         fwrite($out, "\xEF\xBB\xBF");
-        fputcsv($out, ['Kategorie', 'Zuname', 'Vorname', 'Kampfname', 'Geburtsdatum', 'Alter', 'Geschlecht', 'Nation', 'Gym', 'Ort', 'Gewicht gemeldet', 'Wiegegewicht', 'Status', 'Setzung', 'Startgeld', 'Bilanz', 'Anmerkung'], ';', '"', '\\');
+        fputcsv($out, [
+            t('Kategorie'), t('Zuname'), t('Vorname'), t('Kampfname'), t('Geburtsdatum'), t('Alter'), t('Geschlecht'), t('Nation'), t('Gym'),
+            t('Ort'), t('Gewicht gemeldet'), t('Wiegegewicht'), t('Status'), t('Setzung'), t('Startgeld'), t('Bilanz'), t('Anmerkung'),
+        ], ';', '"', '\\');
 
         foreach ($rows as $r) {
             fputcsv($out, [
                 $r['category_name'] ?? '', $r['last_name'], $r['first_name'], $r['nickname'],
                 format_date($r['birthdate']), (string) (age_from($r['birthdate'], (string) $event['starts_on']) ?? ''),
-                AthleteRepo::GENDERS[$r['gender']] ?? $r['gender'], $r['nationality'], $r['gym_name'], $r['gym_city'],
+                t(AthleteRepo::GENDERS[$r['gender']] ?? $r['gender']), $r['nationality'], $r['gym_name'], $r['gym_city'],
                 $r['athlete_weight'] !== null ? number_format((float) $r['athlete_weight'], 1, ',', '') : '',
                 $r['weighed'] !== null ? number_format((float) $r['weighed'], 1, ',', '') : '',
-                EntryRepo::STATUS[$r['status']] ?? $r['status'], (int) $r['seed'] > 0 ? (int) $r['seed'] : '',
-                (int) $r['paid'] === 1 ? 'ja' : 'nein',
+                t(EntryRepo::STATUS[$r['status']] ?? $r['status']), (int) $r['seed'] > 0 ? (int) $r['seed'] : '',
+                (int) $r['paid'] === 1 ? t('ja') : t('nein'),
                 (int) $r['record_wins'] . '-' . (int) $r['record_losses'] . '-' . (int) $r['record_draws'],
                 $r['note'],
             ], ';', '"', '\\');
@@ -233,7 +236,7 @@ final class EntryAdminController
         $entry = EntryRepo::find($entryId);
 
         if ($entry === null || (int) $entry['event_id'] !== $eventId) {
-            Flash::error('Anmeldung nicht gefunden.');
+            Flash::error(t('Anmeldung nicht gefunden.'));
             Url::redirect('/admin/events/' . $eventId . '/anmeldungen');
         }
 

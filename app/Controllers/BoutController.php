@@ -40,7 +40,7 @@ final class BoutController
         }
 
         View::display('admin/events/bouts', [
-            'title'      => $event['name'] . ' – ' . ($event['type'] === 'gala' ? 'Fightcard' : 'Kämpfe'),
+            'title'      => $event['name'] . ' – ' . ($event['type'] === 'gala' ? t('Fightcard') : t('Kämpfe')),
             'event'      => $event,
             'categories' => $categories,
             'bouts'      => $bouts,
@@ -65,12 +65,12 @@ final class BoutController
         $blue = $this->entryOf($eventId, post_id('blue_entry_id'));
 
         if (!$isBreak && $red === null && $blue === null) {
-            Flash::error('Bitte mindestens eine Ecke besetzen.');
+            Flash::error(t('Bitte mindestens eine Ecke besetzen.'));
             Url::redirect('/admin/events/' . $eventId . '/kaempfe');
         }
 
         if ($red !== null && $blue !== null && (int) $red['id'] === (int) $blue['id']) {
-            Flash::error('Rot und Blau können nicht derselbe Sportler sein.');
+            Flash::error(t('Rot und Blau können nicht derselbe Sportler sein.'));
             Url::redirect('/admin/events/' . $eventId . '/kaempfe');
         }
 
@@ -100,7 +100,7 @@ final class BoutController
         ] + self::cardFields());
 
         Audit::log('bout_created', 'event', $eventId, $isBreak ? 'Pause' : 'Kampf #' . $id);
-        Flash::success($isBreak ? 'Pause eingefügt.' : 'Kampf angelegt.');
+        Flash::success($isBreak ? t('Pause eingefügt.') : t('Kampf angelegt.'));
         Url::redirect('/admin/events/' . $eventId . '/kaempfe');
     }
 
@@ -117,11 +117,11 @@ final class BoutController
         );
 
         if ($category === null) {
-            Flash::error('Kategorie nicht gefunden.');
+            Flash::error(t('Kategorie nicht gefunden.'));
             Url::redirect('/admin/events/' . $event['id'] . '/kaempfe');
         }
 
-        if (($pro = \App\Core\License::proFeatureError('Der automatische Turnierbaum')) !== null) {
+        if (($pro = \App\Core\License::proFeatureError(t('Der automatische Turnierbaum'))) !== null) {
             Flash::error($pro);
             Url::redirect('/admin/events/' . $event['id'] . '/kaempfe');
         }
@@ -129,9 +129,9 @@ final class BoutController
         $result = Bracket::generate($event, $category);
 
         if ($result['bouts'] === 0) {
-            Flash::error('„' . $category['name'] . '“: mindestens zwei bestätigte Anmeldungen nötig (' . $result['entries'] . ' vorhanden).');
+            Flash::error(t('„%s“: mindestens zwei bestätigte Anmeldungen nötig (%d vorhanden).', $category['name'], $result['entries']));
         } else {
-            Flash::success(sprintf(
+            Flash::success(t(
                 '„%s“: Turnierbaum mit %d Kämpfen in %d Runden erzeugt (%d Teilnehmer, %d Freilose).',
                 $category['name'],
                 $result['bouts'],
@@ -155,7 +155,7 @@ final class BoutController
         $bout  = $this->own((int) ($args['bid'] ?? 0), (int) $event['id']);
 
         View::display('admin/events/bout', [
-            'title'      => $event['name'] . ' – Kampf ' . ((int) $bout['bout_no'] > 0 ? '#' . $bout['bout_no'] : ''),
+            'title'      => $event['name'] . ' – ' . ((int) $bout['bout_no'] > 0 ? t('Kampf #%d', (int) $bout['bout_no']) : t('Kampf') . ' '),
             'event'      => $event,
             'bout'       => $bout,
             'entries'    => EntryRepo::forEvent((int) $event['id'], ['status' => 'bestaetigt']),
@@ -202,7 +202,7 @@ final class BoutController
             $blue = $this->entryOf($eventId, post_id('blue_entry_id'));
 
             if ($red !== null && $blue !== null && (int) $red['id'] === (int) $blue['id']) {
-                Flash::error('Rot und Blau können nicht derselbe Sportler sein.');
+                Flash::error(t('Rot und Blau können nicht derselbe Sportler sein.'));
                 Url::redirect('/admin/events/' . $eventId . '/kampf/' . $bout['id']);
             }
 
@@ -212,7 +212,7 @@ final class BoutController
 
         Database::update('event_bouts', (int) $bout['id'], $data);
         Audit::log('bout_updated', 'event', $eventId, 'Kampf #' . $bout['bout_no'] . ': ' . Audit::diff($bout, $data));
-        Flash::success('Kampf gespeichert.');
+        Flash::success(t('Kampf gespeichert.'));
         Url::redirect('/admin/events/' . $eventId . '/kampf/' . $bout['id']);
     }
 
@@ -227,19 +227,21 @@ final class BoutController
         $winner = post('winner');
 
         if (!isset(BoutRepo::WINNER[$winner])) {
-            Flash::error('Bitte den Sieger wählen.');
+            Flash::error(t('Bitte den Sieger wählen.'));
             Url::redirectRaw($this->back($event, $bout));
         }
 
         if (($winner === 'red' && $bout['red_entry_id'] === null) || ($winner === 'blue' && $bout['blue_entry_id'] === null)) {
-            Flash::error('Diese Ecke ist nicht besetzt.');
+            Flash::error(t('Diese Ecke ist nicht besetzt.'));
             Url::redirectRaw($this->back($event, $bout));
         }
 
         BoutRepo::setResult((int) $bout['id'], $winner, post('method'), post('result_note'), post('result_round'));
 
         Audit::log('bout_result', 'event', (int) $event['id'], 'Kampf #' . $bout['bout_no'] . ': ' . BoutRepo::WINNER[$winner] . ' ' . post('method'));
-        Flash::success('Ergebnis eingetragen: ' . BoutRepo::WINNER[$winner] . ($winner === 'red' ? ' – ' . BoutRepo::cornerName($bout, 'red') : ($winner === 'blue' ? ' – ' . BoutRepo::cornerName($bout, 'blue') : '')));
+        Flash::success(in_array($winner, ['red', 'blue'], true)
+            ? t('Ergebnis eingetragen: %s – %s', t(BoutRepo::WINNER[$winner]), BoutRepo::cornerName($bout, $winner))
+            : t('Ergebnis eingetragen: %s', t(BoutRepo::WINNER[$winner])));
         Url::redirectRaw($this->back($event, $bout));
     }
 
@@ -255,10 +257,10 @@ final class BoutController
 
         if ($status === 'reopen') {
             BoutRepo::reopen((int) $bout['id']);
-            Flash::success('Ergebnis zurückgenommen – der Kampf ist wieder offen.');
+            Flash::success(t('Ergebnis zurückgenommen – der Kampf ist wieder offen.'));
         } elseif (in_array($status, ['geplant', 'laufend', 'abgesagt'], true)) {
             BoutRepo::setStatus((int) $bout['id'], $status);
-            Flash::success('Kampf: ' . BoutRepo::STATUS[$status]);
+            Flash::success(t('Kampf: %s', t(BoutRepo::STATUS[$status])));
         }
 
         Audit::log('bout_status', 'event', (int) $event['id'], 'Kampf #' . $bout['bout_no'] . ' → ' . $status);
@@ -274,13 +276,13 @@ final class BoutController
         $bout  = $this->own((int) ($args['bid'] ?? 0), (int) $event['id']);
 
         if ((int) $bout['round_no'] > 0 && post_bool('force') !== 1) {
-            Flash::error('Turnierkämpfe werden über „Turnierbaum neu erzeugen“ ersetzt – einzelnes Löschen würde den Baum zerreißen.');
+            Flash::error(t('Turnierkämpfe werden über „Turnierbaum neu erzeugen“ ersetzt – einzelnes Löschen würde den Baum zerreißen.'));
             Url::redirect('/admin/events/' . $event['id'] . '/kampf/' . $bout['id']);
         }
 
         Database::run('DELETE FROM event_bouts WHERE id = ?', [(int) $bout['id']]);
         Audit::log('bout_deleted', 'event', (int) $event['id'], 'Kampf #' . $bout['bout_no']);
-        Flash::success('Kampf gelöscht.');
+        Flash::success(t('Kampf gelöscht.'));
         Url::redirect('/admin/events/' . $event['id'] . '/kaempfe');
     }
 
@@ -312,7 +314,7 @@ final class BoutController
 
         Database::update('event_bouts', (int) $bout['id'], ['active' => $neu, 'updated_at' => gmdate('Y-m-d H:i:s')]);
         Audit::log('bout_active', 'event', (int) $event['id'], 'Kampf #' . $bout['bout_no'] . ($neu ? ' aktiviert' : ' inaktiv'));
-        Flash::success($neu ? 'Kampf wieder aktiv.' : 'Kampf inaktiv – er erscheint nicht mehr auf Website und Zeitplan.');
+        Flash::success($neu ? t('Kampf wieder aktiv.') : t('Kampf inaktiv – er erscheint nicht mehr auf Website und Zeitplan.'));
         Url::redirectRaw($this->back($event, $bout));
     }
 
@@ -325,7 +327,7 @@ final class BoutController
         $event = EventAdminController::load((int) ($args['id'] ?? 0));
 
         View::display('admin/events/schedule', [
-            'title'      => $event['name'] . ' – Zeitplan',
+            'title'      => $event['name'] . ' – ' . t('Zeitplan'),
             'event'      => $event,
             'schedule'   => BoutRepo::schedule((int) $event['id']),
             'times'      => \App\Core\Timetable::compute($event, BoutRepo::forEvent((int) $event['id'])),
@@ -357,7 +359,7 @@ final class BoutController
             'updated_at'     => gmdate('Y-m-d H:i:s'),
         ]);
 
-        Flash::success('Kampf eingeplant.');
+        Flash::success(t('Kampf eingeplant.'));
         Url::redirectRaw((string) ($_SERVER['HTTP_REFERER'] ?? Url::to('/admin/events/' . $eventId . '/zeitplan')));
     }
 
@@ -378,7 +380,7 @@ final class BoutController
         $venueIds  = array_values(array_filter($venueIds, fn (int $v): bool => $this->venueOf($eventId, $v) !== null));
 
         if ($sessionId === null || $venueIds === []) {
-            Flash::error('Bitte Abschnitt und mindestens eine Wettkampfstätte wählen.');
+            Flash::error(t('Bitte Abschnitt und mindestens eine Wettkampfstätte wählen.'));
             Url::redirect('/admin/events/' . $eventId . '/zeitplan');
         }
 
@@ -430,7 +432,7 @@ final class BoutController
         }
 
         Audit::log('bouts_distributed', 'event', $eventId, count($bouts) . ' Kämpfe');
-        Flash::success(count($bouts) . ' Kämpfe auf ' . count($venueIds) . ' Wettkampfstätte(n) verteilt.');
+        Flash::success(t('%d Kämpfe auf %d Wettkampfstätte(n) verteilt.', count($bouts), count($venueIds)));
         Url::redirect('/admin/events/' . $eventId . '/zeitplan');
     }
 
@@ -442,7 +444,7 @@ final class BoutController
 
         $event = EventAdminController::load((int) ($args['id'] ?? 0));
         BoutRepo::renumber((int) $event['id']);
-        Flash::success('Kampfnummern neu vergeben.');
+        Flash::success(t('Kampfnummern neu vergeben.'));
         Url::redirect('/admin/events/' . $event['id'] . '/zeitplan');
     }
 
@@ -487,7 +489,7 @@ final class BoutController
         $bouts = BoutRepo::forEvent((int) $event['id']);
 
         View::display('admin/events/results', [
-            'title'      => $event['name'] . ' – Ergebnisse',
+            'title'      => $event['name'] . ' – ' . t('Ergebnisse'),
             'event'      => $event,
             'finished'   => array_values(array_filter($bouts, static fn (array $b): bool => $b['status'] === 'beendet' && (int) $b['is_break'] === 0 && $b['method'] !== 'Freilos')),
             'open'       => array_values(array_filter($bouts, static fn (array $b): bool => in_array($b['status'], ['geplant', 'laufend'], true) && (int) $b['is_break'] === 0)),
@@ -587,7 +589,7 @@ final class BoutController
         ));
 
         View::display('admin/events/ring', [
-            'title'     => ($venue['name'] ?? 'Ring') . ' – ' . $event['name'],
+            'title'     => ($venue['name'] ?? t('Ring')) . ' – ' . $event['name'],
             'event'     => $event,
             'venue'     => $venue,
             'venues'    => $venues,
@@ -605,7 +607,7 @@ final class BoutController
         $bout = BoutRepo::find($boutId);
 
         if ($bout === null || (int) $bout['event_id'] !== $eventId) {
-            Flash::error('Kampf nicht gefunden.');
+            Flash::error(t('Kampf nicht gefunden.'));
             Url::redirect('/admin/events/' . $eventId . '/kaempfe');
         }
 

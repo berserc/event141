@@ -10,7 +10,8 @@ use App\Models\Setting;
  * Sprache der Oberflaeche. Quellsprache ist Deutsch: der deutsche Text ist
  * zugleich der Schluessel, die Uebersetzungen liegen als PHP-Dateien unter
  * app/lang/<sprache>/*.php (jede liefert ein Array 'Deutsch' => 'Uebersetzung').
- * Fehlt eine Uebersetzung, erscheint der deutsche Text.
+ * Fehlt eine Uebersetzung, erscheint der deutsche Text. Gleichlautende Texte mit
+ * verschiedener Bedeutung bekommen eine Marke: t('Sportler##einzahl').
  *
  * Welche Sprache gilt: Cookie "lang" (Umschalter in der Kopfzeile, ?lang=en),
  * sonst die Einstellung "default_lang", sonst Deutsch.
@@ -102,12 +103,23 @@ final class I18n
     {
         $lang = self::lang();
 
-        if ($lang !== 'de' && $text !== '') {
+        // "Sportler##einzahl": die Marke hinter ## unterscheidet gleichlautende deutsche
+        // Texte mit verschiedener Uebersetzung; im Deutschen entfaellt sie.
+        $marke = strpos($text, '##');
+        $ohne  = $marke === false ? $text : substr($text, 0, $marke);
+
+        if ($lang === 'de') {
+            $text = $ohne;
+        } elseif ($text !== '') {
             $dict = self::dict($lang);
 
             if (isset($dict[$text])) {
                 $text = $dict[$text];
+            } elseif (isset($dict[$ohne])) {
+                $text = $dict[$ohne];
             } else {
+                $text = $ohne;
+
                 foreach (self::PATTERNS[$lang] ?? [] as $muster => $ersatz) {
                     if (preg_match($muster, $text) === 1) {
                         $text = (string) preg_replace($muster, $ersatz, $text);

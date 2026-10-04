@@ -20,7 +20,7 @@ final class UserController
         AuthController::requireRole('superuser');
 
         View::display('admin/users/index', [
-            'title' => 'Benutzer',
+            'title' => t('Benutzer'),
             'users' => UserRepo::all(),
         ], 'layouts/admin');
     }
@@ -30,7 +30,7 @@ final class UserController
         AuthController::requireRole('superuser');
 
         View::display('admin/users/form', [
-            'title'  => 'Neuer Benutzer',
+            'title'  => t('Neuer Benutzer'),
             'user'   => Flash::oldInput() + ['id' => 0, 'username' => '', 'name' => '', 'email' => '', 'role' => 'orga', 'active' => 1],
             'errors' => Flash::errors(),
             'isNew'  => true,
@@ -44,7 +44,7 @@ final class UserController
         $user = UserRepo::find((int) ($args['id'] ?? 0));
 
         if ($user === null) {
-            Flash::error('Benutzer nicht gefunden.');
+            Flash::error(t('Benutzer nicht gefunden.'));
             Url::redirect('/admin/benutzer');
         }
 
@@ -76,7 +76,7 @@ final class UserController
         $id = Database::insert('users', $data);
 
         Audit::log('user_created', 'user', $id, (string) $data['username'] . ' (' . $data['role'] . ')');
-        Flash::success(sprintf(
+        Flash::success(t(
             'Benutzer "%s" angelegt. Startpasswort: %s – bitte sicher weitergeben, es wird nicht erneut angezeigt.',
             $data['username'],
             $generated
@@ -93,7 +93,7 @@ final class UserController
         $existing = UserRepo::find($id);
 
         if ($existing === null) {
-            Flash::error('Benutzer nicht gefunden.');
+            Flash::error(t('Benutzer nicht gefunden.'));
             Url::redirect('/admin/benutzer');
         }
 
@@ -103,7 +103,7 @@ final class UserController
             && ($data['role'] !== 'superuser' || (int) $data['active'] !== 1);
 
         if ($losesSuperuser && UserRepo::activeSuperuserCount($id) === 0) {
-            $errors['role'] = 'Das ist der letzte aktive Superuser – Rolle und Status können nicht geändert werden.';
+            $errors['role'] = t('Das ist der letzte aktive Superuser – Rolle und Status können nicht geändert werden.');
         }
 
         if ($errors !== []) {
@@ -121,7 +121,7 @@ final class UserController
         Database::update('users', $id, $data);
 
         Audit::log('user_updated', 'user', $id, Audit::diff($existing, $data));
-        Flash::success('Benutzer gespeichert.' . ($password !== '' ? ' Neues Passwort: ' . $password : ''));
+        Flash::success($password !== '' ? t('Benutzer gespeichert. Neues Passwort: %s', $password) : t('Benutzer gespeichert.'));
         Url::redirect('/admin/benutzer/' . $id);
     }
 
@@ -134,24 +134,24 @@ final class UserController
         $user = UserRepo::find($id);
 
         if ($user === null) {
-            Flash::error('Benutzer nicht gefunden.');
+            Flash::error(t('Benutzer nicht gefunden.'));
             Url::redirect('/admin/benutzer');
         }
 
         if ($id === Auth::id()) {
-            Flash::error('Das eigene Konto kann nicht gelöscht werden.');
+            Flash::error(t('Das eigene Konto kann nicht gelöscht werden.'));
             Url::redirect('/admin/benutzer/' . $id);
         }
 
         if ($user['role'] === 'superuser' && UserRepo::activeSuperuserCount($id) === 0) {
-            Flash::error('Der letzte aktive Superuser kann nicht gelöscht werden.');
+            Flash::error(t('Der letzte aktive Superuser kann nicht gelöscht werden.'));
             Url::redirect('/admin/benutzer/' . $id);
         }
 
         Database::run('DELETE FROM users WHERE id = ?', [$id]);
 
         Audit::log('user_deleted', 'user', $id, (string) $user['username']);
-        Flash::success('Benutzer gelöscht.');
+        Flash::success(t('Benutzer gelöscht.'));
         Url::redirect('/admin/benutzer');
     }
 
@@ -162,30 +162,30 @@ final class UserController
         $username = post('username');
 
         if ($username === '') {
-            $errors['username'] = 'Benutzername ist erforderlich.';
+            $errors['username'] = t('Benutzername ist erforderlich.');
         } elseif (!preg_match('/^[a-zA-Z0-9._@+-]{3,80}$/', $username)) {
-            $errors['username'] = '3–80 Zeichen. Erlaubt sind Buchstaben, Ziffern und . _ - + @';
+            $errors['username'] = t('3–80 Zeichen. Erlaubt sind Buchstaben, Ziffern und . _ - + @');
         } elseif (UserRepo::usernameTaken($username, $id)) {
-            $errors['username'] = 'Dieser Benutzername ist bereits vergeben.';
+            $errors['username'] = t('Dieser Benutzername ist bereits vergeben.');
         }
 
         $role = post('role');
 
         if (!isset(Auth::ROLES[$role])) {
-            $errors['role'] = 'Bitte eine Rolle wählen.';
+            $errors['role'] = t('Bitte eine Rolle wählen.');
             $role = 'orga';
         }
 
         $email = post('email');
 
         if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors['email'] = 'Bitte eine gültige E-Mail-Adresse eingeben.';
+            $errors['email'] = t('Bitte eine gültige E-Mail-Adresse eingeben.');
         }
 
         $password = (string) ($_POST['password'] ?? '');
 
         if ($password !== '' && mb_strlen($password) < Auth::MIN_PASSWORD_LENGTH) {
-            $errors['password'] = 'Das Passwort muss mindestens ' . Auth::MIN_PASSWORD_LENGTH . ' Zeichen haben.';
+            $errors['password'] = t('Das Passwort muss mindestens %d Zeichen haben.', Auth::MIN_PASSWORD_LENGTH);
         }
 
         $data = [

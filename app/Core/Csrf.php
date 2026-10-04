@@ -35,7 +35,7 @@ final class Csrf
         }
 
         http_response_code(419);
-        Flash::error('Die Sitzung ist abgelaufen. Bitte erneut versuchen.');
+        Flash::error(t('Die Sitzung ist abgelaufen. Bitte erneut versuchen.'));
 
         header('Location: ' . Url::to('/admin'));
         exit;

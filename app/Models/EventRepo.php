@@ -316,17 +316,29 @@ final class EventRepo
         }
 
         if ((string) $c['gender'] !== 'alle') {
-            $teile[] = self::GENDERS[(string) $c['gender']] ?? (string) $c['gender'];
+            $teile[] = t(self::GENDERS[(string) $c['gender']] ?? (string) $c['gender']);
         }
 
         if ($c['age_min'] !== null || $c['age_max'] !== null) {
-            $teile[] = ($c['age_min'] !== null ? (int) $c['age_min'] : '')
-                . '–' . ($c['age_max'] !== null ? (int) $c['age_max'] : '') . ' J.';
+            $teile[] = t(
+                '%s–%s J.',
+                $c['age_min'] !== null ? (string) (int) $c['age_min'] : '',
+                $c['age_max'] !== null ? (string) (int) $c['age_max'] : ''
+            );
         }
 
         if ($c['weight_min'] !== null || $c['weight_max'] !== null) {
-            $teile[] = ($c['weight_min'] !== null ? '>' . rtrim(rtrim(number_format((float) $c['weight_min'], 1, ',', ''), '0'), ',') . ' ' : '')
-                . ($c['weight_max'] !== null ? 'bis ' . rtrim(rtrim(number_format((float) $c['weight_max'], 1, ',', ''), '0'), ',') . ' kg' : 'kg');
+            // Dezimaltrennzeichen wie format_weight(): Komma (de) bzw. Punkt (en).
+            $komma = lang() === 'en' ? '.' : ',';
+            $kg    = static fn ($v): string => rtrim(rtrim(number_format((float) $v, 1, $komma, ''), '0'), $komma);
+
+            if ($c['weight_min'] !== null && $c['weight_max'] !== null) {
+                $teile[] = t('>%s bis %s kg', $kg($c['weight_min']), $kg($c['weight_max']));
+            } elseif ($c['weight_max'] !== null) {
+                $teile[] = t('bis %s kg', $kg($c['weight_max']));
+            } else {
+                $teile[] = '>' . $kg($c['weight_min']) . ' kg';
+            }
         }
 
         return implode(' · ', $teile);

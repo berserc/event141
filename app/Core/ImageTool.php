@@ -30,18 +30,18 @@ final class ImageTool
         }
         $tmp = (string) ($file['tmp_name'] ?? '');
         if ($tmp === '' || !is_file($tmp)) {
-            throw new RuntimeException('Datei fehlt.');
+            throw new RuntimeException(t('Datei fehlt.'));
         }
         if ((int) ($file['size'] ?? 0) > self::MAX_BYTES) {
-            throw new RuntimeException('Die Datei ist größer als ' . (self::MAX_BYTES / 1048576) . ' MB.');
+            throw new RuntimeException(t('Die Datei ist größer als %s MB.', self::MAX_BYTES / 1048576));
         }
         if (!function_exists('imagecreatetruecolor')) {
-            throw new RuntimeException('Die Bildbibliothek braucht die PHP-Erweiterung GD.');
+            throw new RuntimeException(t('Die Bildbibliothek braucht die PHP-Erweiterung GD.'));
         }
 
         $info = @getimagesize($tmp);
         if ($info === false) {
-            throw new RuntimeException('Die Datei ist kein Bild.');
+            throw new RuntimeException(t('Die Datei ist kein Bild.'));
         }
         $type = (int) $info[2];
         $src  = match ($type) {
@@ -52,7 +52,7 @@ final class ImageTool
             default        => false,
         };
         if ($src === false) {
-            throw new RuntimeException('Nur JPG, PNG, GIF oder WebP – oder das Bild ist zu groß für den Speicher.');
+            throw new RuntimeException(t('Nur JPG, PNG, GIF oder WebP – oder das Bild ist zu groß für den Speicher.'));
         }
 
         // Handyfotos: Drehung aus den EXIF-Daten anwenden
@@ -71,7 +71,7 @@ final class ImageTool
         $base    = rtrim((string) Config::get('upload_dir'), '/\\') . '/' . trim($subDir, '/');
         foreach ([$base, $base . '/t'] as $dir) {
             if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
-                throw new RuntimeException('Der Upload-Ordner konnte nicht angelegt werden.');
+                throw new RuntimeException(t('Der Upload-Ordner konnte nicht angelegt werden.'));
             }
         }
         $name  = $prefix . date('ymd') . '-' . substr(bin2hex(random_bytes(4)), 0, 7);
@@ -83,7 +83,7 @@ final class ImageTool
         $okBig = $keepPng ? imagepng($big, "$base/$name.$ext", 6) : imagejpeg($big, "$base/$name.$ext", 84);
         $okTh  = $keepPng ? imagepng($thumb, "$base/t/$name.$ext", 6) : imagejpeg($thumb, "$base/t/$name.$ext", 80);
         if (!$okBig || !$okTh) {
-            throw new RuntimeException('Das Bild konnte nicht gespeichert werden (Schreibrechte im Upload-Ordner?).');
+            throw new RuntimeException(t('Das Bild konnte nicht gespeichert werden (Schreibrechte im Upload-Ordner?).'));
         }
         @chmod("$base/$name.$ext", 0644);
         @chmod("$base/t/$name.$ext", 0644);
@@ -120,10 +120,10 @@ final class ImageTool
     private static function errorMessage(int $code): string
     {
         return match ($code) {
-            UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'Die Datei ist zu groß (Server-Limit).',
-            UPLOAD_ERR_PARTIAL                        => 'Der Upload wurde abgebrochen.',
-            UPLOAD_ERR_NO_FILE                        => 'Keine Datei ausgewählt.',
-            default                                   => 'Beim Upload ist ein Fehler aufgetreten.',
+            UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => t('Die Datei ist zu groß (Server-Limit).'),
+            UPLOAD_ERR_PARTIAL                        => t('Der Upload wurde abgebrochen.'),
+            UPLOAD_ERR_NO_FILE                        => t('Keine Datei ausgewählt.'),
+            default                                   => t('Beim Upload ist ein Fehler aufgetreten.'),
         };
     }
 }

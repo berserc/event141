@@ -21,12 +21,12 @@ $items = [
 ];
 ?>
 <!DOCTYPE html>
-<html lang="de">
+<html lang="<?= e(lang()) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title><?= e($title !== '' ? $title . ' | Gym-Bereich' : 'Gym-Bereich') ?> – <?= e($orgName) ?></title>
+    <title><?= e($title !== '' ? $title . ' | ' . t('Gym-Bereich') : t('Gym-Bereich')) ?> – <?= e($orgName) ?></title>
     <link rel="stylesheet" href="<?= e(asset('css/site.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/event.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/fightcard.css')) ?>">
@@ -35,14 +35,14 @@ $items = [
 <body class="page page--gym">
 
 <?php if (!empty($showEnvBanner)): ?>
-    <div class="env-banner" role="status">Testumgebung</div>
+    <div class="env-banner" role="status"><?= e(t('Testumgebung')) ?></div>
 <?php endif; ?>
 
 <?php if (GymAuth::isAdminView()): ?>
     <div class="env-banner" role="status">
-        Verwaltungsansicht: Sie sind als Gym „<?= e($authGym['name'] ?? '') ?>“ unterwegs.
+        <?= t('Verwaltungsansicht: Sie sind als Gym „%s“ unterwegs.', e($authGym['name'] ?? '')) ?>
         <form method="post" action="<?= e(url('/gym/logout')) ?>" class="inline"><?= csrf_field() ?>
-            <button class="linklike" type="submit" style="color:#fff;text-decoration:underline">Zurück zur Verwaltung</button>
+            <button class="linklike" type="submit" style="color:#fff;text-decoration:underline"><?= e(t('Zurück zur Verwaltung')) ?></button>
         </form>
     </div>
 <?php endif; ?>
@@ -53,22 +53,23 @@ $items = [
             <?php if (site_logo() !== ''): ?>
                 <img src="<?= e(site_logo()) ?>" alt="" style="height:2.6rem;width:auto;max-width:9rem;object-fit:contain">
             <?php endif; ?>
-            <span class="site-brand__name"><?= e($orgName) ?> <small>Gym-Bereich</small></span>
+            <span class="site-brand__name"><?= e($orgName) ?> <small><?= e(t('Gym-Bereich')) ?></small></span>
         </a>
 
-        <nav class="site-nav" aria-label="Gym-Navigation">
+        <nav class="site-nav" aria-label="<?= e(t('Gym-Navigation')) ?>">
             <?php if (!empty($authGym)): ?>
                 <?php foreach ($items as [$path, $label]): ?>
-                    <a href="<?= e(url($path)) ?>"<?= $current === url($path) || ($path !== '/gym' && str_starts_with($current, url($path))) ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
+                    <a href="<?= e(url($path)) ?>"<?= $current === url($path) || ($path !== '/gym' && str_starts_with($current, url($path))) ? ' aria-current="page"' : '' ?>><?= e(t($label)) ?></a>
                 <?php endforeach; ?>
                 <form method="post" action="<?= e(url('/gym/logout')) ?>" class="inline">
                     <?= csrf_field() ?>
-                    <button class="btn btn--ghost btn--sm btn--on-dark" type="submit">Abmelden</button>
+                    <button class="btn btn--ghost btn--sm btn--on-dark" type="submit"><?= e(t('Abmelden')) ?></button>
                 </form>
             <?php else: ?>
-                <a href="<?= e(url('/')) ?>">Website</a>
-                <a href="<?= e(url('/gym/login')) ?>">Anmelden</a>
+                <a href="<?= e(url('/')) ?>"><?= e(t('Website')) ?></a>
+                <a href="<?= e(url('/gym/login')) ?>"><?= e(t('Anmelden')) ?></a>
             <?php endif; ?>
+            <?= lang_switch() ?>
         </nav>
     </div>
 </header>
@@ -90,7 +91,7 @@ $items = [
 <footer class="site-footer">
     <div class="wrap site-footer__inner">
         <div class="site-footer__col"><p class="site-footer__name"><?= e($orgName) ?></p></div>
-        <nav class="site-footer__col site-footer__nav" aria-label="Rechtliches">
+        <nav class="site-footer__col site-footer__nav" aria-label="<?= e(t('Rechtliches')) ?>">
             <?php foreach ($footerPages as $footerPage): ?>
                 <a href="<?= e(url('/seite/' . $footerPage['slug'])) ?>"><?= e($footerPage['title']) ?></a>
             <?php endforeach; ?>

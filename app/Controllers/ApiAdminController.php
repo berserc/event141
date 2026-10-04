@@ -28,7 +28,7 @@ final class ApiAdminController
         unset($_SESSION['new_api_key']);
 
         View::display('admin/api', [
-            'title'    => 'API & Kopplungen',
+            'title'    => t('API & Kopplungen'),
             'keys'     => ApiKeyRepo::all(),
             'webhooks' => Database::all(
                 'SELECT w.*, e.name AS event_name FROM webhooks w LEFT JOIN events e ON e.id = w.event_id ORDER BY w.id DESC'
@@ -47,7 +47,7 @@ final class ApiAdminController
         $name = post('name');
 
         if ($name === '') {
-            Flash::error('Bitte einen Namen für den Schlüssel angeben (wofür wird er verwendet?).');
+            Flash::error(t('Bitte einen Namen für den Schlüssel angeben (wofür wird er verwendet?).'));
             Url::redirect('/admin/api');
         }
 
@@ -78,7 +78,9 @@ final class ApiAdminController
         if ($row !== null) {
             Database::update('api_keys', (int) $row['id'], ['active' => (int) $row['active'] === 1 ? 0 : 1]);
             Audit::log('api_key_toggled', 'api_key', (int) $row['id'], (string) $row['name']);
-            Flash::success('Schlüssel „' . $row['name'] . '“ ' . ((int) $row['active'] === 1 ? 'deaktiviert.' : 'aktiviert.'));
+            Flash::success((int) $row['active'] === 1
+                ? t('Schlüssel „%s“ deaktiviert.', $row['name'])
+                : t('Schlüssel „%s“ aktiviert.', $row['name']));
         }
 
         Url::redirect('/admin/api');
@@ -94,7 +96,7 @@ final class ApiAdminController
         if ($row !== null) {
             Database::run('DELETE FROM api_keys WHERE id = ?', [(int) $row['id']]);
             Audit::log('api_key_deleted', 'api_key', (int) $row['id'], (string) $row['name']);
-            Flash::success('Schlüssel gelöscht – gekoppelte Systeme mit diesem Schlüssel haben keinen Zugriff mehr.');
+            Flash::success(t('Schlüssel gelöscht – gekoppelte Systeme mit diesem Schlüssel haben keinen Zugriff mehr.'));
         }
 
         Url::redirect('/admin/api');
@@ -110,7 +112,7 @@ final class ApiAdminController
         $url = post('url');
 
         if (!preg_match('#^https?://#i', $url) || filter_var($url, FILTER_VALIDATE_URL) === false) {
-            Flash::error('Bitte eine vollständige Adresse angeben (https://…).');
+            Flash::error(t('Bitte eine vollständige Adresse angeben (https://…).'));
             Url::redirect('/admin/api');
         }
 
@@ -124,7 +126,7 @@ final class ApiAdminController
         ]);
 
         Audit::log('webhook_created', 'webhook', $id, $url);
-        Flash::success('Webhook angelegt. Das Secret steht in der Liste – beim Empfänger eintragen.');
+        Flash::success(t('Webhook angelegt. Das Secret steht in der Liste – beim Empfänger eintragen.'));
         Url::redirect('/admin/api');
     }
 
@@ -138,7 +140,7 @@ final class ApiAdminController
         if ($hook !== null) {
             $slug   = $hook['event_id'] !== null ? (string) Database::value('SELECT slug FROM events WHERE id = ?', [(int) $hook['event_id']]) : '';
             $status = Webhook::deliver($hook, ['event' => $slug, 'event_id' => $hook['event_id'], 'type' => 'ping', 'at' => gmdate('c')]);
-            Flash::info('Test gesendet: ' . $status);
+            Flash::info(t('Test gesendet: %s', $status));
         }
 
         Url::redirect('/admin/api');
@@ -150,7 +152,7 @@ final class ApiAdminController
         Csrf::verify();
 
         Database::run('DELETE FROM webhooks WHERE id = ?', [(int) ($args['id'] ?? 0)]);
-        Flash::success('Webhook gelöscht.');
+        Flash::success(t('Webhook gelöscht.'));
         Url::redirect('/admin/api');
     }
 }

@@ -27,12 +27,12 @@ final class SystemController
             $manifest = Updater::manifest();
 
             if ($manifest === null) {
-                Flash::error('Update-Server nicht erreichbar (' . Updater::manifestUrl() . ').');
+                Flash::error(t('Update-Server nicht erreichbar (%s).', Updater::manifestUrl()));
             }
         }
 
         View::display('admin/system/updates', [
-            'title'    => 'Updates',
+            'title'    => t('Updates'),
             'version'  => Updater::currentVersion(),
             'manifest' => $manifest,
             'geprueft' => query('pruefen') === '1',
@@ -50,12 +50,12 @@ final class SystemController
         $manifest = Updater::manifest();
 
         if ($manifest === null) {
-            Flash::error('Update-Server nicht erreichbar.');
+            Flash::error(t('Update-Server nicht erreichbar.'));
             Url::redirect('/admin/updates');
         }
 
         if (!Updater::updateAvailable($manifest)) {
-            Flash::info('Es ist bereits die neueste Version installiert.');
+            Flash::info(t('Es ist bereits die neueste Version installiert.'));
             Url::redirect('/admin/updates');
         }
 
@@ -64,13 +64,12 @@ final class SystemController
 
             $_SESSION['_update_log'] = $log;
             Audit::log('system_updated', 'system', null, 'Version ' . $manifest['version']);
-            Flash::success('Update auf Version ' . $manifest['version'] . ' installiert.');
+            Flash::success(t('Update auf Version %s installiert.', $manifest['version']));
         } catch (RuntimeException $e) {
-            Flash::error('Update abgebrochen: ' . $e->getMessage());
+            Flash::error(t('Update abgebrochen: %s', $e->getMessage()));
         } catch (Throwable $e) {
             error_log('[event141] Update-Fehler: ' . $e->getMessage());
-            Flash::error('Unerwarteter Fehler beim Update – Details im Server-Log. '
-                . 'Eine Datenbanksicherung liegt unter data/backups/.');
+            Flash::error(t('Unerwarteter Fehler beim Update – Details im Server-Log. Eine Datenbanksicherung liegt unter data/backups/.'));
         }
 
         Url::redirect('/admin/updates');

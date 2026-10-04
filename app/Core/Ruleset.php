@@ -78,7 +78,7 @@ final class Ruleset
     public static function classLabel(array $div): string
     {
         [$von, $bis] = $div['age'] + [null, null];
-        $alter       = $von !== null && $bis !== null ? " ($von–$bis)" : ($von !== null ? " (ab $von)" : ($bis !== null ? " (bis $bis)" : ''));
+        $alter       = $von !== null && $bis !== null ? ' (' . $von . '–' . $bis . ')' : ($von !== null ? ' (' . t('ab %d', $von) . ')' : ($bis !== null ? ' (' . t('bis %d', $bis) . ')' : ''));
 
         return (string) $div['class'] . $alter;
     }

@@ -1087,3 +1087,10 @@ a.stat:hover { border-color: var(--accent-text); background: var(--accent-soft);
 .gallery-admin[data-sortable] .gallery-admin__item.is-dragging { opacity: .4; }
 .gallery-admin__no { position: absolute; left: .4rem; top: .4rem; background: rgba(0,0,0,.65); color: #fff; font-size: .7rem; padding: .05rem .4rem; border-radius: 4px; pointer-events: none; }
 .gallery-admin__hint { color: var(--ink-soft, #666); font-size: .8rem; margin: -.4rem 0 .6rem; }
+
+/* Sprachumschalter in der Verwaltung und auf der Anmeldeseite */
+.lang-switch--admin { color: #fff; opacity: .85; padding: 0 .4rem; }
+.lang-switch--admin strong { color: var(--accent); }
+.lang-switch--admin a:hover { color: var(--accent); }
+.lang-switch-corner { position: absolute; top: .8rem; right: 1rem; margin: 0; }
+.lang-switch-corner .lang-switch { color: var(--ink-soft); }

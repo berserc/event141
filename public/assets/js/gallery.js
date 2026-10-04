@@ -7,10 +7,10 @@
 
     var box = document.createElement('div');
     box.className = 'lightbox';
-    box.innerHTML = '<button type="button" class="lightbox__close" aria-label="Schließen">✕</button>'
-        + '<button type="button" class="lightbox__nav lightbox__nav--prev" aria-label="Zurück">‹</button>'
+    box.innerHTML = '<button type="button" class="lightbox__close" aria-label="' + ((window.I18N && window.I18N.close) || 'Schließen') + '">✕</button>'
+        + '<button type="button" class="lightbox__nav lightbox__nav--prev" aria-label="' + ((window.I18N && window.I18N.prev) || 'Zurück') + '">‹</button>'
         + '<figure class="lightbox__figure"><img class="lightbox__img" alt=""><figcaption class="lightbox__caption"></figcaption></figure>'
-        + '<button type="button" class="lightbox__nav lightbox__nav--next" aria-label="Weiter">›</button>';
+        + '<button type="button" class="lightbox__nav lightbox__nav--next" aria-label="' + ((window.I18N && window.I18N.next) || 'Weiter') + '">›</button>';
     document.body.appendChild(box);
 
     var img = box.querySelector('.lightbox__img'), cap = box.querySelector('.lightbox__caption'), cur = 0;

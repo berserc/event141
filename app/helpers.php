@@ -453,7 +453,7 @@ function client_ip(): string
 function admin_tabs(array $tabs): string
 {
     $current = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
-    $html    = '<nav class="tabs" aria-label="Unterseiten">';
+    $html    = '<nav class="tabs" aria-label="' . e(t('Unterseiten')) . '">';
 
     foreach ($tabs as [$label, $path]) {
         $href   = url($path);
