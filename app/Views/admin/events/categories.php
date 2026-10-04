@@ -87,6 +87,43 @@ $fmt = static fn ($v): string => $v === null || $v === '' ? '' : rtrim(rtrim(num
                     </form>
                 </details>
             <?php endif; ?>
+
+            <?php foreach (\App\Core\Ruleset::all() as $rs): ?>
+                <details class="plan-edit" style="margin-top:.6rem">
+                    <summary>Aus Regelsatz anlegen: <strong><?= e($rs['name']) ?></strong> <small class="muted">(<?= count(\App\Core\Ruleset::expand($rs)) ?> Kategorien)</small></summary>
+                    <form method="post" action="<?= e(url('/admin/events/' . $id . '/regelsatz')) ?>" class="form" style="margin-top:.6rem">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="ruleset" value="<?= e($rs['code']) ?>">
+                        <p class="muted" style="margin-top:0"><?= e($rs['version']) ?> ·
+                            <a href="<?= e(url('/admin/regelsaetze/' . $rs['code'])) ?>">Tabellen ansehen</a></p>
+                        <div class="field">
+                            <label>Disziplinen</label>
+                            <div class="checkbox-grid">
+                                <?php foreach ($rs['disciplines'] as $dKey => $disc): ?>
+                                    <label class="check"><input type="checkbox" name="disc[]" value="<?= e((string) $dKey) ?>" checked> <?= e($disc['name']) ?> <small class="muted">(<?= $disc['area'] === 'tatami' ? 'Tatami' : 'Ring' ?>)</small></label>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Altersklassen</label>
+                            <div class="checkbox-grid">
+                                <?php foreach (\App\Core\Ruleset::classes($rs) as $cKey => $cLabel): ?>
+                                    <label class="check"><input type="checkbox" name="class[]" value="<?= e((string) $cKey) ?>" checked> <?= e($cLabel) ?></label>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Geschlecht</label>
+                            <div class="checkbox-grid">
+                                <label class="check"><input type="checkbox" name="gender[]" value="m" checked> männlich</label>
+                                <label class="check"><input type="checkbox" name="gender[]" value="w" checked> weiblich</label>
+                            </div>
+                        </div>
+                        <p class="field__hint">Gleichnamige Kategorien bleiben unangetastet; alles lässt sich danach einzeln anpassen oder entfernen.</p>
+                        <button class="btn btn--sm" type="submit">Kategorien anlegen</button>
+                    </form>
+                </details>
+            <?php endforeach; ?>
         <?php endif; ?>
     </div>
 

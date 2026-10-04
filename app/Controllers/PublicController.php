@@ -311,6 +311,45 @@ final class PublicController
         ]);
     }
 
+    /**
+     * Alte Adressen einer importierten Event-Website im NAFN-Format
+     * (index.html, fight.html?fight=<id>&event=<kuerzel>, bericht.html …)
+     * dauerhaft auf die neuen Seiten leiten – geteilte Links und QR-Codes
+     * bleiben so gueltig, wenn die Domain auf Event141 umzieht.
+     */
+    public function legacy(): void
+    {
+        $seite = basename((string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH), '.html');
+        $ziel  = '/';
+
+        if ($seite === 'impressum') {
+            $ziel = '/seite/impressum';
+        } else {
+            // Event: ausdruecklich genannt (?event=…), sonst das Startseiten-Event.
+            $event = EventRepo::findBySlug(query('event')) ?? EventRepo::findBySlug(Setting::get('home_event'));
+
+            if ($event !== null && (int) $event['published'] === 1) {
+                $base = '/e/' . $event['slug'];
+                $ziel = Setting::get('home_event') === (string) $event['slug'] ? '/' : $base;
+
+                if ($seite === 'fight') {
+                    $bout = \App\Core\Database::one(
+                        "SELECT id FROM event_bouts WHERE event_id = ? AND external_id = ? AND external_id <> '' AND is_break = 0",
+                        [(int) $event['id'], query('fight')]
+                    );
+                    $ziel = $bout !== null ? $base . '/kampf/' . (int) $bout['id'] : $base . '/kaempfe';
+                } elseif ($seite === 'bericht') {
+                    $ziel = $base . '/bericht';
+                } elseif ($seite === 'galerie') {
+                    $ziel = $base . '/galerie';
+                }
+            }
+        }
+
+        header('Location: ' . Url::to($ziel), true, 301);
+        exit;
+    }
+
     public function robots(): void
     {
         header('Content-Type: text/plain; charset=UTF-8');

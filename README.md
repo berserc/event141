@@ -127,6 +127,23 @@ php -S localhost:8124 -t public public/router.php
 6. Am Wettkampftag: **Ringansicht** je Ring – Kämpfe starten, Ergebnisse eintragen.
    Sieger rücken automatisch auf; die Website zeigt Live-Status und Ergebnisse.
 
+## Regelsätze
+
+Unter `app/Rulesets/` liegen die Wettkampfstrukturen der Verbände als
+PHP-Dateien: **WAKO Kickboxen** (alle Tatami- und Ring-Disziplinen),
+**Olympisches Boxen** (World Boxing, U13/U15 nach ÖBV) und **IFMA Muay Thai**
+(Regelwerk v3.0). Beim Event unter *Kategorien → Aus Regelsatz anlegen* werden
+daraus alle Alters- und Gewichtsklassen mit Rundenzahl und Rundenzeit erzeugt;
+*Regelsätze* in der Verwaltung zeigt die Tabellen zum Nachschlagen. Ein eigener
+Regelsatz ist eine weitere Datei im selben Format (siehe `app/Core/Ruleset.php`).
+
+Beispiel-Turnier für eine leere Installation – alle Kategorien eines
+Regelsatzes, erfundene Gyms und Sportler, Turnierbäume und Zeitplan:
+
+```bash
+php bin/seed-tournament.php --ruleset=wako --name="Kickboxing Open" --days=3 --rings=4 --tatamis=6
+```
+
 ## Kopplung mit Gym141
 
 Im Gym-Bereich (oder in der Verwaltung beim Gym) unter **Gym141**: Adresse der

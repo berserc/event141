@@ -65,6 +65,19 @@ Liste eines früheren Events.
 
 ---
 
+**Aus einem Regelsatz anlegen.** Unter der Kategorienliste steht für jeden
+hinterlegten Regelsatz ein Aufklapper „Aus Regelsatz anlegen“: Disziplinen,
+Altersklassen und Geschlecht anhaken, *Kategorien anlegen* – fertig sind alle
+Alters- und Gewichtsklassen samt Rundenzahl und Rundenzeit. Hinterlegt sind
+**WAKO Kickboxen** (Point Fighting, Light Contact, Kick Light, Formen, Full
+Contact, Low Kick, K1), **Olympisches Boxen** (World Boxing, U13/U15 nach ÖBV)
+und **IFMA Muay Thai** (U8 bis Masters, Wai Kru). Die Tabellen stehen zum
+Nachschlagen unter *Regelsätze* in der Navigation. Sie sind eine Arbeitshilfe –
+maßgeblich ist das aktuelle Regelwerk des Verbands; jede erzeugte Kategorie
+lässt sich danach ändern oder entfernen.
+
+---
+
 ## Anmeldungen
 
 Gyms melden ihre Sportler im Gym-Bereich selbst an; die Verwaltung kann unter

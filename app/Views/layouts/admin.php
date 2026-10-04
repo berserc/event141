@@ -39,6 +39,7 @@ $nav = [
     ],
     'Events' => [
         ['/admin/events', 'Events', null, 'calendar'],
+        ['/admin/regelsaetze', 'Regelsätze', null, 'list'],
     ],
     'Teilnehmer' => [
         ['/admin/gyms', 'Gyms & Vereine', null, 'flag'],

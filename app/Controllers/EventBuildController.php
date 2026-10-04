@@ -344,6 +344,50 @@ final class EventBuildController
         Url::redirect('/admin/events/' . $event['id'] . '/kategorien');
     }
 
+    /** Kategorien aus einem Regelsatz (WAKO, olympisches Boxen, IFMA …) erzeugen. */
+    public function applyRuleset(array $args): void
+    {
+        AuthController::requireWrite();
+        Csrf::verify();
+
+        $event   = EventAdminController::load((int) ($args['id'] ?? 0));
+        $back    = '/admin/events/' . $event['id'] . '/kategorien';
+        $ruleset = \App\Core\Ruleset::find(post('ruleset'));
+
+        if ($ruleset === null) {
+            Flash::error('Regelsatz nicht gefunden.');
+            Url::redirect($back);
+        }
+
+        $pick = static fn (string $key): array => array_values(array_filter(
+            array_map('strval', (array) ($_POST[$key] ?? [])),
+            static fn (string $v): bool => $v !== ''
+        ));
+
+        $disciplines = $pick('disc');
+        $classes     = $pick('class');
+        $genders     = array_values(array_intersect($pick('gender'), ['m', 'w']));
+
+        if ($disciplines === [] || $classes === [] || $genders === []) {
+            Flash::error('Bitte mindestens eine Disziplin, eine Altersklasse und ein Geschlecht wählen.');
+            Url::redirect($back);
+        }
+
+        $rows = \App\Core\Ruleset::expand($ruleset, $disciplines, $classes, $genders);
+
+        if ($rows === []) {
+            Flash::error('Diese Auswahl ergibt keine Kategorien (die gewählten Altersklassen gibt es in den gewählten Disziplinen nicht).');
+            Url::redirect($back);
+        }
+
+        $result = \App\Core\Ruleset::apply((int) $event['id'], $rows);
+
+        Audit::log('ruleset_applied', 'event', (int) $event['id'], $ruleset['name'] . ': ' . $result['created'] . ' Kategorien');
+        Flash::success($result['created'] . ' Kategorien aus „' . $ruleset['name'] . '“ angelegt'
+            . ($result['skipped'] > 0 ? ' (' . $result['skipped'] . ' gab es schon)' : '') . '.');
+        Url::redirect($back);
+    }
+
     /** Stellt sicher, dass ein Datensatz zum Event gehoert. */
     private function own(string $table, int $id, int $eventId): void
     {

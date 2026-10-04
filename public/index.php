@@ -126,6 +126,11 @@ if ($publicSite) {
 }
 
 $router->get('/seite/{slug}', [$public, 'page']);
+
+// Alte Adressen einer importierten Event-Website (NAFN-Format): index.html, fight.html?fight=… usw.
+foreach (['index', 'fight', 'bericht', 'galerie', 'impressum'] as $alt) {
+    $router->get('/' . $alt . '.html', [$public, 'legacy']);
+}
 $router->get('/impressum', static fn () => (new PublicController())->page(['slug' => 'impressum']));
 $router->get('/datenschutz', static fn () => (new PublicController())->page(['slug' => 'datenschutz']));
 $router->get('/robots.txt', [$public, 'robots']);
@@ -248,6 +253,7 @@ $router->post('/admin/events/{id}/staette-loeschen', [$build, 'deleteVenue']);
 $router->get('/admin/events/{id}/kategorien', [$build, 'categories']);
 $router->post('/admin/events/{id}/kategorie', [$build, 'saveCategory']);
 $router->post('/admin/events/{id}/kategorie-loeschen', [$build, 'deleteCategory']);
+$router->post('/admin/events/{id}/regelsatz', [$build, 'applyRuleset']);
 $router->post('/admin/events/{id}/kategorien-kopieren', [$build, 'copyCategories']);
 
 $entries = new EntryAdminController();
@@ -329,6 +335,11 @@ $router->post('/admin/einstellungen', [$settings, 'save']);
 $router->post('/admin/einstellungen/lizenz-pruefen', [$settings, 'checkLicense']);
 $router->post('/admin/einstellungen/ticket141-pruefen', [$settings, 'checkTicket141']);
 $router->get('/admin/protokoll', [$settings, 'auditLog']);
+
+$rulesets = new App\Controllers\RulesetController();
+
+$router->get('/admin/regelsaetze', [$rulesets, 'index']);
+$router->get('/admin/regelsaetze/{code}', [$rulesets, 'show']);
 
 $system = new App\Controllers\SystemController();
 
