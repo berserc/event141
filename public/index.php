@@ -30,6 +30,9 @@ use App\Models\Setting;
 
 require dirname(__DIR__) . '/app/bootstrap.php';
 
+// Sprachumschalter: ?lang=en merkt die Sprache im Cookie und leitet zurueck.
+\App\Core\I18n::handleSwitch();
+
 // ------------------------------------------------------------------ Health --
 $healthBase = rtrim((string) Config::get('base_path', ''), '/');
 $healthPath = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);

@@ -107,7 +107,37 @@ function link_out(string $url, string $label = '', string $class = 'contact-link
     );
 }
 
-/** "2026-07-27" -> "27.07.2026" */
+/**
+ * Text in der Sprache der Oberflaeche. Der deutsche Text ist der Schluessel;
+ * weitere Argumente fuellen %s/%d-Platzhalter: t('%d Kämpfe verteilt.', $n).
+ * Gibt den Text UNMASKIERT zurueck – in Views mit e() ausgeben.
+ */
+function t(?string $text, mixed ...$args): string
+{
+    return \App\Core\I18n::translate((string) $text, $args);
+}
+
+/** Aktuelle Sprache der Oberflaeche ("de", "en"). */
+function lang(): string
+{
+    return \App\Core\I18n::lang();
+}
+
+/** Sprachumschalter (DE · EN) fuer die Kopfzeilen. */
+function lang_switch(string $class = 'lang-switch'): string
+{
+    $out = [];
+
+    foreach (array_keys(\App\Core\I18n::LANGS) as $code) {
+        $out[] = $code === lang()
+            ? '<strong aria-current="true">' . strtoupper($code) . '</strong>'
+            : '<a href="' . e(\App\Core\I18n::switchUrl($code)) . '" hreflang="' . $code . '" rel="nofollow">' . strtoupper($code) . '</a>';
+    }
+
+    return '<span class="' . e($class) . '" aria-label="Sprache / Language">' . implode('<span aria-hidden="true"> · </span>', $out) . '</span>';
+}
+
+/** "2026-07-27" -> "27.07.2026" (en: "27 Jul 2026") */
 function format_date(?string $isoDate): string
 {
     if ($isoDate === null || trim($isoDate) === '') {
@@ -116,10 +146,10 @@ function format_date(?string $isoDate): string
 
     $ts = strtotime($isoDate);
 
-    return $ts === false ? $isoDate : date('d.m.Y', $ts);
+    return $ts === false ? $isoDate : date(lang() === 'en' ? 'j M Y' : 'd.m.Y', $ts);
 }
 
-/** "2026-07-27" -> "Mo. 27.07.2026" */
+/** "2026-07-27" -> "Mo. 27.07.2026" (en: "Mon 27 Jul 2026") */
 function format_date_long(?string $isoDate): string
 {
     if ($isoDate === null || trim($isoDate) === '') {
@@ -130,6 +160,10 @@ function format_date_long(?string $isoDate): string
 
     if ($ts === false) {
         return $isoDate;
+    }
+
+    if (lang() === 'en') {
+        return date('D j M Y', $ts);
     }
 
     $tage = ['So.', 'Mo.', 'Di.', 'Mi.', 'Do.', 'Fr.', 'Sa.'];
@@ -155,6 +189,12 @@ function format_date_range(?string $from, ?string $to): string
         return format_date($from) . ' – ' . format_date($to);
     }
 
+    if (lang() === 'en') {
+        return date('Y-m', $a) === date('Y-m', $b)
+            ? date('j', $a) . '–' . date('j M Y', $b)
+            : date('j M', $a) . ' – ' . date('j M Y', $b);
+    }
+
     if (date('Y-m', $a) === date('Y-m', $b)) {
         return date('d.', $a) . '–' . date('d.m.Y', $b);
     }
@@ -170,7 +210,7 @@ function format_datetime(?string $iso): string
 
     $ts = strtotime($iso . ' UTC');
 
-    return $ts === false ? $iso : date('d.m.Y H:i', $ts);
+    return $ts === false ? $iso : date(lang() === 'en' ? 'j M Y H:i' : 'd.m.Y H:i', $ts);
 }
 
 /** "13:05:00" -> "13:05" */
@@ -185,7 +225,9 @@ function format_time(?string $time): string
 
 function format_money(float|int|string|null $amount): string
 {
-    return number_format((float) $amount, 2, ',', '.') . ' €';
+    return lang() === 'en'
+        ? '€ ' . number_format((float) $amount, 2, '.', ',')
+        : number_format((float) $amount, 2, ',', '.') . ' €';
 }
 
 /** Gewicht 72.5 -> "72,5 kg" */
@@ -195,7 +237,9 @@ function format_weight(float|int|string|null $kg): string
         return '';
     }
 
-    return rtrim(rtrim(number_format((float) $kg, 1, ',', '.'), '0'), ',') . ' kg';
+    $komma = lang() === 'en' ? '.' : ',';
+
+    return rtrim(rtrim(number_format((float) $kg, 1, $komma, ''), '0'), $komma) . ' kg';
 }
 
 /** Alter in Jahren zum Stichtag (Standard: heute). */
