@@ -22,7 +22,7 @@ $j  = ['key' => 'j', 'class' => 'Juniors', 'de' => 'Junioren', 'age' => [16, 18]
 $s  = ['key' => 's', 'class' => 'Seniors', 'de' => 'Senioren', 'age' => [19, 40], 'rounds' => 3, 'minutes' => 2, 'break' => 1,
     'note'    => 'Bei Cups/Opens auch 2 × 2:00.',
     'weights' => ['m' => $tatamiM, 'w' => $tatamiW]];
-$v  = ['key' => 'v', 'class' => 'Master Class (Veterans)', 'de' => 'Masters', 'age' => [41, 55], 'rounds' => 2, 'minutes' => 2, 'break' => 1,
+$v  = ['key' => 'v', 'class' => 'Veterans', 'de' => 'Masters', 'age' => [41, 55], 'rounds' => 2, 'minutes' => 2, 'break' => 1,
     'note'    => 'Bei Cups/Opens auch 2 × 1:30 mit 0:30 Pause.',
     'weights' => ['m' => [63, 74, 84, 94, '+94'], 'w' => [55, 65, '+65']]];
 

@@ -19,7 +19,7 @@ namespace App\Core;
  *   disciplines => [ key => [
  *       name, short, area (ring|tatami), mode (ko|liste), equipment,
  *       divisions => [ [
- *           key, class (offizieller Name), de (deutscher Name), age => [von, bis],
+ *           key, class (offizieller englischer Name, steht im Kategorienamen), de (deutscher Name, nur Anzeige), age => [von, bis],
  *           rounds, minutes, break (Minuten), note,
  *           weights => [ 'm' => [57, 63, '+63'], 'w' => [...] ]   // Obergrenzen in kg, '+X' = offene Klasse
  *           min     => [ 'm' => 44, 'w' => 42 ]                   // optionale Untergrenze der leichtesten Klasse
@@ -80,7 +80,7 @@ final class Ruleset
         [$von, $bis] = $div['age'] + [null, null];
         $alter       = $von !== null && $bis !== null ? " ($von–$bis)" : ($von !== null ? " (ab $von)" : ($bis !== null ? " (bis $bis)" : ''));
 
-        return (string) ($div['de'] ?? $div['class']) . $alter;
+        return (string) $div['class'] . $alter;
     }
 
     /** "-63 kg", "+94 kg", "63,5 kg" */
@@ -105,7 +105,6 @@ final class Ruleset
     public static function expand(array $ruleset, array $disciplines = [], array $classes = [], array $genders = []): array
     {
         $rows   = [];
-        $prefix = count($ruleset['disciplines']) > 1;
 
         foreach ($ruleset['disciplines'] as $dKey => $disc) {
             if ($disciplines !== [] && !in_array((string) $dKey, $disciplines, true)) {
@@ -117,8 +116,8 @@ final class Ruleset
                     continue;
                 }
 
-                $jung  = ($div['age'][1] ?? 99) < 18;
-                $label = ['m' => $jung ? 'männlich' : 'Herren', 'w' => $jung ? 'weiblich' : 'Damen'];
+                // Kategorienamen international: offizieller Klassenname + Male/Female
+                $label = ['m' => 'Male', 'w' => 'Female'];
                 $basis = [
                     'discipline'    => (string) $disc['name'],
                     'age_min'       => $div['age'][0] ?? null,
@@ -131,7 +130,7 @@ final class Ruleset
                     '_class'        => (string) $div['key'],
                     '_area'         => (string) ($disc['area'] ?? 'ring'),
                 ];
-                $kopf  = ($prefix ? (string) $disc['short'] . ' ' : '') . (string) ($div['de'] ?? $div['class']);
+                $kopf  = (string) $disc['short'] . ' ' . (string) $div['class'];
 
                 // Formen & Co.: Kategorien ohne Gewicht
                 if (isset($div['styles'])) {

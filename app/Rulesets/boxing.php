@@ -14,31 +14,30 @@ $wom  = [48, 51, 54, 57, 60, 65, 70, 75, 80, '+80'];
 
 return [
     'code'     => 'boxing',
-    'name'     => 'Olympisches Boxen',
-    'org'      => 'World Boxing · national: Österreichischer Boxverband (ÖBV)',
+    'name'     => 'Olympisches Boxen (World Boxing)',
+    'org'      => 'World Boxing (WB)',
     'sport'    => 'Boxen',
     'version'  => 'World Boxing Competition Rules (November 2024, Gewichtsklassen ab 01.01.2025); U15/U13 nach ÖBV-Wettkampfbestimmungen 2026',
     'source'   => 'https://worldboxing.org/',
     'age_rule' => 'Maßgeblich ist das Geburtsjahr: Alter = Wettkampfjahr minus Geburtsjahr.',
     'note'     => 'Handschuhe: 10 oz für alle Frauen, alle U17/U15/U13 sowie Männer Elite/U19 bis 65 kg; 12 oz für Männer Elite/U19 ab der 70-kg-Klasse. '
         . 'Kopfschutz: Pflicht für Frauen, U19, U17, U15 und U13; Elite-Männer boxen ohne (World Boxing berät über die Wiedereinführung, Abstimmung im November 2026). '
-        . 'Pause zwischen den Runden: 1 Minute. IBA-Wettkämpfe verwenden andere Gewichtsklassen (Männer 48–100+ kg in 14 Klassen, Frauen 48–81+ kg in 12 Klassen) – '
-        . 'dafür die Kategorien nach dem Anlegen anpassen. Masters regelt World Boxing nicht.',
+        . 'Pause zwischen den Runden: 1 Minute. U15 und U13 sowie Masters regelt World Boxing nicht selbst – für U15/U13 sind die Klassen des ÖBV (EUBC-Limits) hinterlegt.',
 
     'disciplines' => [
         'box' => [
-            'name' => 'Boxen', 'short' => 'Boxen', 'area' => 'ring', 'mode' => 'ko',
+            'name' => 'Boxing', 'short' => 'WB', 'area' => 'ring', 'mode' => 'ko',
             'equipment' => 'Die leichteste Klasse hat eine Untergrenze (Männer 47 kg, Frauen 45 kg, U17 44 kg).',
             'divisions' => [
                 ['key' => 'u13', 'class' => 'U13', 'de' => 'Schüler U13', 'age' => [11, 12], 'rounds' => 3, 'minutes' => 1.5, 'break' => 1,
                     'note'    => 'ÖBV/EUBC; unter 34 kg weiter in 1,5-kg-Schritten.',
                     'weights' => ['m' => $eubc, 'w' => $eubc]],
-                ['key' => 'u15', 'class' => 'U15 (Schoolboys/Schoolgirls)', 'de' => 'Schüler U15', 'age' => [13, 14], 'rounds' => 3, 'minutes' => 1.5, 'break' => 1,
+                ['key' => 'u15', 'class' => 'U15', 'de' => 'Schüler U15', 'age' => [13, 14], 'rounds' => 3, 'minutes' => 1.5, 'break' => 1,
                     'note'    => 'ÖBV/EUBC; unter 34 kg weiter in 1,5-kg-Schritten.',
                     'weights' => ['m' => $eubc, 'w' => $eubc]],
-                ['key' => 'u17', 'class' => 'U17 (Junior)', 'de' => 'Junioren U17', 'age' => [15, 16], 'rounds' => 3, 'minutes' => 2, 'break' => 1,
+                ['key' => 'u17', 'class' => 'U17', 'de' => 'Junioren U17', 'age' => [15, 16], 'rounds' => 3, 'minutes' => 2, 'break' => 1,
                     'weights' => ['m' => $u17, 'w' => $u17], 'min' => ['m' => 44, 'w' => 44]],
-                ['key' => 'u19', 'class' => 'U19 (Youth)', 'de' => 'Jugend U19', 'age' => [17, 18], 'rounds' => 3, 'minutes' => 3, 'break' => 1,
+                ['key' => 'u19', 'class' => 'U19', 'de' => 'Jugend U19', 'age' => [17, 18], 'rounds' => 3, 'minutes' => 3, 'break' => 1,
                     'weights' => ['m' => $men, 'w' => $wom], 'min' => ['m' => 47, 'w' => 45]],
                 ['key' => 'elite', 'class' => 'Elite', 'de' => 'Elite', 'age' => [19, 40], 'rounds' => 3, 'minutes' => 3, 'break' => 1,
                     'weights' => ['m' => $men, 'w' => $wom], 'min' => ['m' => 47, 'w' => 45]],

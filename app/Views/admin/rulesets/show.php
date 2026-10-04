@@ -40,7 +40,7 @@ $liste = static fn (array $limits): string => implode(' · ', array_map(static f
                 <tbody>
                 <?php foreach ($disc['divisions'] as $div): ?>
                     <tr>
-                        <td><strong><?= e($div['de'] ?? $div['class']) ?></strong><br><small class="muted"><?= e($div['class']) ?></small></td>
+                        <td><strong><?= e($div['class']) ?></strong><?php if ((string) ($div['de'] ?? '') !== '' && $div['de'] !== $div['class']): ?><br><small class="muted"><?= e($div['de']) ?></small><?php endif; ?></td>
                         <td style="white-space:nowrap"><?= (int) $div['age'][0] ?>–<?= (int) $div['age'][1] ?></td>
                         <td style="white-space:nowrap">
                             <?php if (isset($div['styles'])): ?>
