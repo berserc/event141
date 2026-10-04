@@ -186,6 +186,13 @@ final class EventExtrasController
         $event = EventAdminController::load((int) ($args['id'] ?? 0));
         $doc   = (string) ($args['doc'] ?? '');
 
+        // Turnierbaeume und Running Order teilen sich die Ansicht mit der Website.
+        if (in_array($doc, \App\Core\PrintDocs::DOCS, true)) {
+            \App\Core\PrintDocs::display($event, $doc);
+
+            return;
+        }
+
         if (!in_array($doc, ['aushang', 'check', 'kabinen'], true)) {
             Url::redirect('/admin/events/' . $event['id'] . '/listen');
         }

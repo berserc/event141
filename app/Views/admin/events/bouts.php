@@ -62,6 +62,9 @@ $entryOptions = static function (?int $selected = null) use ($entries): string {
                 <h2><?= e($c['name']) ?> <small class="muted"><?= e(EventRepo::categoryInfo($c)) ?></small></h2>
                 <div class="card__actions">
                     <span class="badge"><?= e(t('%d bestätigt', (int) $c['confirmed_count'])) ?></span>
+                    <?php if ($list !== [] && $c['mode'] === 'ko'): ?>
+                        <a class="btn btn--sm" href="<?= e(url('/admin/events/' . $id . '/druck/spinne', ['kat' => $c['id']])) ?>" target="_blank" rel="noopener">🖨 <?= e(t('Spinne drucken')) ?></a>
+                    <?php endif; ?>
                     <?php if ($canWrite && $c['mode'] === 'ko'): ?>
                         <form method="post" action="<?= e(url('/admin/events/' . $id . '/turnierbaum')) ?>" class="inline"
                               <?= $list !== [] ? 'data-confirm="' . e(t('Turnierbaum neu erzeugen? Bestehende Kämpfe und Ergebnisse dieser Kategorie werden ersetzt.')) . '"' : '' ?>>
@@ -88,6 +91,19 @@ $entryOptions = static function (?int $selected = null) use ($entries): string {
                         </tbody>
                     </table>
                 </div>
+                <?php if ($c['mode'] === 'ko'): ?>
+                    <details class="plan-edit" style="margin-top:.8rem">
+                        <summary><?= e(t('Spinne anzeigen')) ?></summary>
+                        <div class="spinne-scroll" style="margin:.8rem 0 0">
+                            <?php
+                            $rounds   = \App\Core\Bracket::rounds((int) $c['id']);
+                            $feeders  = \App\Core\PrintDocs::feeders($list);
+                            $boutBase = url('/admin/events/' . $id . '/kampf/');
+                            require dirname(__DIR__, 2) . '/partials/_spinne.php';
+                            ?>
+                        </div>
+                    </details>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
     <?php endforeach; ?>

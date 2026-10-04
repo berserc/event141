@@ -319,12 +319,12 @@ final class EventRepo
             $teile[] = t(self::GENDERS[(string) $c['gender']] ?? (string) $c['gender']);
         }
 
-        if ($c['age_min'] !== null || $c['age_max'] !== null) {
-            $teile[] = t(
-                '%s–%s J.',
-                $c['age_min'] !== null ? (string) (int) $c['age_min'] : '',
-                $c['age_max'] !== null ? (string) (int) $c['age_max'] : ''
-            );
+        if ($c['age_min'] !== null && $c['age_max'] !== null) {
+            $teile[] = t('%s–%s J.', (string) (int) $c['age_min'], (string) (int) $c['age_max']);
+        } elseif ($c['age_min'] !== null) {
+            $teile[] = t('ab %d J.', (int) $c['age_min']);
+        } elseif ($c['age_max'] !== null) {
+            $teile[] = t('bis %d J.', (int) $c['age_max']);
         }
 
         if ($c['weight_min'] !== null || $c['weight_max'] !== null) {

@@ -17,6 +17,8 @@ $subtitle = t('Zeitplan');
 $canWrite = Auth::canWrite();
 require __DIR__ . '/_head.php';
 
+$roUrl = '/admin/events/' . $id . '/druck/running-order';
+
 $placeForm = static function (array $bout) use ($id, $sessions, $venues, $csrf): string {
     $html = '<form method="post" action="' . e(url('/admin/events/' . $id . '/zeitplan/einplanen')) . '" class="place-form">'
         . '<input type="hidden" name="csrf_token" value="' . e($csrf) . '">'
@@ -35,6 +37,17 @@ $placeForm = static function (array $bout) use ($id, $sessions, $venues, $csrf):
     return $html;
 };
 ?>
+
+<p class="print-links">
+    <strong>🖨 Running Order:</strong>
+    <a href="<?= e(url($roUrl)) ?>" target="_blank" rel="noopener"><?= e(t('alle Wettkampfstätten')) ?></a>
+    <?php foreach ($venues as $v): ?>
+        · <a href="<?= e(url($roUrl, ['staette' => $v['id']])) ?>" target="_blank" rel="noopener"><?= e($v['name']) ?></a>
+    <?php endforeach; ?>
+    <?php if ($event['type'] === 'turnier'): ?>
+        &nbsp;|&nbsp; <a href="<?= e(url('/admin/events/' . $id . '/druck/spinne')) ?>" target="_blank" rel="noopener">🕸 <?= e(t('Turnierbäume (Spinne)')) ?></a>
+    <?php endif; ?>
+</p>
 
 <div class="card">
     <form method="post" action="<?= e(url('/admin/events/' . $id . '/live-modus')) ?>" class="inline-form">

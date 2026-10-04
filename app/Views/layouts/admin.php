@@ -69,6 +69,7 @@ $currentPath = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP
     <link rel="stylesheet" href="<?= e(asset('css/admin.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/event.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/fightcard.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('css/spinne.css')) ?>">
     <link rel="icon" href="<?= e(asset('img/favicon.svg')) ?>" type="image/svg+xml">
 </head>
 <body class="admin<?= !empty($isDev) ? ' admin--dev' : '' ?>">

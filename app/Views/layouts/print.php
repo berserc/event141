@@ -14,7 +14,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title><?= e($title) ?></title>
     <style>
-        @page { size: A4 portrait; margin: 12mm; }
+        @page { size: A4 <?= !empty($landscape) ? 'landscape' : 'portrait' ?>; margin: <?= !empty($landscape) ? '10mm' : '12mm' ?>; }
         * { box-sizing: border-box; }
         body { font-family: system-ui, "Segoe UI", Arial, sans-serif; font-size: 10.5pt; color: #111; margin: 0; padding: 12mm; background: #fff; }
         h1 { font-size: 18pt; margin: 0 0 1mm; text-transform: uppercase; letter-spacing: .02em; }
@@ -41,8 +41,9 @@
         .toolbar button { font: inherit; padding: 2mm 5mm; cursor: pointer; }
         @media print { body { padding: 0; } .toolbar { display: none; } }
     </style>
+    <link rel="stylesheet" href="<?= e(asset('css/spinne.css')) ?>">
 </head>
-<body>
+<body class="print-doc">
 <div class="toolbar"><button type="button" onclick="window.print()"><?= e(t('Drucken / als PDF speichern')) ?></button></div>
 <?= $content ?>
 </body>

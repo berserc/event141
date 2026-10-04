@@ -109,22 +109,6 @@ body.admin .corner--blue { color: #1a5fb4; }
 }
 
 /* Turnierbaum */
-.bracket-scroll { overflow-x: auto; padding-bottom: 1rem; margin-bottom: 2.5rem; }
-.bracket { display: grid; grid-template-columns: repeat(var(--rounds, 1), minmax(220px, 1fr)); gap: 1.5rem; min-width: calc(var(--rounds, 1) * 240px); }
-.bracket__round { display: flex; flex-direction: column; justify-content: space-around; gap: .8rem; }
-.bracket__label { font-size: .8rem; text-transform: uppercase; letter-spacing: .1em; color: var(--accent-bright); margin: 0 0 .3rem; text-align: center; }
-.bracket__match { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; font-size: .9rem; }
-.bracket__match--laufend { border-color: var(--accent); }
-.bracket__match--abgesagt { opacity: .45; }
-.bracket__slot { display: flex; justify-content: space-between; gap: .5rem; padding: .4rem .7rem; border-left: 4px solid transparent; }
-.bracket__slot--red { border-left-color: #ff7b85; border-bottom: 1px solid var(--line); }
-.bracket__slot--blue { border-left-color: #7cb7ff; }
-.bracket__slot.is-winner { background: rgba(230,57,70,.15); font-weight: 800; }
-.bracket__slot small { color: var(--ink-soft); white-space: nowrap; }
-.bracket__meta { padding: .2rem .7rem; background: var(--bg-soft); color: var(--ink-soft); font-size: .75rem; }
-body.admin .bracket__match { background: #fff; }
-body.admin .bracket__slot--red { border-left-color: #b3202c; }
-body.admin .bracket__slot--blue { border-left-color: #1a5fb4; }
 
 /* Öffentlicher Zeitplan */
 .pub-session { margin-bottom: 2rem; }

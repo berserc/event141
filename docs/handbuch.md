@@ -228,6 +228,28 @@ Kabine landen.
 
 ---
 
+## Turnierbaum („Spinne“) und Running Order
+
+**Spinne:** Jede Kategorie mit Turnierbaum wird als klassische Spinne
+dargestellt – Runden als Spalten, Verbindungslinien, rechts der Sieger. Offene
+Plätze zeigen „Sieger #12“ (Sieger des Kampfs Nr. 12), Freilose sind als solche
+markiert. Zu finden auf der Website unter *Turnierplan* und in der Verwaltung
+unter *Kämpfe*.
+
+**Drucken / PDF:** *Listen & Druck → Turnierbäume (Spinne)* druckt alle
+Kategorien, je Kategorie eine Seite im Querformat; der Knopf *Spinne drucken*
+bei einer Kategorie druckt nur diese. Auf der Website gibt es dieselben Knöpfe
+für Trainer und Besucher. Im Druckdialog des Browsers „Als PDF speichern“
+wählen, um eine PDF-Datei zu bekommen.
+
+**Running Order:** die Kampfreihenfolge je Wettkampfstätte – für jeden Tag,
+Abschnitt und Ring eine eigene Seite mit Kampfnummer, voraussichtlicher
+Uhrzeit, Kategorie und Runde, roter und blauer Ecke und einem Feld für den
+Sieger. Aufruf unter *Listen & Druck* oder im *Zeitplan* (dort auch gezielt für
+einen einzelnen Ring), auf der Website unter *Zeitplan*.
+
+---
+
 ## Sportler und Gyms
 
 *Sportler*: Name, Kampfname, Gym, Geburtsdatum (oder Alter), Bilanz, Bio,

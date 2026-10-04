@@ -33,30 +33,22 @@ use App\Models\EventRepo;
             <p class="muted"><?= e(t('Die Turnierbäume werden nach Anmeldeschluss erstellt.')) ?></p>
         <?php endif; ?>
 
+        <?php if ($brackets !== []): ?>
+            <p class="print-links">
+                <a class="btn btn--ghost btn--on-dark btn--sm" href="<?= e(url('/e/' . $event['slug'] . '/druck/spinne')) ?>" target="_blank" rel="noopener">🖨 <?= e(t('Alle Turnierbäume drucken / PDF')) ?></a>
+                <a class="btn btn--ghost btn--on-dark btn--sm" href="<?= e(url('/e/' . $event['slug'] . '/druck/running-order')) ?>" target="_blank" rel="noopener">🖨 <?= e(t('Running Order drucken / PDF')) ?></a>
+            </p>
+        <?php endif; ?>
+
+        <?php $boutBase = url('/e/' . $event['slug'] . '/kampf/'); $feeders = \App\Core\PrintDocs::feeders($bouts); ?>
         <?php foreach ($brackets as $b): ?>
-            <h2 class="section-heading" id="kat-<?= (int) $b['category']['id'] ?>"><?= e($b['category']['name']) ?> <small class="muted"><?= e(EventRepo::categoryInfo($b['category'])) ?></small></h2>
-            <div class="bracket-scroll">
-                <div class="bracket" style="--rounds:<?= count($b['rounds']) ?>">
-                    <?php foreach ($b['rounds'] as $round): ?>
-                        <div class="bracket__round">
-                            <h3 class="bracket__label"><?= e(t($round['label'])) ?></h3>
-                            <?php foreach ($round['bouts'] as $bout): ?>
-                                <?php $red = BoutRepo::cornerName($bout, 'red'); $blue = BoutRepo::cornerName($bout, 'blue'); ?>
-                                <div class="bracket__match bracket__match--<?= e($bout['status']) ?>" title="<?= e(t('Kampf #%d', (int) $bout['bout_no'])) ?><?= $bout['venue_name'] ? ' · ' . e($bout['venue_name']) : '' ?>">
-                                    <div class="bracket__slot bracket__slot--red<?= $bout['winner'] === 'red' ? ' is-winner' : '' ?>">
-                                        <span><?= $red !== '' ? e($red) : '<em class="muted">' . ($bout['status'] === 'abgesagt' ? '–' : e(t('offen'))) . '</em>' ?></span>
-                                        <?php if ($bout['red_gym'] !== null): ?><small><?= e($bout['red_gym_short'] ?: $bout['red_gym']) ?></small><?php endif; ?>
-                                    </div>
-                                    <div class="bracket__slot bracket__slot--blue<?= $bout['winner'] === 'blue' ? ' is-winner' : '' ?>">
-                                        <span><?= $blue !== '' ? e($blue) : '<em class="muted">' . ($bout['method'] === 'Freilos' ? e(t('Freilos')) : ($bout['status'] === 'abgesagt' ? '–' : e(t('offen')))) . '</em>' ?></span>
-                                        <?php if ($bout['blue_gym'] !== null): ?><small><?= e($bout['blue_gym_short'] ?: $bout['blue_gym']) ?></small><?php endif; ?>
-                                    </div>
-                                    <div class="bracket__meta">#<?= (int) $bout['bout_no'] ?><?= $bout['status'] === 'laufend' ? ' <span class="live-badge">LIVE</span>' : '' ?><?= $bout['status'] === 'beendet' && $bout['method'] !== '' && $bout['method'] !== 'Freilos' ? ' · ' . e(t($bout['method'])) : '' ?></div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
+            <?php $rounds = $b['rounds']; ?>
+            <div class="spinne-head" id="kat-<?= (int) $b['category']['id'] ?>">
+                <h2 class="section-heading"><?= e($b['category']['name']) ?> <small class="muted"><?= e(EventRepo::categoryInfo($b['category'])) ?></small></h2>
+                <a class="print-link" href="<?= e(url('/e/' . $event['slug'] . '/druck/spinne', ['kat' => $b['category']['id']])) ?>" target="_blank" rel="noopener">🖨 <?= e(t('Drucken / PDF')) ?></a>
+            </div>
+            <div class="spinne-scroll">
+                <?php require dirname(__DIR__) . '/partials/_spinne.php'; ?>
             </div>
         <?php endforeach; ?>
 

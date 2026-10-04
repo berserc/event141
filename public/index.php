@@ -118,6 +118,7 @@ if ($publicSite) {
     $router->get('/e/{slug}/kaempfe', [$public, 'bouts']);
     $router->get('/e/{slug}/kampf/{id}', [$public, 'fight']);
     $router->get('/e/{slug}/zeitplan', [$public, 'schedule']);
+    $router->get('/e/{slug}/druck/{doc}', [$public, 'printDoc']);
     $router->get('/e/{slug}/teilnehmer', [$public, 'entries']);
     $router->get('/e/{slug}/ergebnisse', [$public, 'results']);
     $router->get('/e/{slug}/bericht', [$public, 'report']);

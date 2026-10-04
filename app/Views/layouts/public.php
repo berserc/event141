@@ -31,6 +31,7 @@ $gymArea   = $gymArea ?? true;
     <link rel="stylesheet" href="<?= e(asset('css/site.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/event.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/fightcard.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('css/spinne.css')) ?>">
     <link rel="icon" href="<?= e(asset('img/favicon.svg')) ?>" type="image/svg+xml">
 </head>
 <body class="page page--<?= e($activePage) ?>">

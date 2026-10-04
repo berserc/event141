@@ -18,6 +18,9 @@ use App\Models\BoutRepo;
 <?php require __DIR__ . '/_event-nav.php'; ?>
 
 <section class="wrap">
+    <p class="print-links">
+        <a class="btn btn--ghost btn--on-dark btn--sm" href="<?= e(url('/e/' . $event['slug'] . '/druck/running-order')) ?>" target="_blank" rel="noopener">🖨 <?= e(t('Running Order drucken / PDF')) ?></a>
+    </p>
     <?php $hatKaempfe = false; ?>
     <?php foreach ($schedule['days'] as $day): ?>
         <h2 class="section-heading"><?= e(format_date_long($day['day_date'])) ?><?= $day['label'] !== '' ? ' – ' . e(t($day['label'])) : '' ?></h2>

@@ -27,6 +27,14 @@ sort($kabinen);
     <a class="stat <?= $conflicts !== [] ? 'stat--danger' : '' ?>" href="<?= e(url('/admin/events/' . $id . '/druck/kabinen')) ?>" target="_blank" rel="noopener">
         <span class="stat__value">🚪</span><span class="stat__label"><?= e(t('Kabineneinteilung + Türschilder')) ?></span>
     </a>
+    <a class="stat" href="<?= e(url('/admin/events/' . $id . '/druck/running-order')) ?>" target="_blank" rel="noopener">
+        <span class="stat__value">🕒</span><span class="stat__label"><?= e(t('Running Order (Reihenfolge je Ring)')) ?></span>
+    </a>
+    <?php if ($event['type'] === 'turnier'): ?>
+        <a class="stat" href="<?= e(url('/admin/events/' . $id . '/druck/spinne')) ?>" target="_blank" rel="noopener">
+            <span class="stat__value">🕸</span><span class="stat__label"><?= e(t('Turnierbäume (Spinne), alle Kategorien')) ?></span>
+        </a>
+    <?php endif; ?>
     <a class="stat" href="<?= e(url('/admin/events/' . $id . '/anmeldungen.csv')) ?>">
         <span class="stat__value">⬇</span><span class="stat__label"><?= e(t('Teilnehmer als CSV (Excel)')) ?></span>
     </a>

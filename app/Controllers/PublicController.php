@@ -188,6 +188,21 @@ final class PublicController
         View::display('public/bouts', $data);
     }
 
+    /** Druckansichten fuer Besucher: Turnierbaeume ("Spinne") und Running Order. */
+    public function printDoc(array $args): void
+    {
+        $event = $this->loadEvent($args);
+        $doc   = (string) ($args['doc'] ?? '');
+
+        if (!in_array($doc, \App\Core\PrintDocs::DOCS, true)) {
+            $this->notFound();
+
+            return;
+        }
+
+        \App\Core\PrintDocs::display($event, $doc);
+    }
+
     /** Kampf-Detailseite: Story, beide Kaempfer mit Bio, Bilanz, Medien. */
     public function fight(array $args): void
     {

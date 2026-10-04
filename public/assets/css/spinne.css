@@ -1,0 +1,83 @@
+/* ==========================================================================
+   Event141 – Turnierbaum als "Spinne": Runden als Spalten, Verbindungslinien
+   zwischen den Kaempfen. Farben kommen aus den Variablen der jeweiligen
+   Umgebung (Website dunkel, Verwaltung hell, Druck schwarz/weiss).
+   ========================================================================== */
+
+.spinne-scroll { overflow-x: auto; padding-bottom: 1rem; margin-bottom: 2.2rem; }
+
+.spinne {
+    --sp-gap: 14px;
+    --sp-line: var(--line, #9a9a9a);
+    display: flex;
+    align-items: stretch;
+    min-width: calc(var(--rounds, 2) * 185px);
+    font-size: .85rem;
+}
+
+.spinne__round { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+.spinne__round--winner { flex: .7 1 0; }
+.spinne__label { padding-bottom: .4rem; text-align: center; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--accent-bright, #555); }
+.spinne__cells { flex: 1; display: flex; flex-direction: column; }
+.spinne__cell { position: relative; flex: 1 1 0; display: flex; align-items: center; min-height: 4.4rem; padding: 3px var(--sp-gap); }
+.spinne__round:first-child .spinne__cell { padding-left: 0; }
+
+.spinne__match { position: relative; flex: 1; min-width: 0; border: 1px solid var(--sp-line); border-radius: 6px; background: var(--card, #fff); }
+.spinne__match--laufend { border-color: var(--accent, #c8102e); box-shadow: 0 0 0 1px var(--accent, #c8102e); }
+.spinne__slot { display: flex; justify-content: space-between; align-items: baseline; gap: .4rem; padding: .22rem .5rem; border-left: 4px solid transparent; white-space: nowrap; }
+.spinne__slot span { overflow: hidden; text-overflow: ellipsis; }
+.spinne__slot em { font-style: italic; opacity: .65; }
+.spinne__slot small { flex: none; color: var(--ink-soft, #555); font-size: .78em; }
+.spinne__slot--red { border-left-color: #c8102e; border-bottom: 1px solid var(--sp-line); border-top-left-radius: 5px; }
+.spinne__slot--blue { border-left-color: #1a5fb4; }
+.spinne__slot.is-winner { font-weight: 800; }
+.spinne__meta { padding: .1rem .5rem .15rem; border-top: 1px dashed var(--sp-line); font-size: .7rem; color: var(--ink-soft, #555); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.spinne__meta a { color: inherit; text-decoration: none; }
+.spinne__meta a:hover { text-decoration: underline; }
+
+.spinne__winner { position: relative; flex: 1; min-height: 1.7rem; padding: .25rem .5rem; border-bottom: 2px solid var(--sp-line); font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Linien: aus jedem Kampf nach rechts … */
+.spinne__round:not(.spinne__round--winner) .spinne__cell::after { content: ""; position: absolute; right: 0; top: 50%; width: var(--sp-gap); border-top: 1px solid var(--sp-line); }
+/* … je zwei Kaempfe senkrecht verbunden … */
+.spinne__round:not(.spinne__round--winner):not(.spinne__round--final) .spinne__cell:nth-child(odd)::before { content: ""; position: absolute; right: 0; top: 50%; bottom: 0; border-right: 1px solid var(--sp-line); }
+.spinne__round:not(.spinne__round--winner):not(.spinne__round--final) .spinne__cell:nth-child(even)::before { content: ""; position: absolute; right: 0; top: 0; bottom: 50%; border-right: 1px solid var(--sp-line); }
+/* … und weiter in den Folgekampf bzw. zum Sieger. */
+.spinne__round:not(:first-child) .spinne__match::before,
+.spinne__winner::before { content: ""; position: absolute; left: calc(-1 * var(--sp-gap) - 1px); top: 50%; width: var(--sp-gap); border-top: 1px solid var(--sp-line); }
+.spinne__winner::before { top: auto; bottom: -2px; border-top-width: 2px; }
+
+/* Leere Plaetze (kein Sportler, kein Kampf) bleiben frei. */
+.spinne__cell.is-empty .spinne__match { visibility: hidden; }
+.spinne__cell.is-empty::after, .spinne__cell.is-empty::before { display: none; }
+
+/* Website (dunkel): Linien etwas heller als die Kartenraender */
+body.page .spinne { --sp-line: #54566a; }
+
+/* Verwaltung (hell) */
+body.admin .spinne { --sp-line: #b9bcc4; }
+body.admin .spinne__match { background: #fff; }
+
+/* Kopf ueber dem Baum mit Druck-Link */
+.spinne-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem 1rem; }
+.spinne-head .print-link { font-size: .8rem; white-space: nowrap; }
+
+/* Druck (layouts/print): schwarz/weiss, eine Kategorie je Seite */
+.print-doc .spinne { --sp-line: #555; font-size: 8.5pt; min-width: 0; }
+.print-doc .spinne__label { color: #333; font-size: 7.5pt; }
+.print-doc .spinne__cell { min-height: 12mm; }
+.print-doc .spinne__match { background: #fff; }
+.print-doc .spinne__slot small, .print-doc .spinne__meta { color: #444; }
+.print-doc .spinne-page { page-break-after: always; break-after: page; display: flex; flex-direction: column; min-height: 182mm; }
+.print-doc .spinne-page:last-child { page-break-after: auto; break-after: auto; }
+.print-doc .spinne-page .spinne { flex: 1; }
+.print-doc .spinne-page h1 { font-size: 15pt; }
+/* Grosse Baeume (ab 16 Kaempfen in der ersten Runde) enger setzen, damit sie auf eine Seite passen */
+.print-doc .spinne--dense { font-size: 7pt; --sp-gap: 10px; }
+.print-doc .spinne--dense .spinne__cell { min-height: 10mm; padding-top: 1px; padding-bottom: 1px; }
+.print-doc .spinne--dense .spinne__slot { padding: .06rem .4rem; }
+.print-doc .spinne--dense .spinne__meta { padding: 0 .4rem; }
+@media screen { .print-doc .spinne-page { margin-bottom: 14mm; padding-bottom: 8mm; border-bottom: .3mm dashed #bbb; } }
+
+/* Zeile mit Druck-Links */
+.print-links { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .6rem; margin: .2rem 0 1.2rem; font-size: .9rem; }
