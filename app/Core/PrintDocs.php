@@ -17,7 +17,7 @@ final class PrintDocs
 {
     public const DOCS = ['spinne', 'running-order'];
 
-    /** Druckansicht ausgeben; Filter kommen aus der Adresse (?kat=, ?disziplin=, ?staette=, ?tag=). */
+    /** Druckansicht ausgeben; Filter kommen aus der Adresse (?kat=, CategoryFilter, ?staette=, ?tag=). */
     public static function display(array $event, string $doc): void
     {
         $eventId = (int) $event['id'];
@@ -34,7 +34,7 @@ final class PrintDocs
 
             View::display('admin/events/print-spinne', $data + [
                 'title'     => $event['name'] . ' – ' . t('Turnierbäume'),
-                'brackets'  => self::brackets($eventId, $kat, query('disziplin')),
+                'brackets'  => self::brackets($eventId, $kat, CategoryFilter::fromQuery()),
                 'landscape' => true,
             ], 'layouts/print');
 
@@ -55,16 +55,17 @@ final class PrintDocs
      *
      * @return list<array{category:array<string,mixed>,rounds:list<array{round:int,label:string,bouts:list<array<string,mixed>>}>}>
      */
-    public static function brackets(int $eventId, ?int $categoryId = null, string $discipline = ''): array
+    public static function brackets(int $eventId, ?int $categoryId = null, array $filter = []): array
     {
-        $out = [];
+        $out        = [];
+        $categories = array_values(array_filter(EventRepo::categories($eventId), static fn (array $c): bool => (int) $c['bout_count'] > 0));
 
-        foreach (EventRepo::categories($eventId) as $c) {
+        if ($filter !== []) {
+            $categories = CategoryFilter::apply($eventId, $categories, $filter);
+        }
+
+        foreach ($categories as $c) {
             if ($categoryId !== null && (int) $c['id'] !== $categoryId) {
-                continue;
-            }
-
-            if ($discipline !== '' && (string) $c['discipline'] !== $discipline) {
                 continue;
             }
 

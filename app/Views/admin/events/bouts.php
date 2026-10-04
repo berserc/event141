@@ -51,8 +51,23 @@ $entryOptions = static function (?int $selected = null) use ($entries): string {
         </div>
     </div>
 <?php else: ?>
-    <?php if ($categories === []): ?>
+    <?php if ($filterTotal === 0): ?>
         <div class="notice notice--warn"><?= t('Noch keine Kategorien – bitte zuerst unter <a href="%s">Kategorien</a> anlegen. Turnierbäume werden je Kategorie erzeugt.', e(url('/admin/events/' . $id . '/kategorien'))) ?></div>
+    <?php endif; ?>
+
+    <?php if ($filterTotal > 0): ?>
+        <?php
+        $filterAction = url('/admin/events/' . $id . '/kaempfe');
+        $filterShown  = count($categories);
+        $filterAktiv  = \App\Core\CategoryFilter::isActive($filter);
+        require dirname(__DIR__, 2) . '/partials/_category-filter.php';
+        ?>
+        <p class="print-links">
+            <a href="<?= e(url('/admin/events/' . $id . '/druck/spinne', \App\Core\CategoryFilter::query($filter))) ?>" target="_blank" rel="noopener">🖨 <?= e($filterAktiv ? t('Turnierbäume der Auswahl drucken / PDF') : t('Alle Turnierbäume drucken / PDF')) ?></a>
+        </p>
+        <?php if ($categories === []): ?>
+            <div class="notice"><?= e(t('Keine Kategorie passt zu diesem Filter.')) ?></div>
+        <?php endif; ?>
     <?php endif; ?>
 
     <?php foreach ($categories as $c): ?>
@@ -147,12 +162,12 @@ $entryOptions = static function (?int $selected = null) use ($entries): string {
                     <label for="b-title"><?= e(t('Bezeichnung')) ?></label>
                     <input id="b-title" name="title" placeholder="<?= e(t('Hauptkampf, Titelkampf, Superfight …')) ?>">
                 </div>
-                <?php if ($categories !== []): ?>
+                <?php if ($allCategories !== []): ?>
                     <div class="field field--grow">
                         <label for="b-cat"><?= e(t('Kategorie')) ?></label>
                         <select id="b-cat" name="category_id">
                             <option value=""><?= e(t('– keine –')) ?></option>
-                            <?php foreach ($categories as $c): ?>
+                            <?php foreach ($allCategories as $c): ?>
                                 <option value="<?= (int) $c['id'] ?>"><?= e($c['name']) ?></option>
                             <?php endforeach; ?>
                         </select>

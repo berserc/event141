@@ -29,7 +29,9 @@ final class BoutController
         AuthController::requireLogin();
 
         $event      = EventAdminController::load((int) ($args['id'] ?? 0));
-        $categories = EventRepo::categories((int) $event['id']);
+        $alle       = EventRepo::categories((int) $event['id']);
+        $filter     = \App\Core\CategoryFilter::fromQuery();
+        $categories = \App\Core\CategoryFilter::apply((int) $event['id'], $alle, $filter);
         $bouts      = BoutRepo::forEvent((int) $event['id']);
 
         // Turnier: Kaempfe je Kategorie nach Runden gruppieren.
@@ -43,6 +45,10 @@ final class BoutController
             'title'      => $event['name'] . ' – ' . ($event['type'] === 'gala' ? t('Fightcard') : t('Kämpfe')),
             'event'      => $event,
             'categories' => $categories,
+            'allCategories' => $alle,
+            'filter'        => $filter,
+            'filterOptions' => \App\Core\CategoryFilter::options($alle),
+            'filterTotal'   => count($alle),
             'bouts'      => $bouts,
             'byCategory' => $byCategory,
             'entries'    => EntryRepo::forEvent((int) $event['id'], ['status' => 'bestaetigt']),

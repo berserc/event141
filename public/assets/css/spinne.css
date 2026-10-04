@@ -81,3 +81,13 @@ body.admin .spinne__match { background: #fff; }
 
 /* Zeile mit Druck-Links */
 .print-links { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .6rem; margin: .2rem 0 1.2rem; font-size: .9rem; }
+
+/* Filterzeile ueber den Turnierbaeumen */
+.cat-filter { display: flex; flex-wrap: wrap; align-items: flex-end; gap: .6rem .8rem; margin: .2rem 0 1rem; padding: .8rem 1rem; border: 1px solid var(--line, #ccc); border-radius: var(--radius, 8px); background: var(--card, #fff); }
+.cat-filter label { display: flex; flex-direction: column; gap: .2rem; margin: 0; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft, #555); }
+.cat-filter select, .cat-filter input { min-width: 9rem; padding: .4rem .6rem; border: 1px solid var(--line, #bbb); border-radius: 6px; background: var(--bg-soft, #fff); color: var(--ink, #111); font: inherit; font-size: .9rem; font-weight: 400; text-transform: none; letter-spacing: 0; }
+.cat-filter__search { flex: 1 1 14rem; }
+.cat-filter__search input { width: 100%; }
+.cat-filter__reset { align-self: center; font-size: .85rem; }
+.cat-filter__count { margin-left: auto; align-self: center; font-size: .85rem; color: var(--ink-soft, #555); white-space: nowrap; }
+body.admin .cat-filter select, body.admin .cat-filter input { background: #fff; color: inherit; }

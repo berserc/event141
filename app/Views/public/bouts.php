@@ -29,15 +29,25 @@ use App\Models\EventRepo;
             </div>
         <?php endif; ?>
     <?php else: ?>
-        <?php if ($brackets === []): ?>
+        <?php
+        $filterAktiv = \App\Core\CategoryFilter::isActive($filter);
+        $filterQuery = \App\Core\CategoryFilter::query($filter);
+        ?>
+        <?php if ($filterTotal === 0): ?>
             <p class="muted"><?= e(t('Die Turnierbäume werden nach Anmeldeschluss erstellt.')) ?></p>
-        <?php endif; ?>
-
-        <?php if ($brackets !== []): ?>
+        <?php else: ?>
+            <?php
+            $filterAction = url('/e/' . $event['slug'] . '/kaempfe');
+            $filterShown  = count($brackets);
+            require dirname(__DIR__) . '/partials/_category-filter.php';
+            ?>
             <p class="print-links">
-                <a class="btn btn--ghost btn--on-dark btn--sm" href="<?= e(url('/e/' . $event['slug'] . '/druck/spinne')) ?>" target="_blank" rel="noopener">🖨 <?= e(t('Alle Turnierbäume drucken / PDF')) ?></a>
+                <a class="btn btn--ghost btn--on-dark btn--sm" href="<?= e(url('/e/' . $event['slug'] . '/druck/spinne', $filterQuery)) ?>" target="_blank" rel="noopener">🖨 <?= e($filterAktiv ? t('Auswahl drucken / PDF') : t('Alle Turnierbäume drucken / PDF')) ?></a>
                 <a class="btn btn--ghost btn--on-dark btn--sm" href="<?= e(url('/e/' . $event['slug'] . '/druck/running-order')) ?>" target="_blank" rel="noopener">🖨 <?= e(t('Running Order drucken / PDF')) ?></a>
             </p>
+            <?php if ($brackets === []): ?>
+                <p class="muted"><?= e(t('Kein Turnierbaum passt zu diesem Filter.')) ?></p>
+            <?php endif; ?>
         <?php endif; ?>
 
         <?php $boutBase = url('/e/' . $event['slug'] . '/kampf/'); $feeders = \App\Core\PrintDocs::feeders($bouts); ?>

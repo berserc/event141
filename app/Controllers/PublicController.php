@@ -155,9 +155,14 @@ final class PublicController
         $eventId = (int) $event['id'];
 
         $brackets = [];
+        $filter   = \App\Core\CategoryFilter::fromQuery();
+        $mitBaum  = [];
 
         if ($event['type'] === 'turnier') {
-            foreach (EventRepo::categories($eventId) as $c) {
+            // Nur Kategorien mit Kaempfen; der Filter (Disziplin, Altersklasse, Geschlecht, Suche) grenzt weiter ein.
+            $mitBaum = array_values(array_filter(EventRepo::categories($eventId), static fn (array $c): bool => (int) $c['bout_count'] > 0));
+
+            foreach (\App\Core\CategoryFilter::apply($eventId, $mitBaum, $filter) as $c) {
                 $rounds = Bracket::rounds((int) $c['id']);
 
                 if ($rounds !== []) {
@@ -173,6 +178,9 @@ final class PublicController
             'bouts'      => $bouts,
             'times'      => Timetable::compute($event, $bouts),
             'brackets'   => $brackets,
+            'filter'        => $filter,
+            'filterOptions' => \App\Core\CategoryFilter::options($mitBaum),
+            'filterTotal'   => count($mitBaum),
             'activePage' => 'event',
             'eventTab'   => 'kaempfe',
         ];

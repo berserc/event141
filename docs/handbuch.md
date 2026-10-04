@@ -236,6 +236,12 @@ Plätze zeigen „Sieger #12“ (Sieger des Kampfs Nr. 12), Freilose sind als so
 markiert. Zu finden auf der Website unter *Turnierplan* und in der Verwaltung
 unter *Kämpfe*.
 
+**Filter:** Über den Turnierbäumen steht eine Filterzeile – Disziplin,
+Altersklasse, Geschlecht und eine Suche nach Kategorie, Sportler oder Gym
+(„Wo startet mein Verein?“). Der Druck-Knopf daneben druckt dann genau diese
+Auswahl. Der Filter steht in der Adresse, ein gefilterter Turnierplan lässt
+sich also als Link weitergeben.
+
 **Drucken / PDF:** *Listen & Druck → Turnierbäume (Spinne)* druckt alle
 Kategorien, je Kategorie eine Seite im Querformat; der Knopf *Spinne drucken*
 bei einer Kategorie druckt nur diese. Auf der Website gibt es dieselben Knöpfe
