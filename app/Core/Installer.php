@@ -190,7 +190,52 @@ final class Installer
             'ticket141_slug'        => "TEXT NOT NULL DEFAULT ''",
             // Seit 0.9.2: Altersklassen nach Geburtsjahr (Verbandsregel) oder nach Alter am Wettkampftag.
             'age_mode'              => "TEXT NOT NULL DEFAULT 'jahrgang'",
+            // Seit 0.10.0: Verband/Land/Region und Eintrag im zentralen Verzeichnis.
+            'federation'            => "TEXT NOT NULL DEFAULT ''",
+            'country'               => "TEXT NOT NULL DEFAULT ''",
+            'region'                => "TEXT NOT NULL DEFAULT ''",
+            'directory_listed'      => 'INTEGER NOT NULL DEFAULT 0',
+            'directory_note'        => "TEXT NOT NULL DEFAULT ''",
         ]);
+
+        // Seit 0.10.0: Alter ohne Geburtsdatum zaehlt mit dem Kalenderjahr weiter.
+        $this->addColumns($pdo, 'athletes', ['age_year' => 'INTEGER']);
+        $pdo->exec("UPDATE athletes SET age_year = CAST(substr(COALESCE(updated_at, created_at, datetime('now')), 1, 4) AS INTEGER) WHERE age IS NOT NULL AND age_year IS NULL");
+        $pdo->exec("CREATE TRIGGER IF NOT EXISTS athletes_age_year_insert AFTER INSERT ON athletes WHEN NEW.age IS NOT NULL AND NEW.age_year IS NULL
+            BEGIN UPDATE athletes SET age_year = CAST(strftime('%Y', 'now') AS INTEGER) WHERE id = NEW.id; END");
+        $pdo->exec("CREATE TRIGGER IF NOT EXISTS athletes_age_year_update AFTER UPDATE OF age ON athletes WHEN NEW.age IS NOT OLD.age
+            BEGIN UPDATE athletes SET age_year = CASE WHEN NEW.age IS NULL THEN NULL ELSE CAST(strftime('%Y', 'now') AS INTEGER) END WHERE id = NEW.id; END");
+
+        // Seit 0.10.0: zentrales Verzeichnis (nur von der Verzeichnis-Instanz befuellt).
+        $pdo->exec(<<<'SQL'
+CREATE TABLE IF NOT EXISTS directory_events (
+    id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_url         TEXT    NOT NULL,                 -- Adresse der meldenden Instanz (https://verband.event141.com)
+    host               TEXT    NOT NULL,
+    slug               TEXT    NOT NULL,
+    name               TEXT    NOT NULL,
+    type               TEXT    NOT NULL DEFAULT 'turnier',
+    sport              TEXT    NOT NULL DEFAULT '',
+    federation         TEXT    NOT NULL DEFAULT '',
+    country            TEXT    NOT NULL DEFAULT '',
+    region             TEXT    NOT NULL DEFAULT '',
+    city               TEXT    NOT NULL DEFAULT '',
+    venue              TEXT    NOT NULL DEFAULT '',
+    starts_on          TEXT    NOT NULL,
+    ends_on            TEXT    NOT NULL DEFAULT '',
+    status             TEXT    NOT NULL DEFAULT '',
+    registration_open  INTEGER NOT NULL DEFAULT 0,
+    registration_until TEXT    NOT NULL DEFAULT '',
+    url                TEXT    NOT NULL,
+    image_url          TEXT    NOT NULL DEFAULT '',
+    org_name           TEXT    NOT NULL DEFAULT '',
+    state              TEXT    NOT NULL DEFAULT 'wartet',  -- sichtbar | wartet | versteckt
+    fetched_at         TEXT,
+    created_at         TEXT    NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (source_url, slug)
+);
+SQL);
+        $pdo->exec('CREATE INDEX IF NOT EXISTS idx_directory_dates ON directory_events(state, starts_on)');
         $this->addColumns($pdo, 'event_entries', [
             'medical_ok' => 'INTEGER NOT NULL DEFAULT 0',
             'music'      => "TEXT NOT NULL DEFAULT ''",

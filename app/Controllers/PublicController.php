@@ -34,9 +34,32 @@ final class PublicController
             }
         }
 
+        $eigene = \App\Core\EventCalendar::fromLocal(EventRepo::published());
+        $filter = \App\Core\EventCalendar::filterFromQuery();
+
+        // Zentrales Verzeichnis (event141.com): Produktseite + Kalender aller gemeldeten Events.
+        if (\App\Core\Directory::isDirectory()) {
+            $alle  = array_merge($eigene, \App\Core\EventCalendar::fromDirectory(\App\Core\Directory::visible()));
+            $heute = date('Y-m-d');
+
+            View::display('public/directory-home', [
+                'title'           => t('Event-Kalender'),
+                'metaDesc'        => t('Event141 – Turniere und Fight Nights im gemeinsamen Kalender: nach Sportart, Verband, Land und Region. Dazu die Software für Anmeldung, Turnierbaum, Zeitplan und Ergebnisse.'),
+                'calItems'        => $alle,
+                'calFilter'       => $filter,
+                'anzahlEvents'    => count(array_filter($alle, static fn (array $i): bool => (string) $i['ends_on'] >= $heute)),
+                'anzahlInstanzen' => count(array_unique(array_filter(array_column($alle, 'org')))),
+                'activePage'      => 'home',
+            ]);
+
+            return;
+        }
+
         View::display('public/home', [
             'title'      => '',
             'metaDesc'   => t('%s – Events, Turniere und Fight Nights: Termine, Kämpfe, Ergebnisse.', Setting::get('org_name')),
+            'calItems'   => $eigene,
+            'calFilter'  => $filter,
             'events'     => EventRepo::published(),
             'introTitle' => t(Setting::get('home_title', 'Unsere Events')),
             'introText'  => Setting::get('home_text', ''),
@@ -441,7 +464,18 @@ final class PublicController
 
     private function loadEvent(array $args): array
     {
-        $event = EventRepo::findBySlug($args['slug'] ?? '');
+        $slug  = (string) ($args['slug'] ?? '');
+        $event = EventRepo::findBySlug($slug);
+
+        // /<nummer> fuehrt auf das Event mit dieser Nummer
+        if ($event === null && ctype_digit($slug)) {
+            $perId = EventRepo::find((int) $slug);
+
+            if ($perId !== null && (int) $perId['published'] === 1) {
+                header('Location: ' . Url::to('/e/' . $perId['slug']), true, 302);
+                exit;
+            }
+        }
 
         if ($event === null || ((int) $event['published'] !== 1 && !\App\Core\Auth::check())) {
             $this->notFound();

@@ -41,7 +41,7 @@ $err = static fn (string $f): string => isset($errors[$f]) ? '<p class="field__e
 </div>
 <div class="field"><label for="bio"><?= e(t('Bio')) ?> <small><?= e(t('(Kampf-Detailseite)')) ?></small></label><textarea id="bio" name="bio" rows="4"<?= $dis ?>><?= e($athlete['bio'] ?? '') ?></textarea></div>
 <div class="field-row">
-    <div class="field field--xs"><label for="age"><?= e(t('Alter')) ?> <small><?= e(t('(ohne Geb.-Datum)')) ?></small></label><input id="age" name="age" type="number" min="0" value="<?= e((string) ($athlete['age'] ?? '')) ?>"<?= $dis ?>></div>
+    <div class="field field--xs"><label for="age"><?= e(t('Alter')) ?> <small><?= e(t('(ohne Geb.-Datum)')) ?></small></label><input id="age" name="age" type="number" min="0" value="<?= e((string) (athlete_age(null, $athlete['age'] ?? null, $athlete['age_year'] ?? null) ?? '')) ?>"<?= $dis ?>></div>
     <div class="field field--grow">
         <label for="video"><?= e(t('Kämpfer-Video')) ?> <small><?= e(t('(MP4/WebM, stumm, max. 100 MB – animierte Fightcard)')) ?></small></label>
         <?php if (($athlete['video_path'] ?? '') !== ''): ?>

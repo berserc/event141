@@ -161,6 +161,26 @@ function birth_years(?int $ageMin, ?int $ageMax, int $year): string
     return $ageMax !== null ? t('Jg. %d und jünger', $year - $ageMax) : '';
 }
 
+/**
+ * Alter eines Sportlers heute: aus dem Geburtsdatum, sonst aus dem
+ * eingetragenen Alter – das zaehlt mit jedem Kalenderjahr weiter
+ * ($ageYear = Jahr der Eintragung).
+ */
+function athlete_age(?string $birthdate, mixed $age, mixed $ageYear = null): ?int
+{
+    if ($birthdate !== null && trim($birthdate) !== '') {
+        return age_from($birthdate);
+    }
+
+    if ($age === null || $age === '') {
+        return null;
+    }
+
+    $jahr = (int) $ageYear;
+
+    return (int) $age + ($jahr > 0 ? max(0, (int) date('Y') - $jahr) : 0);
+}
+
 /** Aktuelle Sprache der Oberflaeche ("de", "en"). */
 function lang(): string
 {

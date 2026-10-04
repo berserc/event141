@@ -90,6 +90,12 @@ final class ApiController
         ]);
     }
 
+    /** Nur die Eckdaten eines Events – das holt sich das zentrale Verzeichnis ab. */
+    public function info(array $args): void
+    {
+        $this->json(['event' => $this->eventJson($this->loadEvent($args))]);
+    }
+
     /** Fightcard im fights.json-Format der NAFN-Website (Kopplung bestehender Event-Seiten). */
     public function fightcard(array $args): void
     {
@@ -536,6 +542,15 @@ final class ApiController
             'tickets_url' => self::ticketsUrl($e),
             'poster_url' => $e['poster_path'] !== '' ? Fightcard::requestBase() . upload_url((string) $e['poster_path']) : null,
             'url'        => Fightcard::requestBase() . url('/e/' . $e['slug']),
+            // Angaben fuer Kalender und zentrales Verzeichnis
+            'federation' => (string) ($e['federation'] ?? ''),
+            'country'    => (string) ($e['country'] ?? ''),
+            'region'     => (string) ($e['region'] ?? ''),
+            'city'       => (string) $e['venue_city'],
+            'venue_name' => (string) $e['venue_name'],
+            'registration_until' => (string) ($e['registration_until'] ?? ''),
+            'org'        => \App\Models\Setting::get('org_name'),
+            'directory'  => (int) ($e['directory_listed'] ?? 0) === 1,
         ];
     }
 

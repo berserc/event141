@@ -376,6 +376,10 @@ final class EventAdminController
 
         Database::run('DELETE FROM events WHERE id = ?', [$id]);
         Audit::log('event_deleted', 'event', $id, (string) $event['name']);
+
+        if ((string) ($event['directory_note'] ?? '') !== '') {
+            \App\Core\Directory::forget((string) $event['slug']);   // Eintrag im zentralen Verzeichnis entfernen
+        }
         Flash::success(t('Event „%s“ samt Anmeldungen und Kämpfen gelöscht.', $event['name']));
         Url::redirect('/admin/events');
     }
@@ -395,6 +399,7 @@ final class EventAdminController
             'short_name' => '', 'live_mode' => 0, 'default_bout_minutes' => 12, 'default_break_minutes' => 15,
             'show_countdown' => 1, 'show_map' => 1, 'location_note' => '', 'min_age_note' => '', 'ticket_note' => '',
             'tickets_json' => '[]', 'social_json' => '{}', 'ticket141_slug' => '', 'age_mode' => 'jahrgang',
+            'federation' => '', 'country' => '', 'region' => '', 'directory_listed' => 0, 'directory_note' => '',
         ];
     }
 
@@ -483,6 +488,10 @@ final class EventAdminController
             'social_json'           => self::socialFromPost(),
             'ticket141_slug'        => mb_substr(trim(post('ticket141_slug')), 0, 120),
             'age_mode'              => post('age_mode') === 'stichtag' ? 'stichtag' : 'jahrgang',
+            'federation'            => mb_substr(trim(post('federation')), 0, 80),
+            'country'               => preg_match('/^[A-Za-z]{2}$/', trim(post('country'))) === 1 ? strtoupper(trim(post('country'))) : '',
+            'region'                => mb_substr(trim(post('region')), 0, 80),
+            'directory_listed'      => post_bool('directory_listed'),
         ];
 
         return [$data, $errors];

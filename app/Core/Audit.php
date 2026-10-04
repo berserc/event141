@@ -38,6 +38,7 @@ final class Audit
         // gekoppelten Systeme (nach dem Absenden der Antwort).
         if ($entity === 'event' && $entityId !== null && $action !== 'event_deleted') {
             Webhook::queue($entityId);
+            Directory::queue($entityId);   // zentrales Verzeichnis (nur wenn das Event dort gelistet ist/war)
         }
     }
 

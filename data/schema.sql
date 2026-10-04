@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS athletes (
     note             TEXT    NOT NULL DEFAULT '',
     active           INTEGER NOT NULL DEFAULT 1,
     age              INTEGER,                         -- Alter, falls kein Geburtsdatum bekannt
+    age_year         INTEGER,                         -- Jahr, in dem das Alter eingetragen wurde (zaehlt jedes Jahr mit)
     bio              TEXT    NOT NULL DEFAULT '',
     video_path       TEXT    NOT NULL DEFAULT '',     -- MP4/WebM fuer die animierte Fightcard
     media_mode       TEXT    NOT NULL DEFAULT 'photo', -- photo | video | both
@@ -188,6 +189,11 @@ CREATE TABLE IF NOT EXISTS events (
     belt_path          TEXT    NOT NULL DEFAULT '',       -- Bild des Titelguertels (Titelkaempfe)
     ticket141_slug     TEXT    NOT NULL DEFAULT '',       -- Kuerzel des gekoppelten Ticket141-Events
     age_mode           TEXT    NOT NULL DEFAULT 'jahrgang', -- Altersklassen nach Geburtsjahr (jahrgang) oder Alter am Wettkampftag (stichtag)
+    federation         TEXT    NOT NULL DEFAULT '',       -- Verband (WAKO, World Boxing, IFMA …)
+    country            TEXT    NOT NULL DEFAULT '',       -- Land des Austragungsorts (ISO-2)
+    region             TEXT    NOT NULL DEFAULT '',       -- Bundesland / Region
+    directory_listed   INTEGER NOT NULL DEFAULT 0,        -- im zentralen Event141-Verzeichnis listen
+    directory_note     TEXT    NOT NULL DEFAULT '',       -- Ergebnis der letzten Meldung ans Verzeichnis
     created_by         INTEGER REFERENCES users(id),
     created_at         TEXT    NOT NULL DEFAULT (datetime('now')),
     updated_at         TEXT    NOT NULL DEFAULT (datetime('now'))
@@ -369,6 +375,34 @@ CREATE TABLE IF NOT EXISTS api_keys (
     last_used_at TEXT,
     created_by   INTEGER REFERENCES users(id),
     created_at   TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Zentrales Verzeichnis (event141.com): von Instanzen gemeldete Events.
+CREATE TABLE IF NOT EXISTS directory_events (
+    id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_url         TEXT    NOT NULL,                 -- Adresse der meldenden Instanz (https://verband.event141.com)
+    host               TEXT    NOT NULL,
+    slug               TEXT    NOT NULL,
+    name               TEXT    NOT NULL,
+    type               TEXT    NOT NULL DEFAULT 'turnier',
+    sport              TEXT    NOT NULL DEFAULT '',
+    federation         TEXT    NOT NULL DEFAULT '',
+    country            TEXT    NOT NULL DEFAULT '',
+    region             TEXT    NOT NULL DEFAULT '',
+    city               TEXT    NOT NULL DEFAULT '',
+    venue              TEXT    NOT NULL DEFAULT '',
+    starts_on          TEXT    NOT NULL,
+    ends_on            TEXT    NOT NULL DEFAULT '',
+    status             TEXT    NOT NULL DEFAULT '',
+    registration_open  INTEGER NOT NULL DEFAULT 0,
+    registration_until TEXT    NOT NULL DEFAULT '',
+    url                TEXT    NOT NULL,
+    image_url          TEXT    NOT NULL DEFAULT '',
+    org_name           TEXT    NOT NULL DEFAULT '',
+    state              TEXT    NOT NULL DEFAULT 'wartet',  -- sichtbar | wartet | versteckt
+    fetched_at         TEXT,
+    created_at         TEXT    NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (source_url, slug)
 );
 
 -- Ausgehende Webhooks: bei Aenderungen an einem Event wird die URL per POST

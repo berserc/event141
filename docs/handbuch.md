@@ -312,6 +312,35 @@ angezeigt. Details in `docs/api.md`.
 
 ---
 
+## Kalender, kurze Adressen und das Event141-Verzeichnis
+
+**Kalender des Veranstalters.** Die Startseite einer Instanz ist der Kalender
+aller veröffentlichten Events – als Liste oder Monatskalender, mit Filtern
+nach Sportart, Verband, Land, Region, Art und Zeitraum und einer Suche. Ein
+Verband führt so alle seine Turniere unter einer Adresse. (Ist unter
+*Einstellungen → Startseite* ein einzelnes Event gewählt, zeigt die Startseite
+stattdessen dieses Event.)
+
+**Kurze Adressen.** Jedes Event liegt direkt unter der Adresse der Instanz:
+`verband.event141.com/turniername` (auch `…/3` mit der Event-Nummer). Die
+früheren Adressen mit `/e/` leiten dauerhaft dorthin um.
+
+**Event141-Verzeichnis.** Unter *Grunddaten → Kalender & Verzeichnis* stehen
+Verband, Land und Region sowie der Haken **„Im Event141-Verzeichnis listen“**.
+Ist er gesetzt und das Event veröffentlicht, erscheint es im gemeinsamen
+Kalender auf event141.com – mit Name, Datum, Ort, Sportart, Verband und einem
+Link zurück zur eigenen Seite. Das Verzeichnis holt sich die Angaben selbst von
+der Instanz ab und hält sie aktuell; Haken entfernen oder Event löschen nimmt
+den Eintrag wieder heraus. Unter dem Haken steht, ob die Meldung angekommen
+ist. Instanzen auf eigenen Domains werden vom Verzeichnis einmalig freigegeben.
+
+**Alter und neues Jahr.** Jahrgänge und Altersklassen werden bei jedem Aufruf
+aus dem Wettkampfjahr berechnet – ein kopiertes oder verschobenes Turnier zeigt
+sofort die Jahrgänge des neuen Jahres. Ein Alter, das ohne Geburtsdatum
+eingetragen wurde, zählt mit jedem Kalenderjahr automatisch um eins weiter.
+
+---
+
 ## Sprache (Deutsch / Englisch)
 
 Website, Gym-Bereich und Verwaltung gibt es auf Deutsch und Englisch. Oben

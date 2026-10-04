@@ -114,16 +114,19 @@ $public = new PublicController();
 
 if ($publicSite) {
     $router->get('/', [$public, 'home']);
-    $router->get('/e/{slug}', [$public, 'event']);
-    $router->get('/e/{slug}/kaempfe', [$public, 'bouts']);
-    $router->get('/e/{slug}/kampf/{id}', [$public, 'fight']);
-    $router->get('/e/{slug}/zeitplan', [$public, 'schedule']);
-    $router->get('/e/{slug}/druck/{doc}', [$public, 'printDoc']);
-    $router->get('/e/{slug}/teilnehmer', [$public, 'entries']);
-    $router->get('/e/{slug}/ergebnisse', [$public, 'results']);
-    $router->get('/e/{slug}/bericht', [$public, 'report']);
-    $router->get('/e/{slug}/galerie', [$public, 'galleries']);
-    $router->get('/e/{slug}/galerie/{gslug}', [$public, 'gallery']);
+    // Events liegen direkt unter /<kuerzel> (siehe ganz unten). Die frueheren
+    // Adressen /e/<kuerzel>/… leiten dauerhaft dorthin um.
+    $kurz = static function (): void {
+        $basis = rtrim((string) Config::get('base_path', ''), '/');
+        $ziel  = preg_replace('#^' . preg_quote($basis, '#') . '/e/#', $basis . '/', (string) ($_SERVER['REQUEST_URI'] ?? '/'), 1);
+
+        header('Location: ' . $ziel, true, 301);
+        exit;
+    };
+
+    foreach (['', '/kaempfe', '/kampf/{id}', '/zeitplan', '/druck/{doc}', '/teilnehmer', '/ergebnisse', '/bericht', '/galerie', '/galerie/{gslug}'] as $suffix) {
+        $router->get('/e/{slug}' . $suffix, $kurz);
+    }
     $router->get('/sitemap.xml', [$public, 'sitemap']);
 } else {
     $router->get('/', static fn () => Url::redirect('/admin'));
@@ -145,6 +148,7 @@ $api = new ApiController();
 $router->get('/api/events', [$api, 'events']);
 $router->get('/api/event/{slug}', [$api, 'event']);
 $router->get('/api/event/{slug}/live', [$api, 'live']);
+$router->get('/api/event/{slug}/info', [$api, 'info']);
 $router->get('/api/event/{slug}/fightcard', [$api, 'fightcard']);
 
 // Plattform-API v1 (mit API-Schluessel: auch Entwuerfe lesen, schreiben, Gym-Endpunkte)
@@ -359,6 +363,25 @@ $router->post('/admin/api/schluessel/{id}/loeschen', [$apiAdmin, 'deleteKey']);
 $router->post('/admin/api/webhook', [$apiAdmin, 'createWebhook']);
 $router->post('/admin/api/webhook/{id}/test', [$apiAdmin, 'testWebhook']);
 $router->post('/admin/api/webhook/{id}/loeschen', [$apiAdmin, 'deleteWebhook']);
+
+// Zentrales Verzeichnis: Meldungen der Instanzen + Verwaltung der Eintraege.
+$directory = new App\Controllers\DirectoryController();
+
+$router->post('/api/directory/ping', [$directory, 'ping']);
+$router->get('/admin/verzeichnis', [$directory, 'index']);
+$router->post('/admin/verzeichnis/aktualisieren', [$directory, 'refresh']);
+$router->post('/admin/verzeichnis/{id}', [$directory, 'action']);
+
+// Events direkt unter /<kuerzel> – kurze Adressen im Kalender eines Verbands
+// (verband.event141.com/turniername). Muss nach allen festen Routen stehen.
+if ($publicSite) {
+    foreach ([
+        '' => 'event', '/kaempfe' => 'bouts', '/kampf/{id}' => 'fight', '/zeitplan' => 'schedule', '/druck/{doc}' => 'printDoc',
+        '/teilnehmer' => 'entries', '/ergebnisse' => 'results', '/bericht' => 'report', '/galerie' => 'galleries', '/galerie/{gslug}' => 'gallery',
+    ] as $suffix => $methode) {
+        $router->get('/{slug}' . $suffix, [$public, $methode]);
+    }
+}
 
 $router->notFound([$public, 'notFound']);
 

@@ -15,6 +15,12 @@ final class Url
     {
         $base = rtrim((string) Config::get('base_path', ''), '/');
         $path = '/' . ltrim($path, '/');
+
+        // Event-Seiten liegen direkt unter /<kuerzel>; im Code heissen sie weiter /e/<kuerzel>.
+        if (str_starts_with($path, '/e/')) {
+            $path = substr($path, 2);
+        }
+
         $url  = $base . ($path === '/' ? '/' : rtrim($path, '/'));
 
         $query = array_filter($query, static fn ($v): bool => $v !== null && $v !== '');

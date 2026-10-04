@@ -127,6 +127,25 @@ php -S localhost:8124 -t public public/router.php
 6. Am Wettkampftag: **Ringansicht** je Ring – Kämpfe starten, Ergebnisse eintragen.
    Sieger rücken automatisch auf; die Website zeigt Live-Status und Ergebnisse.
 
+## Kalender und zentrales Verzeichnis
+
+Die Startseite einer Instanz ist der **Event-Kalender** des Veranstalters
+(Liste oder Monatsblatt, Filter nach Sportart, Verband, Land, Region, Art,
+Zeitraum). Events liegen unter kurzen Adressen: `instanz/<kürzel>`.
+
+Events mit dem Haken „Im Event141-Verzeichnis listen“ meldet die Instanz an
+das zentrale Verzeichnis (`directory_url`, Vorgabe `https://event141.com`;
+leer = abgeschaltet). Das Verzeichnis holt die Eckdaten selbst über
+`GET /api/event/<kürzel>/info` ab – gelistet wird nur, was unter der gemeldeten
+Adresse wirklich erreichbar und freigegeben ist.
+
+Eine Installation wird selbst zum Verzeichnis mit `'directory' => true` in
+`app/config.php`: Startseite = Produktseite + Kalender aller gemeldeten Events,
+Verwaltung → *Verzeichnis* zum Freigeben/Verstecken. Instanzen unter
+`directory_trusted` (Vorgabe `['.event141.com']`) erscheinen sofort, andere
+nach Freigabe. `php bin/directory-refresh.php` (Cron, z. B. stündlich) hält die
+Einträge aktuell.
+
 ## Sprachen
 
 Die Oberfläche (Website, Gym-Bereich, Verwaltung) ist zwischen **Deutsch und

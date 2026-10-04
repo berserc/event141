@@ -17,7 +17,7 @@ $lblBeginn = t('Beginn');
 
 $corner = static function (string $side) use ($bout): array {
     $birth = $bout[$side . '_birth'] ?? null;
-    $age   = $birth ? age_from((string) $birth) : ($bout[$side . '_age'] !== null ? (int) $bout[$side . '_age'] : null);
+    $age   = athlete_age($birth !== null ? (string) $birth : null, $bout[$side . '_age'] ?? null, $bout[$side . '_age_year'] ?? null);
 
     return [
         'name'   => BoutRepo::cornerName($bout, $side) ?: 'TBA',

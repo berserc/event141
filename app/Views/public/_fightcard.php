@@ -55,7 +55,7 @@ $resultText = static function (array $b): string {
 $ageOf = static function (array $b, string $s): ?int {
     $birth = $b[$s . '_birth'] ?? null;
 
-    return $birth ? age_from((string) $birth) : ($b[$s . '_age'] !== null ? (int) $b[$s . '_age'] : null);
+    return athlete_age($birth !== null ? (string) $birth : null, $b[$s . '_age'] ?? null, $b[$s . '_age_year'] ?? null);
 };
 
 // Bilanz + Alter als goldene Chips (wie nafn.at)

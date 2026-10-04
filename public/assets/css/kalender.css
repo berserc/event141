@@ -1,0 +1,89 @@
+/* ==========================================================================
+   Event141 – Event-Kalender (Liste + Monatsblatt) und Startseite des
+   zentralen Verzeichnisses (event141.com).
+   ========================================================================== */
+
+.event-cal { margin: 1rem 0 2.5rem; scroll-margin-top: 5rem; }
+.cal-views { display: inline-flex; margin-left: auto; align-self: center; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; font-size: .85rem; white-space: nowrap; }
+.cal-views a { padding: .35rem .8rem; color: var(--ink-soft); text-decoration: none; }
+.cal-views a[aria-current] { background: var(--accent); color: #fff; font-weight: 700; }
+
+/* Liste */
+.cal-list { display: grid; gap: .5rem; }
+.cal-list__month { margin: 1.2rem 0 .1rem; font-size: .85rem; text-transform: uppercase; letter-spacing: .14em; color: var(--accent-bright); border-bottom: 1px solid var(--line); padding-bottom: .35rem; }
+.cal-row { display: grid; grid-template-columns: 10.5rem minmax(0, 2.2fr) minmax(0, 1.3fr) auto; gap: .9rem; align-items: center; padding: .7rem 1rem; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); color: var(--ink); text-decoration: none; transition: border-color .15s, transform .15s; }
+.cal-row:hover { border-color: var(--accent); transform: translateX(3px); color: var(--ink); }
+.cal-row span { min-width: 0; }
+.cal-row strong { display: block; overflow-wrap: anywhere; }
+.cal-row small { display: block; color: var(--ink-soft); font-size: .8rem; }
+.cal-row__date strong { color: var(--accent-bright); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cal-row__main strong { font-size: 1.05rem; text-transform: uppercase; letter-spacing: .02em; }
+.cal-row__state { display: flex; flex-direction: column; align-items: flex-end; gap: .25rem; }
+.cal-badge { display: inline-block; padding: .15rem .6rem; border: 1px solid var(--line); border-radius: 999px; font-size: .75rem; color: var(--ink-soft); white-space: nowrap; }
+.cal-badge--open { border-color: #2a9d8f; color: #5fd3c4; }
+
+@media (max-width: 760px) {
+    .cal-row { grid-template-columns: 1fr; gap: .25rem; }
+    .cal-row__state { flex-direction: row; align-items: center; }
+    .cal-views { margin-left: 0; }
+}
+
+/* Monatsblatt */
+.cal-month__head { display: flex; align-items: center; justify-content: center; gap: 1rem; margin: .4rem 0 .8rem; }
+.cal-month__head h3 { margin: 0; min-width: 12rem; text-align: center; text-transform: uppercase; letter-spacing: .08em; }
+.cal-month { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.cal-month__wd { padding: .35rem .5rem; background: var(--bg-soft); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-soft); text-align: center; }
+.cal-day { min-height: 6.2rem; padding: .3rem .35rem .4rem; background: var(--card); display: flex; flex-direction: column; gap: .2rem; }
+.cal-day.is-out { background: var(--bg-soft); }
+.cal-day.is-out .cal-day__no { opacity: .4; }
+.cal-day.is-today .cal-day__no { color: var(--accent-bright); font-weight: 800; }
+.cal-day__no { font-size: .8rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.cal-day__no small { display: none; }
+.cal-chip { display: block; padding: .15rem .4rem; border-radius: 5px; border-left: 3px solid var(--accent); background: rgba(230, 57, 70, .14); color: var(--ink); font-size: .75rem; line-height: 1.25; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-chip--turnier { border-left-color: #2a9d8f; background: rgba(42, 157, 143, .16); }
+.cal-chip small { color: var(--ink-soft); }
+.cal-chip:hover { color: var(--accent-bright); }
+
+@media (max-width: 760px) {
+    /* Auf dem Handy: nur Tage mit Events, untereinander */
+    .cal-month { display: block; background: none; border: 0; }
+    .cal-month__wd, .cal-day.is-empty, .cal-day.is-out { display: none; }
+    .cal-day { min-height: 0; margin-bottom: .5rem; border: 1px solid var(--line); border-radius: var(--radius); }
+    .cal-day__no { font-size: .9rem; font-weight: 700; }
+    .cal-day__no small { display: inline; font-size: 1em; }
+    .cal-day__no { font-size: 0; }
+    .cal-day__no small { font-size: .9rem; }
+    .cal-chip { white-space: normal; font-size: .9rem; padding: .3rem .5rem; }
+}
+
+/* ------------------------------------------------ Startseite event141.com -- */
+.lp-hero { padding: 3.2rem 0 2.2rem; background: radial-gradient(1200px 400px at 20% -10%, rgba(230, 57, 70, .22), transparent 60%), var(--bg); border-bottom: 1px solid var(--line); }
+.lp-hero__kicker { color: var(--accent-bright); font-weight: 800; letter-spacing: .16em; text-transform: uppercase; font-size: .8rem; margin: 0 0 .5rem; }
+.lp-hero h1 { font-size: clamp(2rem, 1.2rem + 3.4vw, 3.6rem); line-height: 1.05; margin: 0 0 .8rem; text-transform: uppercase; letter-spacing: .01em; }
+.lp-hero p.lead { max-width: 62ch; font-size: 1.15rem; color: var(--ink-soft); margin: 0 0 1.4rem; }
+.lp-actions { display: flex; flex-wrap: wrap; gap: .7rem; }
+.lp-stats { display: flex; flex-wrap: wrap; gap: 1.6rem; margin-top: 1.8rem; color: var(--ink-soft); font-size: .9rem; }
+.lp-stats b { display: block; font-size: 1.6rem; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.lp-section { padding: 2.6rem 0 1rem; }
+.lp-section > .wrap > h2 { text-transform: uppercase; letter-spacing: .04em; margin: 0 0 .3rem; }
+.lp-section .lp-sub { color: var(--ink-soft); max-width: 70ch; margin: 0 0 1.4rem; }
+.lp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+.lp-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 1.1rem 1.2rem; }
+.lp-card h3 { margin: 0 0 .4rem; font-size: 1.05rem; text-transform: uppercase; letter-spacing: .04em; color: var(--accent-bright); }
+.lp-card p { margin: 0; color: var(--ink-soft); font-size: .95rem; }
+.lp-steps { counter-reset: schritt; }
+.lp-steps .lp-card { position: relative; padding-top: 2.6rem; }
+.lp-steps .lp-card::before { counter-increment: schritt; content: counter(schritt); position: absolute; top: .9rem; left: 1.2rem; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 800; display: grid; place-items: center; font-size: .9rem; }
+.lp-shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+.lp-shots figure { margin: 0; }
+.lp-shots img { display: block; width: 100%; height: auto; border-radius: var(--radius); border: 1px solid var(--line); }
+.lp-shots figcaption { margin-top: .4rem; font-size: .85rem; color: var(--ink-soft); }
+.lp-price { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; max-width: 760px; }
+.lp-price .lp-card.is-pro { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.lp-price__amount { font-size: 2rem; font-weight: 900; color: var(--ink); margin: .2rem 0 .1rem; }
+.lp-price__amount small { font-size: .9rem; font-weight: 400; color: var(--ink-soft); }
+.lp-price ul { margin: .7rem 0 0; padding-left: 1.1rem; color: var(--ink-soft); font-size: .95rem; }
+.lp-cta { margin: 2.4rem 0 3rem; padding: 1.6rem; text-align: center; background: linear-gradient(160deg, rgba(230, 57, 70, .18), var(--card) 55%); border: 1px solid var(--accent); border-radius: var(--radius-lg); }
+.lp-cta h2 { margin: 0 0 .4rem; text-transform: uppercase; }
+.lp-cta p { color: var(--ink-soft); margin: 0 0 1rem; }

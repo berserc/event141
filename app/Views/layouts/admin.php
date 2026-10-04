@@ -41,6 +41,9 @@ $nav = [
         ['/admin/events', 'Events', null, 'calendar'],
         ['/admin/regelsaetze', 'Regelsätze', null, 'list'],
     ],
+    'Verzeichnis' => \App\Core\Directory::isDirectory() ? [
+        ['/admin/verzeichnis', 'Gemeldete Events', 'superuser', 'calendar'],
+    ] : [],
     'Teilnehmer' => [
         ['/admin/gyms', 'Gyms & Vereine', null, 'flag'],
         ['/admin/sportler', 'Sportler', null, 'users'],

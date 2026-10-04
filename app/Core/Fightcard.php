@@ -180,7 +180,7 @@ final class Fightcard
 
         $nick = (string) $b[$s . '_nick'];
         $name = trim($b[$s . '_first'] . ($nick !== '' ? ' "' . $nick . '" ' : ' ') . $b[$s . '_last']);
-        $age  = $b[$s . '_birth'] ? age_from((string) $b[$s . '_birth']) : ($b[$s . '_age'] !== null ? (int) $b[$s . '_age'] : null);
+        $age  = athlete_age($b[$s . '_birth'] ?? null, $b[$s . '_age'] ?? null, $b[$s . '_age_year'] ?? null);
 
         return [
             'athleteId' => (int) $b[$s . '_athlete_id'],

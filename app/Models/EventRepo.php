@@ -28,6 +28,12 @@ final class EventRepo
         'w'    => 'weiblich',
     ];
 
+    /** Erste Pfadsegmente, die die Anwendung selbst braucht (kein Event-Kuerzel). */
+    public const RESERVED_SLUGS = [
+        'admin', 'gym', 'api', 'e', 'seite', 'assets', 'uploads', 'health', 'setup', 'sitemap', 'robots',
+        'index', 'fight', 'bericht', 'galerie', 'impressum', 'kalender', 'verzeichnis', 'events', 'event',
+    ];
+
     /** Wonach richten sich die Altersklassen? */
     public const AGE_MODES = [
         'jahrgang' => 'Geburtsjahr (Jahrgang) – Alter = Wettkampfjahr minus Geburtsjahr',
@@ -125,6 +131,12 @@ final class EventRepo
     public static function uniqueSlug(string $slug, ?int $ignoreId = null): string
     {
         $base = $slug !== '' ? $slug : 'event';
+
+        // Events liegen unter /<kuerzel> – feste Bereiche der Anwendung duerfen nicht ueberdeckt werden.
+        if (in_array($base, self::RESERVED_SLUGS, true) || ctype_digit($base)) {
+            $base .= '-event';
+        }
+
         $try  = $base;
         $n    = 2;
 

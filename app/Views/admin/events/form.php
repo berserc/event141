@@ -252,6 +252,39 @@ if ($isNew): ?>
         </fieldset>
 
         <fieldset class="card">
+            <legend><?= e(t('Kalender & Verzeichnis')) ?></legend>
+
+            <div class="field-row">
+                <div class="field field--grow">
+                    <label for="federation"><?= e(t('Verband')) ?></label>
+                    <input id="federation" name="federation" list="verbaende" value="<?= e((string) ($event['federation'] ?? '')) ?>" placeholder="WAKO, World Boxing, IFMA …"<?= $ro ?>>
+                    <datalist id="verbaende"><?php foreach (\App\Core\EventCalendar::FEDERATIONS as $vb): ?><option value="<?= e($vb) ?>"></option><?php endforeach; ?></datalist>
+                </div>
+                <div class="field field--xs">
+                    <label for="country"><?= e(t('Land')) ?> <small>(ISO)</small></label>
+                    <input id="country" name="country" maxlength="2" list="laender" value="<?= e((string) ($event['country'] ?? '')) ?>" placeholder="AT"<?= $ro ?>>
+                    <datalist id="laender"><?php foreach (\App\Core\EventCalendar::COUNTRIES as $iso => $land): ?><option value="<?= e($iso) ?>"><?= e(t($land)) ?></option><?php endforeach; ?></datalist>
+                </div>
+                <div class="field field--grow">
+                    <label for="region"><?= e(t('Region / Bundesland')) ?></label>
+                    <input id="region" name="region" value="<?= e((string) ($event['region'] ?? '')) ?>" placeholder="<?= e(t('Steiermark')) ?>"<?= $ro ?>>
+                </div>
+            </div>
+            <p class="field__hint"><?= e(t('Sportart (oben), Verband, Land und Region sind die Filter im Kalender – auf der eigenen Startseite und im Event141-Verzeichnis.')) ?></p>
+
+            <?php if (!\App\Core\Directory::isDirectory() && \App\Core\Directory::url() !== ''): ?>
+                <label class="check">
+                    <input type="checkbox" name="directory_listed" value="1" <?= (int) ($event['directory_listed'] ?? 0) === 1 ? 'checked' : '' ?><?= $ro ?>>
+                    <?= t('Im Event141-Verzeichnis listen (<a href="%1$s" target="_blank" rel="noopener">%2$s</a>)', e(\App\Core\Directory::url()), e((string) parse_url(\App\Core\Directory::url(), PHP_URL_HOST))) ?>
+                </label>
+                <p class="field__hint">
+                    <?= e(t('Das veröffentlichte Event erscheint mit Name, Datum, Ort, Sportart und Verband im gemeinsamen Kalender aller Veranstalter und verlinkt hierher. Haken entfernen = Eintrag verschwindet wieder.')) ?>
+                    <?php if ((string) ($event['directory_note'] ?? '') !== ''): ?><br><strong><?= e((string) $event['directory_note']) ?></strong><?php endif; ?>
+                </p>
+            <?php endif; ?>
+        </fieldset>
+
+        <fieldset class="card">
             <legend><?= e(t('Website')) ?></legend>
 
             <label class="check">
