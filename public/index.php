@@ -232,6 +232,8 @@ $evMedia = new App\Controllers\EventMediaController();
 $router->get('/admin/medien',                                  [$medien, 'index']);
 $router->post('/admin/medien/hochladen',                       [$medien, 'upload']);
 $router->post('/admin/medien/sammel',                          [$medien, 'bulk']);
+$router->post('/admin/medien/{id}/ki-text',                    [$medien, 'aiDescribe']);
+$router->post('/admin/medien/{id}/ki-zuschnitt',               [$medien, 'aiCrop']);
 $router->post('/admin/medien/{id}',                            [$medien, 'update']);
 $router->get('/admin/events/{id}/galerie',                     [$evMedia, 'index']);
 $router->post('/admin/events/{id}/bericht',                    [$evMedia, 'saveReport']);

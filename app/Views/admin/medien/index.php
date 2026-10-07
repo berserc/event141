@@ -1,7 +1,11 @@
 <?php
 
+use App\Core\Ai;
+use App\Core\AiImage;
+
 /**
- * Bildbibliothek: Upload, Suche/Tag-Filter, Bearbeiten je Bild, Sammelaktionen.
+ * Bildbibliothek: Upload, Suche/Tag-Filter, Bearbeiten je Bild, Sammelaktionen,
+ * KI-Bildassistent (Bildtext/Tags, Zuschnitt aufs Zielformat).
  *
  * @var list<array<string,mixed>> $images
  * @var int                        $total
@@ -9,6 +13,7 @@
  * @var string                     $q
  * @var string                     $tag
  */
+$ki = Ai::configured();
 ?>
 <div class="page-head">
     <div>
@@ -41,6 +46,12 @@
                 <input id="up-caption" name="caption" maxlength="200" placeholder="<?= e(t('z. B. Titelkampf Aykac vs. Reiser')) ?>">
             </div>
         </div>
+        <?php if ($ki): ?>
+            <label class="check">
+                <input type="checkbox" name="ki_beschreiben" value="1">
+                <?= e(t('KI: Bildtext und Schlagwörter je Bild automatisch erzeugen (Bilder werden dafür an die Claude API übertragen)')) ?>
+            </label>
+        <?php endif; ?>
         <div class="form-actions">
             <button class="btn btn--primary" type="submit"><?= e(t('Hochladen')) ?></button>
             <span class="muted"><?= e(t('Tipp: Tags wie Anlass, Jahr oder Gruppe – danach lassen sich Bilder überall gezielt finden.')) ?></span>
@@ -97,6 +108,23 @@
                             <button type="button" class="btn btn--sm js-edit-save"><?= e(t('Speichern')) ?></button>
                         </div>
                     </details>
+                    <?php if ($ki): ?>
+                        <details>
+                            <summary class="linklike">✨ <?= e(t('KI-Assistent')) ?></summary>
+                            <div class="image-lib__edit js-ki" data-text-url="<?= e(url('/admin/medien/' . (int) $img['id'] . '/ki-text')) ?>"
+                                 data-crop-url="<?= e(url('/admin/medien/' . (int) $img['id'] . '/ki-zuschnitt')) ?>">
+                                <button type="button" class="btn btn--sm js-ki-text"><?= e(t('Bildtext & Tags erzeugen')) ?></button>
+                                <select class="js-ki-format">
+                                    <?php foreach (AiImage::FORMATS as $code => [, , $label]): ?>
+                                        <option value="<?= e($code) ?>"><?= e(t($label)) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <label class="check"><input type="checkbox" class="js-ki-verbessern" checked> <?= e(t('Helligkeit/Kontrast sanft korrigieren')) ?></label>
+                                <button type="button" class="btn btn--sm js-ki-crop"><?= e(t('Zuschnitt als neues Bild')) ?></button>
+                                <span class="muted"><?= e(t('Das Original bleibt erhalten.')) ?></span>
+                            </div>
+                        </details>
+                    <?php endif; ?>
                 </div>
             </div>
         <?php endforeach; ?>
@@ -128,6 +156,32 @@ document.querySelectorAll('.js-edit-save').forEach(function (btn) {
         fd.append('tag', <?= json_encode($tag) ?>);
         btn.disabled = true; btn.textContent = '…';
         fetch(box.getAttribute('data-url'), { method: 'POST', body: fd, credentials: 'same-origin' }).then(function () { location.reload(); });
+    });
+});
+
+/* KI-Assistent: Bildtext/Tags bzw. Zuschnitt anstossen (dauert ein paar Sekunden) */
+document.querySelectorAll('.js-ki').forEach(function (box) {
+    function senden(url, extra, btn) {
+        var fd = new FormData();
+        fd.append('csrf_token', <?= json_encode(\App\Core\Csrf::token()) ?>);
+        fd.append('q', <?= json_encode($q) ?>);
+        fd.append('tag', <?= json_encode($tag) ?>);
+        Object.keys(extra).forEach(function (k) { fd.append(k, extra[k]); });
+        btn.disabled = true; btn.textContent = '… ' + <?= json_encode(t('KI arbeitet')) ?>;
+        fetch(url, { method: 'POST', body: fd, credentials: 'same-origin' }).then(function () { location.reload(); });
+    }
+
+    var textBtn = box.querySelector('.js-ki-text');
+    var cropBtn = box.querySelector('.js-ki-crop');
+
+    textBtn.addEventListener('click', function () {
+        senden(box.getAttribute('data-text-url'), {}, textBtn);
+    });
+    cropBtn.addEventListener('click', function () {
+        senden(box.getAttribute('data-crop-url'), {
+            format: box.querySelector('.js-ki-format').value,
+            verbessern: box.querySelector('.js-ki-verbessern').checked ? '1' : '0'
+        }, cropBtn);
     });
 });
 </script>

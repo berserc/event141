@@ -122,6 +122,19 @@ final class SettingsController
 
         $this->persistTicket141();
 
+        // KI-Bildassistent: Schluessel leer gelassen = unveraendert,
+        // Loeschen per Checkbox; Modell nur mit plausiblem Namen.
+        $kiKey = trim(post('anthropic_api_key'));
+
+        if (post_bool('anthropic_api_key_clear')) {
+            Setting::set('anthropic_api_key', '');
+        } elseif ($kiKey !== '') {
+            Setting::set('anthropic_api_key', $kiKey);
+        }
+
+        $kiModel = trim(post('ai_model'));
+        Setting::set('ai_model', preg_match('/^[a-z0-9.\-]{3,60}$/', $kiModel) === 1 ? $kiModel : '');
+
         Audit::log('settings_updated', 'settings');
     }
 

@@ -104,6 +104,29 @@ $s = static fn (string $k, string $d = ''): string => e($settings[$k] ?? $d);
         </fieldset>
 
         <fieldset class="card">
+            <legend><?= e(t('KI-Bildassistent (Claude API)')) ?></legend>
+            <?php $kiKey = ($settings['anthropic_api_key'] ?? '') !== ''; ?>
+            <p class="muted">
+                <?= t('Mit einem Schlüssel beschreibt und verschlagwortet die KI Bilder der <strong>Bildbibliothek</strong> und schneidet sie rund ums Motiv auf Zielformate zu (Kämpferfoto 3:4, Titelbild 16:9 …). Die Bilder werden dafür zur Auswertung an die Claude API (Anthropic) übertragen.') ?>
+                <?= $kiKey || \App\Core\Ai::sharedKey() !== '' ? '<span class="pill pill--aktiv">' . e(t('aktiv')) . '</span>' : '' ?>
+            </p>
+            <div class="field">
+                <label for="anthropic_api_key"><?= e(t('Anthropic API-Schlüssel')) ?></label>
+                <input id="anthropic_api_key" name="anthropic_api_key" type="password" autocomplete="new-password"
+                       placeholder="<?= $kiKey ? e(t('gespeichert – zum Ändern neu eingeben')) : 'sk-ant-…' ?>">
+                <p class="field__hint"><?= t('Unter <a href="%s" target="_blank" rel="noopener">platform.claude.com</a> erstellen; abgerechnet wird nach Verbrauch direkt bei Anthropic (eine Auswertung kostet typischerweise unter einen Cent). Leer lassen = bleibt unverändert.', 'https://platform.claude.com/') ?></p>
+            </div>
+            <?php if ($kiKey): ?>
+                <label class="check"><input type="checkbox" name="anthropic_api_key_clear" value="1"> <?= e(t('Gespeicherten Schlüssel löschen')) ?></label>
+                <div class="field field--sm">
+                    <label for="ai_model"><?= e(t('Modell')) ?></label>
+                    <input id="ai_model" name="ai_model" value="<?= $s('ai_model') ?>" placeholder="<?= e(\App\Core\Ai::DEFAULT_MODEL) ?>">
+                    <p class="field__hint"><?= t('Leer = <code>%s</code> (günstig und für Bilder ausreichend).', \App\Core\Ai::DEFAULT_MODEL) ?></p>
+                </div>
+            <?php endif; ?>
+        </fieldset>
+
+        <fieldset class="card">
             <legend><?= e(t('Ergebnisse')) ?></legend>
             <div class="field">
                 <label for="win_methods"><?= t('Siegarten <small>(eine je Zeile)</small>') ?></label>

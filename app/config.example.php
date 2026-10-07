@@ -88,4 +88,20 @@ return [
 
     // Zeitlimit (Sekunden) für Anfragen an eine Gym141-/Ticket141-Instanz.
     'gym141_timeout' => 15,
+
+    // KI-Bildassistent (Claude API): Normalerweise trägt der Veranstalter
+    // seinen eigenen Anthropic-Schlüssel in den Einstellungen ein.
+    // Alternativ kann der BETREIBER einer verwalteten Instanz hier einen
+    // Schlüssel hinterlegen ('' = aus) – damit ruft Event141 immer
+    // 'ai_shared_model' und zählt höchstens 'ai_quota_monthly'
+    // Auswertungen je Monat.
+    // 'ai_shared_key'    => '',
+    // 'ai_shared_model'  => 'claude-haiku-4-5',
+    // 'ai_quota_monthly' => 200,
+
+    // Zeitlimit (Sekunden) für KI-Auswertungen.
+    // 'ai_timeout' => 180,
+
+    // CA-Bundle für HTTPS-Aufrufe, falls PHP keinen CA-Store hat (Windows).
+    // 'ca_bundle' => 'C:/Program Files/Git/mingw64/etc/ssl/certs/ca-bundle.crt',
 ];

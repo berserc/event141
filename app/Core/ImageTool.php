@@ -66,9 +66,19 @@ final class ImageTool
             };
         }
 
-        $keepPng = $type === IMAGETYPE_PNG;
-        $ext     = $keepPng ? 'png' : 'jpg';
-        $base    = rtrim((string) Config::get('upload_dir'), '/\\') . '/' . trim($subDir, '/');
+        return self::store($src, $type === IMAGETYPE_PNG, $subDir, $prefix);
+    }
+
+    /**
+     * Speichert ein fertiges GD-Bild als Bibliotheksbild (verkleinert + Vorschau) –
+     * genutzt vom Upload und vom KI-Bildassistenten (Zuschnitte).
+     *
+     * @return array{file:string,thumb:string,width:int,height:int}
+     */
+    public static function store(\GdImage $src, bool $keepPng, string $subDir = 'bilder', string $prefix = 'b'): array
+    {
+        $ext  = $keepPng ? 'png' : 'jpg';
+        $base = rtrim((string) Config::get('upload_dir'), '/\\') . '/' . trim($subDir, '/');
         foreach ([$base, $base . '/t'] as $dir) {
             if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
                 throw new RuntimeException(t('Der Upload-Ordner konnte nicht angelegt werden.'));
@@ -96,6 +106,37 @@ final class ImageTool
             'width'  => imagesx($big),
             'height' => imagesy($big),
         ];
+    }
+
+    /**
+     * Laedt ein bereits gespeichertes Bibliotheksbild (Pfad relativ zum
+     * Upload-Ordner) als GD-Bild. [Bild, istPng]
+     *
+     * @return array{0:\GdImage,1:bool}
+     */
+    public static function load(string $relPath): array
+    {
+        $abs = rtrim((string) Config::get('upload_dir'), '/\\') . '/' . ltrim($relPath, '/');
+
+        if (!is_file($abs)) {
+            throw new RuntimeException(t('Bild nicht gefunden.'));
+        }
+
+        $info = @getimagesize($abs);
+        $type = (int) ($info[2] ?? 0);
+        $src  = match ($type) {
+            IMAGETYPE_JPEG => @imagecreatefromjpeg($abs),
+            IMAGETYPE_PNG  => @imagecreatefrompng($abs),
+            IMAGETYPE_GIF  => @imagecreatefromgif($abs),
+            IMAGETYPE_WEBP => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($abs) : false,
+            default        => false,
+        };
+
+        if ($src === false) {
+            throw new RuntimeException(t('Die Datei ist kein Bild.'));
+        }
+
+        return [$src, $type === IMAGETYPE_PNG];
     }
 
     /** Skaliert auf die maximale Kantenlaenge (nie vergroessern). */
